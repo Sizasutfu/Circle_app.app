@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Circle Admin — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="admin.css"/>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+      <span class="sidebar-brand-name">Circle</span>
+      <span class="sidebar-brand-badge">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-link" href="dashboard.html" data-page="dashboard">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a class="nav-link" href="users.html" data-page="users">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Users</a>
+      <a class="nav-link" href="posts.html" data-page="posts">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Posts</a>
+      <a class="nav-link" href="reports.html" data-page="reports">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Reports</a>
+      <div class="nav-section-label" style="margin-top:8px">Account</div>
+      <a class="nav-link" href="settings.html" data-page="settings">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</a>
+      <a class="nav-link" href="#" onclick="adminLogout()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <div class="admin-avatar" id="admin-avatar">A</div>
+        <div><div class="admin-name" id="admin-name">Admin</div><div class="admin-role">Super Admin</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <div class="topbar">
+      <button class="icon-btn mobile-menu-btn" id="mobile-menu-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title">Admin <span>Settings</span></div>
+    </div>
+
+    <div class="content">
+      <div class="page-header">
+        <div><h1>Settings</h1><p>Manage your admin account</p></div>
+      </div>
+
+      <div class="settings-grid">
+
+        <!-- Profile Card -->
+        <div class="settings-card">
+          <div class="settings-card-title">Admin Profile</div>
+          <div class="settings-card-body">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px">
+              <div class="admin-avatar" id="profile-avatar"
+                style="width:56px;height:56px;font-size:22px;border-radius:50%;flex-shrink:0">A</div>
+              <div>
+                <div style="font-size:16px;font-weight:800" id="profile-name">—</div>
+                <div style="font-size:13px;color:var(--txt2)" id="profile-email">—</div>
+                <div style="font-size:11px;color:var(--accent);font-weight:700;margin-top:3px">Super Admin</div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.6">
+              Your admin profile is managed through the database.<br/>
+              To change your name or email, update the <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px">users</code> table directly.
+            </div>
+          </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="settings-card">
+          <div class="settings-card-title">Change Password</div>
+          <div class="settings-card-body">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="cur-pw" placeholder="••••••••"/>
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="new-pw" placeholder="Min. 8 characters"/>
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" id="confirm-pw" placeholder="Repeat new password"/>
+            </div>
+            <button class="btn-primary" onclick="changePassword()">Update Password</button>
+          </div>
+        </div>
+
+        <!-- Session Info Card -->
+        <div class="settings-card">
+          <div class="settings-card-title">Current Session</div>
+          <div class="settings-card-body">
+            <div style="font-size:13.5px;color:var(--txt2);margin-bottom:20px;line-height:1.7">
+              Your admin session is secured with a server-side token that expires after <strong style="color:var(--txt)">8 hours</strong>.
+              Tokens are stored in the database and verified on every request.
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn-primary" onclick="adminLogout()" style="background:var(--rose-bg);color:var(--rose);box-shadow:none">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Notes Card -->
+        <div class="settings-card">
+          <div class="settings-card-title">Security Notes</div>
+          <div class="settings-card-body">
+            <ul style="font-size:13px;color:var(--txt2);line-height:2;list-style:none;padding:0">
+              <li>✅ Admin sessions expire after 8 hours</li>
+              <li>✅ All write routes require a valid admin token</li>
+              <li>✅ Token verified server-side on every request</li>
+              <li>✅ Role checked in DB to prevent privilege escalation</li>
+              <li>✅ Passwords stored as bcrypt hashes (cost 10)</li>
+              <li>⚠️ Change the default password immediately after setup</li>
+              <li>⚠️ Never share your admin token</li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /settings-grid -->
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+if (!requireAdminAuth()) throw new Error();
+initAdminPage('settings');
+
+// Populate profile info from localStorage
+const admin = getAdmin();
+if (admin) {
+  document.getElementById('profile-name').textContent  = admin.name  || '—';
+  document.getElementById('profile-email').textContent = admin.email || '—';
+  document.getElementById('profile-avatar').textContent = (admin.name || 'A').charAt(0).toUpperCase();
+}
+
+async function changePassword() {
+  const curPw     = document.getElementById('cur-pw').value;
+  const newPw     = document.getElementById('new-pw').value;
+  const confirmPw = document.getElementById('confirm-pw').value;
+
+  if (!curPw || !newPw || !confirmPw) {
+    showToast('All fields are required.', 'error'); return;
+  }
+  if (newPw.length < 8) {
+    showToast('New password must be at least 8 characters.', 'error'); return;
+  }
+  if (newPw !== confirmPw) {
+    showToast('New passwords do not match.', 'error'); return;
+  }
+
+  try {
+    await adminApi('PUT', '/settings/password', {
+      currentPassword: curPw,
+      newPassword:     newPw,
+    });
+    showToast('Password updated successfully! ✓', 'success');
+    document.getElementById('cur-pw').value     = '';
+    document.getElementById('new-pw').value     = '';
+    document.getElementById('confirm-pw').value = '';
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+</script>
+</body>
+</html>
