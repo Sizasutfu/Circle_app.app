@@ -5,7 +5,7 @@
 // ============================================================
 
 const bcrypt     = require('bcrypt');
-const AdminModel = require('../models/AdminModel');
+const AdminModel = require('../models/adminModel');
 const { sendOk, sendError } = require('../middleware/response');
 
 // ── AUTH ───────────────────────────────────────────────────

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Circle — Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="circle.css"/>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+      <span class="logo-text">Circle</span>
+    </div>
+    <nav class="nav">
+      <div class="nav-item" onclick="goTo('feed')" id="snav-feed">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Feed</span>
+      </div>
+      <div class="nav-item" onclick="goTo('profile')" id="snav-profile">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </div>
+      <div class="nav-item" onclick="goTo('search')" id="snav-search">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="nav-label">Search</span>
+      </div>
+      <div class="nav-item" onclick="openNotifPanel()" id="snav-notif">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-label">Notifications</span>
+        <span class="nav-badge" id="snav-notif-badge">0</span>
+      </div>
+      <div class="nav-item" onclick="goTo('settings')" id="snav-settings">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+    <div class="sidebar-bottom" id="sidebar-user-area" style="display:none">
+      <div class="user-chip" onclick="goTo('profile')">
+        <div class="av" id="sb-avatar">?</div>
+        <div class="user-info">
+          <div class="user-info-name" id="sb-name">—</div>
+          <div class="user-info-sub"  id="sb-email">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR (mobile) -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-mark" style="width:30px;height:30px;border-radius:9px">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px"><circle cx="12" cy="12" r="9" fill="white"/></svg>
+      </div>
+      <span>Circle</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="notif-btn" onclick="openNotifPanel()" id="topbar-notif-btn" style="display:none">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-badge" id="topbar-notif-badge"></span>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="theme-icon-top">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+      <div class="av sm" id="topbar-avatar" style="display:none;cursor:pointer" onclick="goTo('profile')">?</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="content">
+
+<div class="view" id="view-register">
+            <div class="auth-wrap">
+              <div class="auth-card">
+                <div class="auth-brand">
+                  <div class="auth-brand-icon">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="9" />
+                    </svg>
+                  </div>
+                  <span>Circle</span>
+                </div>
+                <h2>Join Circle</h2>
+                <p class="sub">Connect with the people who matter</p>
+                <div class="alert" id="register-alert"></div>
+                <div class="field">
+                  <label>Full Name</label
+                  ><input type="text" id="reg-name" placeholder="Jane Doe" />
+                </div>
+                <div class="field">
+                  <label>Email</label
+                  ><input
+                    type="email"
+                    id="reg-email"
+                    placeholder="jane@example.com"
+                  />
+                </div>
+                <div class="field">
+                  <label>Password</label
+                  ><input
+                    type="password"
+                    id="reg-password"
+                    placeholder="Min. 6 characters"
+                  />
+                </div>
+                <button
+                  class="btn btn-primary btn-full"
+                  onclick="registerUser()"
+                >
+                  Create Account
+                </button>
+                <div class="auth-switch">
+                  Already have an account?
+                  <button onclick="goTo('login')">Sign in</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+    <div class="mnav-item" id="mnav-feed" onclick="goTo('feed')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Feed
+    </div>
+    <div class="mnav-item" id="mnav-search" onclick="goTo('search')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search
+    </div>
+    <div class="mnav-item" id="mnav-profile" onclick="goTo('profile')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </div>
+    <div class="mnav-item" id="mnav-settings" onclick="goTo('settings')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+</nav>
+
+<!-- MOBILE NAV -->
+    <nav class="mobile-nav">
+      <div class="mnav-item active" id="mnav-feed" onclick="goTo('feed')">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        Feed
+      </div>
+      <div class="mnav-item" id="mnav-search" onclick="goTo('search')">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        Search
+      </div>
+      <div class="mnav-item" id="mnav-profile" onclick="goTo('profile')">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        Profile
+      </div>
+      <div class="mnav-item" id="mnav-settings" onclick="goTo('settings')">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"
+          />
+        </svg>
+        Settings
+      </div>
+    </nav>
+
+    <!-- REPORT MODAL -->
+    <div
+      class="modal-backdrop"
+      id="report-modal"
+      onclick="closeReportModal(event)"
+    >
+      <div class="modal">
+        <div class="modal-title">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            viewBox="0 0 24 24"
+            style="color: var(--rose)"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+            />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          Report Post
+        </div>
+        <p style="font-size: 13.5px; color: var(--txt2); margin-bottom: 16px">
+          Tell us what is wrong. Reports are reviewed by our admin team.
+        </p>
+        <div class="field">
+          <label>Reason</label>
+          <select
+            id="report-reason-select"
+            onchange="onReportReasonChange()"
+            style="
+              width: 100%;
+              background: var(--bg);
+              border: 1.5px solid var(--border);
+              border-radius: var(--radius-sm);
+              padding: 11px 14px;
+              font-size: 14px;
+              color: var(--txt);
+              outline: none;
+            "
+          >
+            <option value="">Select a reason...</option>
+            <option value="Spam">Spam</option>
+            <option value="Harassment or bullying">
+              Harassment or bullying
+            </option>
+            <option value="Hate speech">Hate speech</option>
+            <option value="Inappropriate content">Inappropriate content</option>
+            <option value="Misinformation">Misinformation</option>
+            <option value="Violence">Violence</option>
+            <option value="Other">Other (describe below)</option>
+          </select>
+        </div>
+        <div class="field" id="report-other-field" style="display: none">
+          <label>Describe the issue</label>
+          <textarea
+            id="report-other-text"
+            placeholder="Please describe the issue..."
+            rows="3"
+            style="
+              width: 100%;
+              background: var(--bg);
+              border: 1.5px solid var(--border);
+              border-radius: var(--radius-sm);
+              padding: 11px 14px;
+              font-size: 14px;
+              color: var(--txt);
+              outline: none;
+              resize: none;
+            "
+          ></textarea>
+        </div>
+        <div class="modal-actions" style="margin-top: 18px">
+          <button class="modal-cancel" onclick="closeReportModal()">
+            Cancel
+          </button>
+          <button
+            class="modal-confirm"
+            id="report-submit-btn"
+            onclick="submitReport()"
+            style="
+              background: var(--rose);
+              box-shadow: 0 3px 14px rgba(255, 95, 122, 0.3);
+            "
+          >
+            Submit Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPOST MODAL -->
+    <div
+      class="modal-backdrop"
+      id="repost-modal"
+      onclick="closeRepostModal(event)"
+    >
+      <div class="modal">
+        <div class="modal-title">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            viewBox="0 0 24 24"
+          >
+            <polyline points="17 1 21 5 17 9" />
+            <path d="M3 11V9a4 4 0 014-4h14" />
+            <polyline points="7 23 3 19 7 15" />
+            <path d="M21 13v2a4 4 0 01-4 4H3" /></svg
+          >Repost to your feed
+        </div>
+        <div class="repost-preview">
+          <div class="repost-preview-name" id="modal-orig-author">—</div>
+          <div class="repost-preview-text" id="modal-orig-text"></div>
+          <img
+            id="modal-orig-img"
+            class="repost-preview-img"
+            src=""
+            alt=""
+            style="display: none"
+          />
+        </div>
+        <textarea
+          id="repost-quote"
+          placeholder="Add your own comment… (optional)"
+          rows="2"
+        ></textarea>
+        <div class="modal-actions">
+          <button class="modal-cancel" onclick="closeRepostModal()">
+            Cancel
+          </button>
+          <button class="modal-confirm" onclick="confirmRepost()">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+            >
+              <polyline points="17 1 21 5 17 9" />
+              <path d="M3 11V9a4 4 0 014-4h14" /></svg
+            >Repost
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <!-- NOTIFICATION PANEL -->
+    <div
+      class="notif-panel-backdrop"
+      id="notif-backdrop"
+      onclick="closeNotifPanel()"
+    ></div>
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-panel-head">
+        <h2>Notifications</h2>
+        <button class="notif-mark-all" onclick="markAllRead()">
+          Mark all read
+        </button>
+        <button class="notif-close" onclick="closeNotifPanel()">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="notif-list" id="notif-list">
+        <div class="notif-empty">
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+          >
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <p>No notifications yet</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="circle.js"></script>
+
+  <script src="circle.js"></script>
+</body>
+</html>

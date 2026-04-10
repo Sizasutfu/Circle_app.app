@@ -4,8 +4,8 @@
 // ============================================================
 
 const PostModel         = require('../models/PostModel');
-const UserModel         = require('../models/UserModel');
-const NotificationModel = require('../models/NotificationModel');
+const UserModel         = require('../models/userModel');
+const NotificationModel = require('../models/notificationModel');
 const { sendOk, sendError } = require('../middleware/response');
 
 // GET /api/posts?userId=<id>&feed=global|following&page=<n>

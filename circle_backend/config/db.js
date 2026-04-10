@@ -14,6 +14,7 @@ const db = mysql.createPool({
   waitForConnections: true,
   connectionLimit:    10,
   queueLimit:         0,
+ // timezone: "Z",
 });
 
 // Test the connection once at startup so we know immediately if MySQL is down

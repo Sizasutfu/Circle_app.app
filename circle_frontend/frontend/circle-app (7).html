@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Circle</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--radius:16px;--radius-sm:10px;--tr:.2s cubic-bezier(.4,0,.2,1);--tr-spring:.35s cubic-bezier(.34,1.4,.64,1);--font-body:'Plus Jakarta Sans',sans-serif;--font-head:'Bricolage Grotesque',sans-serif}
+[data-theme="dark"]{--bg:#0a0a0d;--surface:#111116;--card:#16161c;--card-hover:#1c1c24;--border:#222230;--border2:#2c2c3a;--accent:#7c6bff;--accent-h:#9585ff;--accent-bg:rgba(124,107,255,.12);--accent-glow:rgba(124,107,255,.25);--green:#22d48f;--green-bg:rgba(34,212,143,.1);--rose:#ff5f7a;--rose-bg:rgba(255,95,122,.1);--amber:#f5a623;--amber-bg:rgba(245,166,35,.1);--txt:#eeeef5;--txt2:#9090aa;--txt3:#55556a;--shadow:0 4px 24px rgba(0,0,0,.4);--shadow-lg:0 12px 48px rgba(0,0,0,.6)}
+[data-theme="light"]{--bg:#f2f2f7;--surface:#ffffff;--card:#ffffff;--card-hover:#f8f8fc;--border:#e4e4ee;--border2:#d8d8e8;--accent:#6255e8;--accent-h:#7060ff;--accent-bg:rgba(98,85,232,.1);--accent-glow:rgba(98,85,232,.2);--green:#10b97a;--green-bg:rgba(16,185,122,.1);--rose:#ef4565;--rose-bg:rgba(239,69,101,.1);--amber:#e09400;--amber-bg:rgba(224,148,0,.1);--txt:#18181f;--txt2:#60607a;--txt3:#a0a0b8;--shadow:0 2px 16px rgba(0,0,0,.08);--shadow-lg:0 8px 40px rgba(0,0,0,.14)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+img{display:block;max-width:100%}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,textarea,select{font-family:inherit;color:inherit}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:72px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:20px 0;position:sticky;top:0;height:100vh;overflow:hidden;transition:width var(--tr),background .3s;z-index:100}
+.sidebar:hover,.sidebar.expanded{width:240px}
+.sidebar:hover .nav-label,.sidebar.expanded .nav-label,.sidebar:hover .logo-text,.sidebar.expanded .logo-text,.sidebar:hover .user-info,.sidebar.expanded .user-info{opacity:1;width:auto;pointer-events:auto}
+.logo-wrap{display:flex;align-items:center;gap:12px;padding:0 0 28px;width:100%;padding-left:20px;overflow:hidden;white-space:nowrap}
+.logo-mark{width:36px;height:36px;flex-shrink:0;background:var(--accent);border-radius:12px;display:grid;place-items:center;box-shadow:0 0 20px var(--accent-glow)}
+.logo-mark svg{width:18px;height:18px;fill:#fff}
+.logo-text{font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.5px;opacity:0;width:0;pointer-events:none;transition:opacity var(--tr);white-space:nowrap}
+.nav{flex:1;display:flex;flex-direction:column;gap:4px;width:100%;padding:0 10px}
+.nav-item{display:flex;align-items:center;gap:14px;padding:11px 12px;border-radius:var(--radius-sm);color:var(--txt2);font-size:14px;font-weight:600;cursor:pointer;user-select:none;transition:background var(--tr),color var(--tr);white-space:nowrap;overflow:hidden}
+.nav-item:hover{background:var(--accent-bg);color:var(--accent)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent)}
+.nav-item svg{width:20px;height:20px;flex-shrink:0}
+.nav-label{opacity:0;width:0;pointer-events:none;transition:opacity var(--tr)}
+.sidebar-bottom{width:100%;padding:0 10px;border-top:1px solid var(--border);padding-top:14px;margin-top:14px}
+.user-chip{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--tr);overflow:hidden;white-space:nowrap}
+.user-chip:hover{background:var(--accent-bg)}
+.user-info{opacity:0;width:0;pointer-events:none;transition:opacity var(--tr);min-width:0}
+.user-info-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-info-sub{font-size:11px;color:var(--txt2)}
+.av{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--accent);display:grid;place-items:center;font-family:var(--font-head);font-size:14px;font-weight:800;color:#fff}
+.av.sm{width:28px;height:28px;font-size:11px}
+.av.lg{width:68px;height:68px;font-size:26px;border-radius:20px;box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
+.main{flex:1;min-width:0}
+.content{max-width:620px;margin:0 auto;padding:28px 20px 80px;width:100%}
+.topbar{display:none;position:sticky;top:0;z-index:90;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 18px;align-items:center;gap:12px;transition:background .3s}
+.topbar-logo{display:flex;align-items:center;gap:9px;flex:1}
+.topbar-logo span{font-family:var(--font-head);font-size:18px;font-weight:800}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--txt2);transition:background var(--tr),color var(--tr)}
+.icon-btn:hover{background:var(--accent-bg);color:var(--accent)}
+.icon-btn svg{width:18px;height:18px}
+.page-header{margin-bottom:24px}
+.page-header h1{font-family:var(--font-head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.2}
+.page-header h1 em{font-style:normal;color:var(--accent)}
+.page-header p{font-size:14px;color:var(--txt2);margin-top:4px}
+.view{display:none;animation:fadeUp .28s ease both}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11.5px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.field input,.field textarea,.field select{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);outline:none;resize:none;color:var(--txt)}
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.field input::placeholder,.field textarea::placeholder{color:var(--txt3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;transition:all var(--tr);cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 16px var(--accent-glow)}
+.btn-primary:hover{background:var(--accent-h);transform:translateY(-1px);box-shadow:0 6px 22px var(--accent-glow)}
+.btn-ghost{background:var(--accent-bg);color:var(--accent)}
+.btn-ghost:hover{background:var(--accent);color:#fff}
+.btn-danger{background:var(--rose-bg);color:var(--rose)}
+.btn-danger:hover{background:var(--rose);color:#fff}
+.btn-outline{border:1.5px solid var(--border);color:var(--txt2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.btn-full{width:100%}
+.auth-wrap{max-width:420px;margin:20px auto}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px 32px;box-shadow:var(--shadow-lg);transition:background .3s}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.auth-brand-icon{width:40px;height:40px;border-radius:12px;background:var(--accent);display:grid;place-items:center;box-shadow:0 0 20px var(--accent-glow)}
+.auth-brand-icon svg{width:20px;height:20px;fill:#fff}
+.auth-brand span{font-family:var(--font-head);font-size:22px;font-weight:800}
+.auth-card h2{font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:4px}
+.auth-card p.sub{color:var(--txt2);font-size:14px;margin-bottom:24px}
+.auth-switch{text-align:center;margin-top:18px;font-size:13.5px;color:var(--txt2)}
+.auth-switch button{color:var(--accent);font-weight:700;font-size:13.5px;cursor:pointer}
+.auth-switch button:hover{text-decoration:underline}
+.alert{padding:11px 14px;border-radius:var(--radius-sm);font-size:13.5px;margin-bottom:16px;display:none;font-weight:500}
+.alert.error{background:var(--rose-bg);border:1px solid var(--rose);color:var(--rose);display:block}
+.alert.success{background:var(--green-bg);border:1px solid var(--green);color:var(--green);display:block}
+.compose{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:18px;transition:border-color var(--tr),background .3s}
+.compose:focus-within{border-color:var(--accent)}
+.compose-row{display:flex;gap:13px;align-items:flex-start}
+.compose-field{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font-size:15px;resize:none;min-height:56px;line-height:1.6;font-family:var(--font-body)}
+.compose-field::placeholder{color:var(--txt3)}
+.compose-bar{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.compose-action{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;color:var(--txt2);font-size:13px;font-weight:600;transition:background var(--tr),color var(--tr);cursor:pointer}
+.compose-action:hover{background:var(--accent-bg);color:var(--accent)}
+.compose-action svg{width:16px;height:16px}
+.post-btn{margin-left:auto;background:var(--accent);color:#fff;padding:8px 22px;border-radius:20px;font-size:13.5px;font-weight:700;box-shadow:0 2px 12px var(--accent-glow);transition:all var(--tr);border:none;cursor:pointer}
+.post-btn:hover{background:var(--accent-h);transform:translateY(-1px)}
+.post-btn:disabled{opacity:.5;transform:none;cursor:not-allowed}
+.img-preview-wrap{position:relative;margin-top:12px;display:none}
+.img-preview-wrap img{width:100%;max-height:240px;object-fit:cover;border-radius:10px}
+.img-remove{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-size:13px;backdrop-filter:blur(6px);transition:background var(--tr);cursor:pointer;border:none}
+.img-remove:hover{background:var(--rose)}
+input[type="file"].hidden{display:none}
+.login-nudge{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px;display:flex;align-items:center;gap:13px;font-size:14px;color:var(--txt2);transition:background .3s}
+.login-nudge-icon{width:40px;height:40px;border-radius:12px;background:var(--accent-bg);display:grid;place-items:center;flex-shrink:0;color:var(--accent)}
+.login-nudge-icon svg{width:20px;height:20px}
+.link{color:var(--accent);font-weight:700;cursor:pointer;background:none;border:none;font-family:inherit;font-size:inherit}
+.feed{display:flex;flex-direction:column;gap:12px}
+.post-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color var(--tr),box-shadow var(--tr),background .3s;animation:fadeUp .28s ease both}
+.post-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.repost-strip{display:flex;align-items:center;gap:7px;padding:10px 16px 0;font-size:12px;font-weight:700;color:var(--green)}
+.repost-strip svg{width:13px;height:13px}
+.post-head{display:flex;align-items:center;gap:11px;padding:14px 16px 0}
+.post-meta{flex:1;min-width:0}
+.post-name{font-size:14px;font-weight:700;cursor:pointer}.post-name:hover{color:var(--accent);text-decoration:underline}
+.post-time{font-size:12px;color:var(--txt2);margin-top:1px}
+.post-del{color:var(--txt3);padding:5px 7px;border-radius:8px;transition:background var(--tr),color var(--tr);cursor:pointer;border:none;background:none}
+.post-del:hover{background:var(--rose-bg);color:var(--rose)}
+.post-del svg{width:14px;height:14px}
+.post-body{padding:10px 16px;font-size:15px;line-height:1.65;color:var(--txt)}
+.post-img{width:100%;max-height:600px;object-fit:cover;border-radius:20px}
+.repost-embed{margin:0 16px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.repost-embed-name{font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.repost-embed-name::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.repost-embed-text{font-size:13.5px;line-height:1.55;color:var(--txt)}
+.repost-embed-img{width:100%;max-height:120px;object-fit:cover;border-radius:7px;margin-top:8px}
+.post-actions{display:flex;align-items:center;gap:2px;padding:10px 12px;border-top:1px solid var(--border)}
+.act-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;font-weight:600;color:var(--txt2);transition:background var(--tr),color var(--tr);cursor:pointer;border:none;background:none}
+.act-btn:hover{background:var(--accent-bg);color:var(--accent)}
+.act-btn.liked{color:var(--rose)}
+.act-btn.liked svg{fill:var(--rose)}
+.act-btn.reposted{color:var(--green)}
+.act-btn.report:hover{background:var(--rose-bg);color:var(--rose)}
+.act-btn.report:hover{background:var(--rose-bg);color:var(--rose)}
+.act-btn svg{width:15px;height:15px;transition:fill var(--tr)}
+.comments-panel{border-top:1px solid var(--border);padding:14px 16px;display:none;flex-direction:column;gap:11px}
+.comments-panel.open{display:flex}
+.comment-row{display:flex;gap:10px}
+.comment-bubble{flex:1;background:var(--bg);border-radius:0 var(--radius-sm) var(--radius-sm) var(--radius-sm);padding:9px 13px}
+.comment-name{font-size:12.5px;font-weight:700;margin-bottom:3px}
+.comment-txt{font-size:13.5px;color:var(--txt2);line-height:1.5}
+.comment-input-row{display:flex;gap:9px;align-items:center;margin-top:4px}
+.comment-input{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:8px 16px;font-size:13.5px;color:var(--txt);outline:none;transition:border-color var(--tr)}
+.comment-input:focus{border-color:var(--accent)}
+.comment-input::placeholder{color:var(--txt3)}
+.send-btn{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 2px 10px var(--accent-glow);transition:all var(--tr);border:none;cursor:pointer}
+.send-btn:hover{background:var(--accent-h);transform:scale(1.08)}
+.send-btn svg{width:14px;height:14px}
+.empty{text-align:center;padding:64px 20px;color:var(--txt2)}
+.empty-icon{width:60px;height:60px;border-radius:18px;background:var(--accent-bg);margin:0 auto 16px;display:grid;place-items:center;color:var(--accent)}
+.empty-icon svg{width:28px;height:28px}
+.empty h3{font-family:var(--font-head);font-size:17px;font-weight:700;color:var(--txt);margin-bottom:6px}
+.empty p{font-size:14px}
+.profile-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:18px;position:relative;overflow:hidden;transition:background .3s}
+.profile-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 90% 20%,var(--accent-bg) 0%,transparent 60%);pointer-events:none}
+.profile-hero-top{display:flex;align-items:flex-start;gap:16px;position:relative}
+.profile-info{flex:1}
+.profile-name{font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:3px}
+.profile-email{font-size:13px;color:var(--txt2)}
+.profile-stats{display:flex;gap:0;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);position:relative}
+.stat{text-align:center;flex:1;cursor:default}
+.stat-n{font-family:var(--font-head);font-size:22px;font-weight:800}
+.stat-l{font-size:11px;font-weight:700;color:var(--txt2);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.profile-actions{display:flex;gap:9px;margin-top:16px;position:relative;flex-wrap:wrap}
+.logout-btn-sm{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;background:var(--rose-bg);color:var(--rose);display:flex;align-items:center;gap:6px;transition:all var(--tr);cursor:pointer;border:none}
+.logout-btn-sm:hover{background:var(--rose);color:#fff}
+.logout-btn-sm svg{width:14px;height:14px}
+.settings-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;transition:background .3s}
+.settings-section-title{padding:16px 20px 12px;font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border)}
+.settings-row{display:flex;align-items:center;gap:14px;padding:15px 20px;border-bottom:1px solid var(--border);transition:background var(--tr);cursor:default}
+.settings-row:last-child{border-bottom:none}
+.settings-row:hover{background:var(--card-hover)}
+.settings-row-icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+.settings-row-icon svg{width:18px;height:18px}
+.settings-row-icon.purple{background:var(--accent-bg);color:var(--accent)}
+.settings-row-icon.green{background:var(--green-bg);color:var(--green)}
+.settings-row-icon.amber{background:var(--amber-bg);color:var(--amber)}
+.settings-row-icon.rose{background:var(--rose-bg);color:var(--rose)}
+.settings-row-body{flex:1;min-width:0}
+.settings-row-title{font-size:14px;font-weight:700}
+.settings-row-sub{font-size:12px;color:var(--txt2);margin-top:2px}
+.settings-row-end{flex-shrink:0}
+.toggle{position:relative;width:46px;height:26px;cursor:pointer;display:inline-block}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:13px;transition:background var(--tr)}
+.toggle input:checked+.toggle-track{background:var(--accent)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform var(--tr-spring)}
+.toggle input:checked~.toggle-thumb{transform:translateX(20px)}
+.settings-edit-form{padding:20px}
+.settings-save-row{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+.danger-zone{background:var(--rose-bg);border:1px solid var(--rose);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.danger-zone h3{font-family:var(--font-head);font-size:15px;font-weight:800;color:var(--rose);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.danger-zone p{font-size:13px;color:var(--txt2);margin-bottom:14px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;display:none;place-items:center;animation:fadeIn .18s ease}
+.modal-backdrop.open{display:grid}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:26px;width:min(500px,94vw);box-shadow:var(--shadow-lg);animation:slideUp .25s cubic-bezier(.34,1.4,.64,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.modal-title{font-family:var(--font-head);font-size:17px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:9px}
+.modal-title svg{width:18px;height:18px;color:var(--green)}
+.repost-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px}
+.repost-preview-name{font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.repost-preview-name::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.repost-preview-text{font-size:14px;line-height:1.55}
+.repost-preview-img{width:100%;max-height:130px;object-fit:cover;border-radius:7px;margin-top:8px}
+.modal textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;color:var(--txt);font-size:14px;resize:none;outline:none;min-height:78px;line-height:1.55;margin-bottom:16px;font-family:var(--font-body);transition:border-color var(--tr)}
+.modal textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.modal textarea::placeholder{color:var(--txt3)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.modal-cancel{padding:9px 18px;border-radius:8px;font-size:14px;font-weight:700;color:var(--txt2);transition:all var(--tr);cursor:pointer}
+.modal-cancel:hover{background:var(--card-hover);color:var(--txt)}
+.modal-confirm{padding:9px 22px;border-radius:8px;font-size:14px;font-weight:700;background:var(--green);color:#fff;box-shadow:0 3px 14px rgba(34,212,143,.3);transition:all var(--tr);cursor:pointer;border:none;display:flex;align-items:center;gap:6px}
+.modal-confirm:hover{background:#2ae89c;transform:translateY(-1px)}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--card);border:1px solid var(--border2);color:var(--txt);padding:11px 22px;border-radius:30px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-lg);z-index:9999;transition:transform var(--tr-spring),opacity .3s;opacity:0;white-space:nowrap;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 0 max(10px,env(safe-area-inset-bottom));z-index:200;justify-content:space-around;transition:background .3s}
+.mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;border-radius:10px;color:var(--txt2);font-size:10px;font-weight:700;transition:color var(--tr);cursor:pointer;flex:1;text-align:center}
+.mnav-item svg{width:22px;height:22px}
+.mnav-item.active{color:var(--accent)}
+.section-label{font-family:var(--font-head);font-size:12px;font-weight:800;margin-bottom:12px;color:var(--txt2);text-transform:uppercase;letter-spacing:.07em}
+.av-upload-wrap{position:relative;display:inline-block;cursor:pointer;flex-shrink:0}
+.av-upload-wrap input[type="file"]{display:none}
+.av-upload-overlay{position:absolute;inset:0;border-radius:inherit;background:rgba(0,0,0,.55);display:grid;place-items:center;opacity:0;transition:opacity var(--tr);color:#fff}
+.av-upload-overlay svg{width:20px;height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.av-upload-badge{position:absolute;bottom:-3px;right:-3px;width:22px;height:22px;border-radius:50%;background:var(--accent);display:grid;place-items:center;border:2px solid var(--bg);box-shadow:0 2px 6px var(--accent-glow);transition:transform var(--tr-spring)}
+.av-upload-badge svg{width:11px;height:11px;fill:#fff}
+.av-upload-wrap:hover .av-upload-overlay{opacity:1}
+.av-upload-wrap:hover .av-upload-badge{transform:scale(1.15)}
+.av img,.av.lg img{width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block}
+.settings-av-preview{display:flex;align-items:center;gap:16px;padding:20px 20px 0}
+.settings-av-preview .av-upload-wrap .av.lg{width:72px;height:72px;font-size:28px}
+.settings-av-info{flex:1}
+.settings-av-info p{font-size:13px;color:var(--txt2);margin-top:4px;line-height:1.5}
+
+/* NOTIFICATIONS */
+.notif-btn{position:relative;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--txt2);transition:background var(--tr),color var(--tr);cursor:pointer;border:none;background:none;flex-shrink:0}
+.notif-btn:hover{background:var(--accent-bg);color:var(--accent)}
+.notif-btn svg{width:18px;height:18px}
+.notif-badge{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:8px;background:var(--rose);color:#fff;font-size:10px;font-weight:800;display:none;place-items:center;padding:0 4px;border:2px solid var(--bg);line-height:1}
+.notif-badge.show{display:grid}
+.notif-panel{position:fixed;top:0;right:0;height:100vh;width:min(380px,100vw);background:var(--surface);border-left:1px solid var(--border);z-index:500;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.3)}
+.notif-panel.open{transform:translateX(0)}
+.notif-panel-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:499;display:none;backdrop-filter:blur(2px)}
+.notif-panel-backdrop.open{display:block}
+.notif-panel-head{display:flex;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border);gap:12px;flex-shrink:0}
+.notif-panel-head h2{font-family:var(--font-head);font-size:17px;font-weight:800;flex:1}
+.notif-mark-all{font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;border:none;background:none;padding:6px 10px;border-radius:8px;transition:background var(--tr)}
+.notif-mark-all:hover{background:var(--accent-bg)}
+.notif-close{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--txt2);cursor:pointer;border:none;background:none;transition:background var(--tr),color var(--tr)}
+.notif-close:hover{background:var(--card-hover);color:var(--txt)}
+.notif-close svg{width:16px;height:16px}
+.notif-list{flex:1;overflow-y:auto;padding:8px 0}
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 20px;cursor:pointer;transition:background var(--tr);border-left:3px solid transparent}
+.notif-item:hover{background:var(--card-hover)}
+.notif-item.unread{background:var(--accent-bg);border-left-color:var(--accent)}
+.notif-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
+.notif-icon.like{background:var(--rose-bg);color:var(--rose)}
+.notif-icon.comment{background:var(--accent-bg);color:var(--accent)}
+.notif-icon.repost{background:var(--green-bg);color:var(--green)}
+.notif-icon.follow{background:var(--amber-bg);color:var(--amber)}
+.notif-body{flex:1;min-width:0}
+.notif-text{font-size:13.5px;line-height:1.5;color:var(--txt)}
+.notif-text strong{font-weight:700}
+.notif-snippet{font-size:12px;color:var(--txt2);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notif-time{font-size:11px;color:var(--txt3);margin-top:4px}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:5px}
+.notif-empty{text-align:center;padding:64px 20px;color:var(--txt2)}
+.notif-empty svg{width:40px;height:40px;margin:0 auto 12px;display:block;color:var(--txt3)}
+.notif-empty p{font-size:14px}
+.nav-item .nav-badge{min-width:18px;height:18px;border-radius:9px;background:var(--rose);color:#fff;font-size:10px;font-weight:800;padding:0 5px;display:none;align-items:center;justify-content:center;margin-left:auto}
+.nav-item .nav-badge.show{display:flex}
+
+/* FOLLOW */
+.follow-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all var(--tr)}
+.follow-btn.follow{background:var(--accent);color:#fff;box-shadow:0 2px 12px var(--accent-glow)}
+.follow-btn.follow:hover{background:var(--accent-h);transform:translateY(-1px)}
+.follow-btn.unfollow{background:var(--card);color:var(--txt2);border:1.5px solid var(--border)}
+.follow-btn.unfollow:hover{background:var(--rose-bg);color:var(--rose);border-color:var(--rose)}
+.follow-btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+/* FEED TABS */
+.feed-tabs{display:flex;gap:6px;margin-bottom:16px}
+.feed-tab{flex:1;padding:9px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;color:var(--txt2);background:var(--card);border:1.5px solid var(--border);cursor:pointer;transition:all var(--tr);text-align:center}
+.feed-tab.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+
+/* SEARCH */
+.search-bar-wrap{position:relative;margin-bottom:20px}
+.search-bar-wrap .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--txt3);pointer-events:none}
+.search-bar{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:30px;padding:11px 16px 11px 42px;font-size:14px;color:var(--txt);outline:none;transition:border-color var(--tr),box-shadow var(--tr)}
+.search-bar:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.search-bar::placeholder{color:var(--txt3)}
+.search-tabs{display:flex;gap:6px;margin-bottom:18px}
+.search-tab{flex:1;padding:9px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;color:var(--txt2);background:var(--card);border:1.5px solid var(--border);cursor:pointer;transition:all var(--tr);text-align:center}
+.search-tab.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.search-results{display:flex;flex-direction:column;gap:10px}
+.search-hint{text-align:center;padding:48px 20px;color:var(--txt2)}
+.search-hint svg{width:40px;height:40px;margin:0 auto 12px;display:block;color:var(--txt3)}
+.search-hint p{font-size:14px}
+.people-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:13px;transition:border-color var(--tr),box-shadow var(--tr)}
+.people-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.people-card-info{flex:1;min-width:0}
+.people-card-name{font-size:14px;font-weight:700}
+.people-card-email{font-size:12px;color:var(--txt2);margin-top:2px}
+.people-card-posts{font-size:11px;color:var(--txt3);margin-top:4px}
+mark.hl{background:var(--accent-bg);color:var(--accent);border-radius:3px;padding:0 2px;font-style:normal}
+
+@media(min-width:769px){.topbar{display:none!important}.mobile-nav{display:none!important}}
+@media(max-width:768px){
+  .sidebar{display:none!important}
+  .topbar{display:flex}
+  .mobile-nav{display:flex}
+  .shell{flex-direction:column}
+  .main{width:100%;min-width:0}
+  .content{padding:16px 12px 100px;max-width:100%}
+  .page-header{margin-bottom:18px}
+  .page-header h1{font-size:22px}
+  .auth-wrap{margin:8px auto}
+  .auth-card{padding:24px 18px;border-radius:14px}
+  .compose{padding:14px}
+  .post-body{font-size:14px;padding:8px 13px}
+  .post-head{padding:12px 13px 0}
+  .post-actions{padding:8px 10px;gap:0}
+  .act-btn{padding:7px 8px;font-size:12px;gap:4px}
+  .act-btn svg{width:14px;height:14px}
+  .comments-panel{padding:12px 13px}
+  .profile-hero{padding:20px 16px}
+  .av.lg{width:56px;height:56px;font-size:22px;border-radius:16px}
+  .profile-name{font-size:18px}
+  .settings-row{padding:13px 14px;gap:11px}
+  .settings-edit-form{padding:14px}
+  .settings-save-row{flex-direction:column-reverse;gap:8px}
+  .settings-save-row .btn{width:100%;justify-content:center}
+  .danger-zone{padding:16px}
+  .danger-zone .btn{width:100%;justify-content:center}
+  .modal-backdrop{align-items:flex-end}
+  .modal{width:100%;border-radius:var(--radius) var(--radius) 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));animation:slideUpMobile .28s cubic-bezier(.34,1.2,.64,1)}
+  @keyframes slideUpMobile{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+  #toast{bottom:80px}
+  .feed-tabs{gap:4px}
+  .feed-tab{font-size:12px;padding:8px}
+}
+@media(max-width:380px){
+  .content{padding:12px 10px 100px}
+  .page-header h1{font-size:20px}
+  .auth-card{padding:20px 14px}
+  .act-btn{padding:6px 6px;font-size:11px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+      <span class="logo-text">Circle</span>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" onclick="goTo('feed')" id="snav-feed">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Feed</span>
+      </div>
+      <div class="nav-item" onclick="goTo('profile')" id="snav-profile">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </div>
+      <div class="nav-item" onclick="goTo('search')" id="snav-search">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="nav-label">Search</span>
+      </div>
+      <div class="nav-item" onclick="openNotifPanel()" id="snav-notif">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-label">Notifications</span>
+        <span class="nav-badge" id="snav-notif-badge">0</span>
+      </div>
+      <div class="nav-item" onclick="goTo('settings')" id="snav-settings">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+    <div class="sidebar-bottom" id="sidebar-user-area" style="display:none">
+      <div class="user-chip" onclick="goTo('profile')">
+        <div class="av" id="sb-avatar">?</div>
+        <div class="user-info">
+          <div class="user-info-name" id="sb-name">—</div>
+          <div class="user-info-sub" id="sb-email">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR (mobile) -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-mark" style="width:30px;height:30px;border-radius:9px"><svg viewBox="0 0 24 24" style="width:15px;height:15px"><circle cx="12" cy="12" r="9" fill="white"/></svg></div>
+      <span>Circle</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="notif-btn" onclick="openNotifPanel()" id="topbar-notif-btn" title="Notifications" style="display:none">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-badge" id="topbar-notif-badge"></span>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme" id="theme-btn-top">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="theme-icon-top"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <div class="av sm" id="topbar-avatar" style="display:none;cursor:pointer" onclick="goTo('profile')">?</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="content">
+
+      <!-- FEED -->
+      <div class="view active" id="view-feed">
+        <div class="page-header">
+          <h1>Your <em>Feed</em></h1>
+          <p>What's happening in your circle</p>
+        </div>
+        <!-- Feed tabs: Global | Following -->
+        <div class="feed-tabs" id="feed-tabs" style="display:none">
+          <button class="feed-tab active" id="ftab-global"    onclick="switchFeedTab('global')">🌐 Global</button>
+          <button class="feed-tab"        id="ftab-following" onclick="switchFeedTab('following')">👥 Following</button>
+        </div>
+        <div class="compose" id="compose-box" style="display:none">
+          <div class="compose-row">
+            <div class="av" id="compose-av">?</div>
+            <textarea class="compose-field" id="post-text" placeholder="What's on your mind?" rows="2"></textarea>
+          </div>
+          <div class="img-preview-wrap" id="img-preview-wrap">
+            <img id="img-preview" src="" alt=""/>
+            <button class="img-remove" onclick="removeImage()">✕</button>
+          </div>
+          <div class="compose-bar">
+            <label class="compose-action" for="img-input">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Photo
+            </label>
+            <input type="file" id="img-input" class="hidden" accept="image/*" onchange="previewImage(event)"/>
+            <button class="post-btn" onclick="createPost()" id="post-submit-btn">Post</button>
+          </div>
+        </div>
+        <div class="login-nudge" id="login-nudge">
+          <div class="login-nudge-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div><button class="link" onclick="goTo('register')">Create an account</button> or <button class="link" onclick="goTo('login')">log in</button> to post and interact.</div>
+        </div>
+        <div class="feed" id="feed-list"></div>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="view" id="view-search">
+        <div class="page-header"><h1><em>Search</em></h1><p>Find posts and people</p></div>
+        <div class="search-bar-wrap">
+          <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-bar" id="search-input" type="text" placeholder="Search posts, people…" oninput="onSearchInput()" autocomplete="off"/>
+        </div>
+        <div class="search-tabs">
+          <button class="search-tab active" id="stab-posts"  onclick="switchSearchTab('posts')">Posts</button>
+          <button class="search-tab"        id="stab-people" onclick="switchSearchTab('people')">People</button>
+        </div>
+        <div class="search-results" id="search-results">
+          <div class="search-hint">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p>Type something to search</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="view" id="view-login">
+        <div class="auth-wrap">
+          <div class="auth-card">
+            <div class="auth-brand"><div class="auth-brand-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div><span>Circle</span></div>
+            <h2>Welcome back</h2><p class="sub">Sign in to your account</p>
+            <div class="alert" id="login-alert"></div>
+            <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
+            <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+            <button class="btn btn-primary btn-full" onclick="loginUser()">Sign In</button>
+            <div class="auth-switch">No account? <button onclick="goTo('register')">Create one</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="view" id="view-register">
+        <div class="auth-wrap">
+          <div class="auth-card">
+            <div class="auth-brand"><div class="auth-brand-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div><span>Circle</span></div>
+            <h2>Join Circle</h2><p class="sub">Connect with the people who matter</p>
+            <div class="alert" id="register-alert"></div>
+            <div class="field"><label>Full Name</label><input type="text" id="reg-name" placeholder="Jane Doe"/></div>
+            <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="jane@example.com"/></div>
+            <div class="field"><label>Password</label><input type="password" id="reg-password" placeholder="Min. 6 characters"/></div>
+            <button class="btn btn-primary btn-full" onclick="registerUser()">Create Account</button>
+            <div class="auth-switch">Already have an account? <button onclick="goTo('login')">Sign in</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="view" id="view-profile">
+        <div class="page-header"><h1><em>Profile</em></h1></div>
+        <div class="profile-hero">
+          <div class="profile-hero-top">
+            <label class="av-upload-wrap" for="profile-pic-input" title="Change profile picture">
+              <div class="av lg" id="profile-av">?</div>
+              <div class="av-upload-overlay"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+              <div class="av-upload-badge"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+              <input type="file" id="profile-pic-input" accept="image/*" onchange="handleProfilePicUpload(event)"/>
+            </label>
+            <div class="profile-info">
+              <div class="profile-name" id="profile-name">—</div>
+              <div class="profile-email" id="profile-email">—</div>
+            </div>
+          </div>
+          <!-- Stats: Posts | Followers | Following | Likes -->
+          <div class="profile-stats">
+            <div class="stat"><div class="stat-n" id="stat-posts">0</div><div class="stat-l">Posts</div></div>
+            <div class="stat"><div class="stat-n" id="stat-followers">0</div><div class="stat-l">Followers</div></div>
+            <div class="stat"><div class="stat-n" id="stat-following">0</div><div class="stat-l">Following</div></div>
+            <div class="stat"><div class="stat-n" id="stat-likes">0</div><div class="stat-l">Likes</div></div>
+          </div>
+          <div class="profile-actions" id="profile-actions">
+            <button class="btn btn-ghost" onclick="goTo('settings')" style="font-size:13px;padding:8px 16px">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit Profile
+            </button>
+            <button class="logout-btn-sm" onclick="logout()">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Log Out
+            </button>
+          </div>
+        </div>
+        <div class="section-label">My Posts</div>
+        <div class="feed" id="profile-feed"></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="view" id="view-settings">
+        <div class="page-header"><h1><em>Settings</em></h1><p>Manage your account and preferences</p></div>
+        <div class="settings-section">
+          <div class="settings-section-title">Edit Profile</div>
+          <div class="settings-av-preview">
+            <label class="av-upload-wrap" for="settings-pic-input" title="Change profile picture">
+              <div class="av lg" id="settings-av">?</div>
+              <div class="av-upload-overlay"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+              <div class="av-upload-badge"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+              <input type="file" id="settings-pic-input" accept="image/*" onchange="handleProfilePicUpload(event)"/>
+            </label>
+            <div class="settings-av-info">
+              <strong style="font-size:14px;font-weight:700">Profile Photo</strong>
+              <p>Tap to upload a new photo.<br>JPG, PNG or GIF · Max 5 MB</p>
+            </div>
+          </div>
+          <div class="settings-edit-form">
+            <div class="field"><label>Full Name</label><input type="text" id="settings-name" placeholder="Your name"/></div>
+            <div class="field"><label>Email</label><input type="email" id="settings-email" placeholder="your@email.com"/></div>
+            <div class="field">
+              <label>New Password <span style="color:var(--txt3);font-weight:400;text-transform:none;font-size:11px">(leave blank to keep current)</span></label>
+              <input type="password" id="settings-password" placeholder="New password"/>
+            </div>
+            <div class="settings-save-row">
+              <button class="btn btn-outline" onclick="goTo('profile')" style="font-size:13px;padding:9px 18px">Cancel</button>
+              <button class="btn btn-primary" onclick="saveProfile()" style="font-size:13px;padding:9px 18px">Save Changes</button>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Appearance</div>
+          <div class="settings-row">
+            <div class="settings-row-icon amber"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+            <div class="settings-row-body"><div class="settings-row-title">Light Mode</div><div class="settings-row-sub">Switch between dark and light theme</div></div>
+            <div class="settings-row-end"><label class="toggle"><input type="checkbox" id="theme-toggle" onchange="toggleTheme()"/><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Notifications</div>
+          <div class="settings-row"><div class="settings-row-icon purple"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div><div class="settings-row-body"><div class="settings-row-title">Likes</div><div class="settings-row-sub">When someone likes your post</div></div><div class="settings-row-end"><label class="toggle"><input type="checkbox" id="notif-likes" checked/><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div></div>
+          <div class="settings-row"><div class="settings-row-icon green"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="settings-row-body"><div class="settings-row-title">Comments</div><div class="settings-row-sub">When someone comments on your post</div></div><div class="settings-row-end"><label class="toggle"><input type="checkbox" id="notif-comments" checked/><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div></div>
+          <div class="settings-row"><div class="settings-row-icon amber"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></div><div class="settings-row-body"><div class="settings-row-title">Reposts</div><div class="settings-row-sub">When someone reposts your content</div></div><div class="settings-row-end"><label class="toggle"><input type="checkbox" id="notif-reposts" checked/><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div></div>
+          <div class="settings-row"><div class="settings-row-icon purple"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="settings-row-body"><div class="settings-row-title">Push Notifications</div><div class="settings-row-sub">Receive browser push notifications</div></div><div class="settings-row-end"><label class="toggle"><input type="checkbox" id="notif-push"/><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div></div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Privacy</div>
+          <div class="settings-row"><div class="settings-row-icon green"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="settings-row-body"><div class="settings-row-title">Private Account</div><div class="settings-row-sub">Only approved followers see your posts</div></div><div class="settings-row-end"><label class="toggle"><input type="checkbox" id="priv-account"/><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div></div>
+          <div class="settings-row"><div class="settings-row-icon purple"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="settings-row-body"><div class="settings-row-title">Show Activity Status</div><div class="settings-row-sub">Let others see when you're online</div></div><div class="settings-row-end"><label class="toggle"><input type="checkbox" id="priv-activity" checked/><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div></div>
+        </div>
+        <div class="danger-zone">
+          <h3><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Danger Zone</h3>
+          <p>These actions are permanent and cannot be undone.</p>
+          <button class="btn btn-danger" onclick="logout()" style="font-size:13px;padding:9px 18px"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Log Out</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <div class="mnav-item active" id="mnav-feed" onclick="goTo('feed')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Feed
+  </div>
+  <div class="mnav-item" id="mnav-search" onclick="goTo('search')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Search
+  </div>
+  <div class="mnav-item" id="mnav-profile" onclick="goTo('profile')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </div>
+  <div class="mnav-item" id="mnav-settings" onclick="goTo('settings')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </div>
+</nav>
+
+<!-- REPORT MODAL -->
+<div class="modal-backdrop" id="report-modal" onclick="closeReportModal(event)">
+  <div class="modal">
+    <div class="modal-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color:var(--rose)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Report Post
+    </div>
+    <p style="font-size:13.5px;color:var(--txt2);margin-bottom:16px">Tell us what is wrong. Reports are reviewed by our admin team.</p>
+    <div class="field">
+      <label>Reason</label>
+      <select id="report-reason-select" onchange="onReportReasonChange()" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;font-size:14px;color:var(--txt);outline:none">
+        <option value="">Select a reason...</option>
+        <option value="Spam">Spam</option>
+        <option value="Harassment or bullying">Harassment or bullying</option>
+        <option value="Hate speech">Hate speech</option>
+        <option value="Inappropriate content">Inappropriate content</option>
+        <option value="Misinformation">Misinformation</option>
+        <option value="Violence">Violence</option>
+        <option value="Other">Other (describe below)</option>
+      </select>
+    </div>
+    <div class="field" id="report-other-field" style="display:none">
+      <label>Describe the issue</label>
+      <textarea id="report-other-text" placeholder="Please describe the issue..." rows="3" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;font-size:14px;color:var(--txt);outline:none;resize:none"></textarea>
+    </div>
+    <div class="modal-actions" style="margin-top:18px">
+      <button class="modal-cancel" onclick="closeReportModal()">Cancel</button>
+      <button class="modal-confirm" id="report-submit-btn" onclick="submitReport()" style="background:var(--rose);box-shadow:0 3px 14px rgba(255,95,122,.3)">
+        Submit Report
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- REPOST MODAL -->
+<div class="modal-backdrop" id="repost-modal" onclick="closeRepostModal(event)">
+  <div class="modal">
+    <div class="modal-title"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Repost to your feed</div>
+    <div class="repost-preview">
+      <div class="repost-preview-name" id="modal-orig-author">—</div>
+      <div class="repost-preview-text" id="modal-orig-text"></div>
+      <img id="modal-orig-img" class="repost-preview-img" src="" alt="" style="display:none"/>
+    </div>
+    <textarea id="repost-quote" placeholder="Add your own comment… (optional)" rows="2"></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeRepostModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmRepost()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/></svg>Repost</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel-backdrop" id="notif-backdrop" onclick="closeNotifPanel()"></div>
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-head">
+    <h2>Notifications</h2>
+    <button class="notif-mark-all" onclick="markAllRead()">Mark all read</button>
+    <button class="notif-close" onclick="closeNotifPanel()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="notif-list" id="notif-list">
+    <div class="notif-empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><p>No notifications yet</p></div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000';
+let posts = [], currentUser = null, pendingImageDataUrl = null, repostTargetId = null;
+let currentFeedTab = 'global';
+let feedPage = 1, feedHasMore = true, feedLoading = false;
+
+/* ── API ──────────────────────────────────────────────────── */
+async function api(method, path, body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  // Attach auth header so protected routes (follow/unfollow) work
+  if (currentUser) opts.headers['X-User-Id'] = currentUser.id;
+  if (body) opts.body = JSON.stringify(body);
+  const res  = await fetch(API + path, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Something went wrong.');
+  return data;
+}
+
+/* ── THEME ────────────────────────────────────────────────── */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('circle_theme', theme);
+  const isLight = theme === 'light';
+  const cb = document.getElementById('theme-toggle');
+  if (cb) cb.checked = isLight;
+  const icon = document.getElementById('theme-icon-top');
+  if (icon) icon.innerHTML = isLight
+    ? '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+function toggleTheme() { applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
+
+/* ── NAV ──────────────────────────────────────────────────── */
+function goTo(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sn = document.getElementById('snav-' + view); if (sn) sn.classList.add('active');
+  document.querySelectorAll('.mnav-item').forEach(n => n.classList.remove('active'));
+  const mn = document.getElementById('mnav-' + view); if (mn) mn.classList.add('active');
+  if (view === 'feed')     loadPosts();
+  if (view === 'profile')  renderProfile();
+  if (view === 'settings') populateSettings();
+  if (view === 'search')   { searchTab = 'posts'; document.getElementById('search-input').value = ''; renderSearchHint(); }
+  window.scrollTo(0, 0);
+}
+
+/* ── AUTH ─────────────────────────────────────────────────── */
+async function registerUser() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const el = document.getElementById('register-alert'); el.className = 'alert';
+  if (!name || !email || !password) return showAlert(el, 'All fields are required.', 'error');
+  if (password.length < 6) return showAlert(el, 'Password must be at least 6 characters.', 'error');
+  try {
+    const res = await api('POST', '/api/users/register', { name, email, password });
+    setCurrentUser(res.data);
+    showAlert(el, 'Account created! Welcome 🎉', 'success');
+    setTimeout(() => goTo('feed'), 900);
+  } catch (e) { showAlert(el, e.message, 'error'); }
+}
+
+async function loginUser() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const el = document.getElementById('login-alert'); el.className = 'alert';
+  if (!email || !password) return showAlert(el, 'Email and password are required.', 'error');
+  try {
+    const res = await api('POST', '/api/users/login', { email, password });
+    setCurrentUser(res.data);
+    showToast('Welcome back, ' + res.data.name.split(' ')[0] + '! 👋');
+    setTimeout(() => goTo('feed'), 400);
+  } catch (e) { showAlert(el, e.message, 'error'); }
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('circle_user');
+  document.getElementById('sidebar-user-area').style.display = 'none';
+  document.getElementById('compose-box').style.display = 'none';
+  document.getElementById('login-nudge').style.display = 'flex';
+  document.getElementById('feed-tabs').style.display = 'none';
+  const ta = document.getElementById('topbar-avatar'); if (ta) ta.style.display = 'none';
+  stopNotifPolling(); updateNotifBadge(0);
+  const topBtn = document.getElementById('topbar-notif-btn'); if (topBtn) topBtn.style.display = 'none';
+  showToast('Logged out successfully.'); goTo('feed');
+}
+
+function setCurrentUser(user) {
+  currentUser = user;
+  localStorage.setItem('circle_user', JSON.stringify(user));
+  const initial = user.name.charAt(0).toUpperCase(), color = stringToColor(user.name);
+  const pic = user.picture || null;
+
+  function applyAv(el) {
+    if (!el) return;
+    if (pic) { el.style.background = 'transparent'; el.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block"/>`; }
+    else { el.innerHTML = initial; el.style.background = color; }
+  }
+
+  const sa = document.getElementById('sb-avatar'); applyAv(sa);
+  document.getElementById('sb-name').textContent = user.name;
+  document.getElementById('sb-email').textContent = user.email;
+  document.getElementById('sidebar-user-area').style.display = 'block';
+  const ca = document.getElementById('compose-av'); applyAv(ca);
+  const ta = document.getElementById('topbar-avatar');
+  if (ta) {
+    ta.style.display = 'grid';
+    if (pic) { ta.style.background = 'transparent'; ta.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`; }
+    else { ta.innerHTML = initial; ta.style.background = color; }
+  }
+  document.getElementById('compose-box').style.display = 'block';
+  document.getElementById('login-nudge').style.display = 'none';
+  document.getElementById('feed-tabs').style.display = 'flex';
+  const topBtn = document.getElementById('topbar-notif-btn'); if (topBtn) topBtn.style.display = 'grid';
+  startNotifPolling();
+}
+
+/* ── SETTINGS ─────────────────────────────────────────────── */
+function populateSettings() {
+  if (!currentUser) { goTo('login'); return; }
+  document.getElementById('settings-name').value  = currentUser.name  || '';
+  document.getElementById('settings-email').value = currentUser.email || '';
+  document.getElementById('settings-password').value = '';
+  const sav = document.getElementById('settings-av');
+  if (sav) {
+    const pic = currentUser.picture || null, initial = currentUser.name.charAt(0).toUpperCase(), color = stringToColor(currentUser.name);
+    if (pic) { sav.style.background = 'transparent'; sav.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block"/>`; }
+    else { sav.innerHTML = initial; sav.style.background = color; }
+  }
+  const p = JSON.parse(localStorage.getItem('circle_notif_prefs') || '{}');
+  ['likes','comments','reposts','push'].forEach(k => { const el = document.getElementById('notif-' + k); if (el && p[k] !== undefined) el.checked = p[k]; });
+  ['account','activity'].forEach(k => { const el = document.getElementById('priv-' + k); if (el && p[k] !== undefined) el.checked = p[k]; });
+}
+
+async function saveProfile() {
+  if (!currentUser) return;
+  const name     = document.getElementById('settings-name').value.trim();
+  const email    = document.getElementById('settings-email').value.trim();
+  const password = document.getElementById('settings-password').value;
+  if (!name || !email) { showToast('Name and email are required.'); return; }
+  const prefs = { likes: document.getElementById('notif-likes').checked, comments: document.getElementById('notif-comments').checked, reposts: document.getElementById('notif-reposts').checked, push: document.getElementById('notif-push').checked, account: document.getElementById('priv-account').checked, activity: document.getElementById('priv-activity').checked };
+  localStorage.setItem('circle_notif_prefs', JSON.stringify(prefs));
+  try {
+    const res = await api('PUT', `/api/users/${currentUser.id}`, { name, email, password: password || undefined });
+    const updatedUser = { ...res.data, picture: currentUser.picture || res.data.picture || null };
+    localStorage.setItem('circle_user', JSON.stringify(updatedUser));
+    setCurrentUser(updatedUser);
+    showToast('Profile updated! ✅');
+    setTimeout(() => goTo('profile'), 600);
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+/* ── FEED TABS ────────────────────────────────────────────── */
+function switchFeedTab(tab) {
+  currentFeedTab = tab;
+  document.getElementById('ftab-global').classList.toggle('active',    tab === 'global');
+  document.getElementById('ftab-following').classList.toggle('active', tab === 'following');
+  loadPosts();
+}
+
+/* ── POSTS ────────────────────────────────────────────────── */
+async function loadPosts() {
+  if (!currentUser) { goTo('login'); return; }
+  feedPage = 1; feedHasMore = true; feedLoading = false; posts = [];
+  const c = document.getElementById('feed-list');
+  c.innerHTML = `<div class="empty"><div class="empty-icon"><div class="spinner" style="border-color:rgba(124,107,255,.3);border-top-color:var(--accent);width:24px;height:24px"></div></div><p>Loading posts…</p></div>`;
+  await fetchMorePosts(true);
+}
+
+async function fetchMorePosts(isFirstPage = false) {
+  if (feedLoading || !feedHasMore) return;
+  feedLoading = true;
+  try {
+    const qs  = `?userId=${currentUser.id}&feed=${currentFeedTab}&page=${feedPage}`;
+    const res = await api('GET', `/api/posts${qs}`);
+    const { posts: newPosts, hasMore } = res.data;
+    feedHasMore = hasMore; feedPage++;
+    posts = isFirstPage ? newPosts : [...posts, ...newPosts];
+    if (isFirstPage) {
+      renderFeed();
+    } else {
+      const c = document.getElementById('feed-list');
+      const frag = document.createDocumentFragment();
+      newPosts.forEach(p => { const d = document.createElement('div'); d.innerHTML = buildPostCard(p); frag.appendChild(d.firstElementChild); });
+      c.appendChild(frag);
+    }
+    updateScrollSentinel();
+  } catch (e) {
+    if (isFirstPage)
+      document.getElementById('feed-list').innerHTML = `<div class="empty"><div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Can\'t reach the server</h3><p>${e.message}</p></div>`;
+  } finally { feedLoading = false; }
+}
+
+let _scrollObserver = null;
+function updateScrollSentinel() {
+  let s = document.getElementById('feed-sentinel');
+  if (!feedHasMore) { if (s) s.remove(); return; }
+  if (!s) { s = document.createElement('div'); s.id = 'feed-sentinel'; s.style.cssText = 'height:40px;width:100%'; document.getElementById('feed-list').appendChild(s); }
+  if (_scrollObserver) _scrollObserver.disconnect();
+  _scrollObserver = new IntersectionObserver(entries => { if (entries[0].isIntersecting) fetchMorePosts(); }, { rootMargin: '200px' });
+  _scrollObserver.observe(s);
+}
+async function createPost() {
+  if (!currentUser) { showToast('Please log in first.'); return; }
+  const text = document.getElementById('post-text').value.trim();
+  if (!text && !pendingImageDataUrl) { showToast('Write something or add a photo!'); return; }
+  const btn = document.getElementById('post-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const res = await api('POST', '/api/posts', { text, image: pendingImageDataUrl || null });
+    posts.unshift(res.data);
+    document.getElementById('post-text').value = '';
+    removeImage(); renderFeed(); showToast('Posted! ✨');
+  } catch (e) { showToast('Error: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = 'Post'; }
+}
+
+async function deletePost(postId) {
+  if (!currentUser) return;
+  try {
+    await api('DELETE', `/api/posts/${postId}`);
+    posts = posts.filter(p => p.id !== postId);
+    renderFeed();
+    if (document.getElementById('view-profile').classList.contains('active')) renderProfile();
+    showToast('Post deleted.');
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+/* ── LIKES ────────────────────────────────────────────────── */
+async function toggleLike(postId) {
+  if (!currentUser) { showToast('Log in to like posts.'); goTo('login'); return; }
+  try {
+    await api('POST', `/api/posts/${postId}/like`, { userId: currentUser.id });
+    const post = posts.find(p => p.id === postId);
+    if (post) { const i = post.likes.indexOf(currentUser.id); if (i === -1) post.likes.push(currentUser.id); else post.likes.splice(i, 1); }
+    refreshLikeBtn(postId);
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+function refreshLikeBtn(postId) {
+  const card = document.querySelector(`[data-post-id="${postId}"]`); if (!card) return;
+  const post = posts.find(p => p.id === postId); if (!post) return;
+  const liked = currentUser && post.likes.includes(currentUser.id);
+  const btn = card.querySelector('.like-btn');
+  btn.className = 'act-btn like-btn' + (liked ? ' liked' : '');
+  btn.innerHTML = `<svg fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><span>${post.likes.length || ''}</span>`;
+}
+
+/* ── COMMENTS ─────────────────────────────────────────────── */
+function toggleComments(postId) { document.querySelector(`[data-post-id="${postId}"] .comments-panel`).classList.toggle('open'); }
+
+async function addComment(postId) {
+  if (!currentUser) { showToast('Log in to comment.'); goTo('login'); return; }
+  const input = document.querySelector(`[data-post-id="${postId}"] .comment-input`);
+  const text = input.value.trim(); if (!text) return;
+  try {
+    const res = await api('POST', `/api/posts/${postId}/comment`, { userId: currentUser.id, text });
+    const post = posts.find(p => p.id === postId);
+    if (post) post.comments.push(res.data);
+    input.value = '';
+    renderCommentList(postId);
+    const ce = document.querySelector(`[data-post-id="${postId}"] .comment-count`);
+    if (ce && post) ce.textContent = post.comments.length || '';
+    showToast('Comment added!');
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+function renderCommentList(postId) {
+  const post  = posts.find(p => p.id === postId);
+  const panel = document.querySelector(`[data-post-id="${postId}"] .comments-panel`);
+  if (!panel || !post) return;
+  panel.querySelector('.comment-list').innerHTML = buildCommentItems(post.comments);
+}
+
+function buildCommentItems(comments) {
+  return comments.map(c => {
+    const col = stringToColor(c.author);
+    const avInner = c.authorPicture
+      ? `<img src="${c.authorPicture}" alt="${escHtml(c.author.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+      : escHtml(c.author.charAt(0));
+    return `<div class="comment-row"><div class="av sm" style="background:${c.authorPicture ? 'transparent' : col}">${avInner}</div><div class="comment-bubble"><div class="comment-name">${escHtml(c.author)}</div><div class="comment-txt">${escHtml(c.text)}</div></div></div>`;
+  }).join('');
+}
+
+/* ── REPOSTS ──────────────────────────────────────────────── */
+function openRepostModal(postId) {
+  if (!currentUser) { showToast('Log in to repost.'); goTo('login'); return; }
+  const post = posts.find(p => p.id === postId); if (!post) return;
+  if (post.reposts && post.reposts.includes(currentUser.id)) { showToast('Already reposted!'); return; }
+  repostTargetId = postId;
+  document.getElementById('modal-orig-author').textContent = post.author;
+  document.getElementById('modal-orig-text').textContent   = post.text || '';
+  document.getElementById('repost-quote').value = '';
+  const img = document.getElementById('modal-orig-img');
+  if (post.image) { img.src = post.image; img.style.display = 'block'; } else { img.src = ''; img.style.display = 'none'; }
+  document.getElementById('repost-modal').classList.add('open');
+  setTimeout(() => document.getElementById('repost-quote').focus(), 120);
+}
+
+function closeRepostModal(e) {
+  if (e && e.target !== document.getElementById('repost-modal')) return;
+  document.getElementById('repost-modal').classList.remove('open'); repostTargetId = null;
+}
+
+async function confirmRepost() {
+  if (!currentUser || !repostTargetId) return;
+  const orig  = posts.find(p => p.id === repostTargetId); if (!orig) return;
+  const quote = document.getElementById('repost-quote').value.trim();
+  try {
+    const res = await api('POST', `/api/posts/${repostTargetId}/repost`, { userId: currentUser.id, text: quote || null });
+    const repost = res.data;
+    if (!orig.reposts) orig.reposts = [];
+    orig.reposts.push(currentUser.id);
+    posts.unshift(repost);
+    document.getElementById('repost-modal').classList.remove('open');
+    repostTargetId = null;
+    renderFeed();
+    showToast('Reposted! ♻️');
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('repost-modal').classList.remove('open');
+    repostTargetId = null;
+    closeNotifPanel();
+    const rm = document.getElementById('report-modal');
+    if(rm) rm.classList.remove('open');
+    reportTargetPostId = null;
+  }
+});
+
+/* ── IMAGE ────────────────────────────────────────────────── */
+function previewImage(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { pendingImageDataUrl = e.target.result; document.getElementById('img-preview').src = e.target.result; document.getElementById('img-preview-wrap').style.display = 'block'; };
+  reader.readAsDataURL(file);
+}
+function removeImage() { pendingImageDataUrl = null; document.getElementById('img-preview').src = ''; document.getElementById('img-preview-wrap').style.display = 'none'; document.getElementById('img-input').value = ''; }
+
+/* ── RENDER ───────────────────────────────────────────────── */
+function renderFeed() {
+  const c = document.getElementById('feed-list');
+  if (!posts.length) {
+    const emptyMsg = currentFeedTab === 'following'
+      ? '<h3>No posts yet</h3><p>Follow some people to see their posts here!</p>'
+      : '<h3>Nothing here yet</h3><p>Be the first to post something!</p>';
+    c.innerHTML = `<div class="empty"><div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>${emptyMsg}</div>`;
+    return;
+  }
+  c.innerHTML = posts.map(p => buildPostCard(p)).join('');
+}
+
+
+/* -- VIEW PROFILE (click author name/avatar) ------------------- */
+async function viewProfile(userId) {
+  if (!userId) return;
+  goTo('profile');
+  await renderProfile(userId);
+}
+
+async function renderProfile(viewedUserId = null) {
+  if (!currentUser) { goTo('login'); return; }
+  const targetId = viewedUserId || currentUser.id;
+  const isOwnProfile = targetId === currentUser.id;
+  let profileData = null;
+  try {
+    const res = await api('GET', `/api/users/${targetId}/profile`);
+    profileData = res.data;
+  } catch (e) {}
+  const name    = profileData?.name    || currentUser.name;
+  const email   = profileData?.email   || currentUser.email;
+  const pic     = profileData?.picture || (isOwnProfile ? currentUser.picture : null);
+  const initial = name.charAt(0).toUpperCase();
+  const color   = stringToColor(name);
+  const av = document.getElementById('profile-av');
+  if (pic) { av.style.background = 'transparent'; av.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block"/>`; }
+  else { av.innerHTML = initial; av.style.background = color; }
+  document.getElementById('profile-name').textContent  = name;
+  document.getElementById('profile-email').textContent = email;
+  document.getElementById('stat-posts').textContent     = profileData?.postCount     || 0;
+  document.getElementById('stat-followers').textContent = profileData?.followerCount  || 0;
+  document.getElementById('stat-following').textContent = profileData?.followingCount || 0;
+  const liked = posts.reduce((n, p) => n + (p.likes.includes(currentUser.id) ? 1 : 0), 0);
+  document.getElementById('stat-likes').textContent = liked;
+  const actionsEl = document.getElementById('profile-actions');
+  if (isOwnProfile) {
+    actionsEl.innerHTML = `
+      <button class="btn btn-ghost" onclick="goTo('settings')" style="font-size:13px;padding:8px 16px">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit Profile
+      </button>
+      <button class="logout-btn-sm" onclick="logout()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log Out
+      </button>`;
+  } else {
+    const isFollowing = profileData?.isFollowing || false;
+    actionsEl.innerHTML = `<button class="btn ${isFollowing ? 'btn-outline' : 'btn-primary'}" style="font-size:13px;padding:8px 20px" data-following="${isFollowing}" onclick="toggleFollow(${targetId}, this)">${isFollowing ? 'Following' : 'Follow'}</button>`;
+  }
+  const userPosts = posts.filter(p => p.userId === targetId);
+  const sorted = [...userPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const c = document.getElementById('profile-feed');
+  c.innerHTML = sorted.length
+    ? sorted.map(p => buildPostCard(p, isOwnProfile)).join('')
+    : `<div class="empty"><div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>No posts yet</h3><p>${isOwnProfile ? 'Share your first post!' : 'Nothing posted yet.'}</p></div>`;
+}
+
+function buildPostCard(post, showDelete = false) {
+  const liked     = currentUser && post.likes.includes(currentUser.id);
+  const reposted  = currentUser && post.reposts && post.reposts.includes(currentUser.id);
+  const canDelete = currentUser && (currentUser.id === post.userId || showDelete);
+  const color     = stringToColor(post.author);
+  return `<div class="post-card" data-post-id="${post.id}">
+    ${post.isRepost ? `<div class="repost-strip"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>${escHtml(post.author)} reposted</div>` : ''}
+    <div class="post-head">
+      <div class="av" style="background:${post.authorPicture ? 'transparent' : color};cursor:pointer" onclick="viewProfile(${post.userId})" title="View profile">${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(post.author.charAt(0))}</div>
+      <div class="post-meta"><div class="post-name" onclick="viewProfile(${post.userId})" style="cursor:pointer" title="View profile">${escHtml(post.author)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
+      ${canDelete ? `<button class="post-del" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ''}
+    </div>
+    ${post.text ? `<div class="post-body">${escHtml(post.text)}</div>` : ''}
+    ${post.isRepost && post.originalPost ? `<div class="repost-embed"><div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ''}${post.originalPost.image ? `<img class="repost-embed-img" src="${post.originalPost.image}" loading="lazy"/>` : ''}</div>` : (!post.isRepost && post.image ? `<img class="post-img" src="${post.image}" loading="lazy"/>` : '')}
+    <div class="post-actions">
+      <button class="act-btn like-btn${liked ? ' liked' : ''}" onclick="toggleLike(${post.id})">
+        <svg fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <span>${post.likes.length || ''}</span>
+      </button>
+      <button class="act-btn" onclick="toggleComments(${post.id})">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span class="comment-count">${post.comments.length || ''}</span>
+      </button>
+      ${!post.isRepost ? `<button class="act-btn repost-btn${reposted ? ' reposted' : ''}" onclick="openRepostModal(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg><span>${post.reposts ? post.reposts.length || '' : ''}</span></button>` : ''}
+      ${!canDelete && !post.isRepost ? `<button class="act-btn report" style="margin-left:auto" title="Report post" onclick="reportPost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>` : ''}
+    </div>
+    <div class="comments-panel">
+      <div class="comment-list">${buildCommentItems(post.comments)}</div>
+      <div class="comment-input-row">
+        <input class="comment-input" type="text" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment(${post.id})"/>
+        <button class="send-btn" onclick="addComment(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── PROFILE PICTURE ──────────────────────────────────────── */
+async function handleProfilePicUpload(event) {
+  if (!currentUser) { showToast('Log in first.'); return; }
+  const file = event.target.files[0]; if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5 MB.'); return; }
+  showToast('Uploading…');
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const res = await api('PUT', `/api/users/${currentUser.id}/picture`, { picture: e.target.result });
+      currentUser.picture = res.data.picture;
+      localStorage.setItem('circle_user', JSON.stringify(currentUser));
+      setCurrentUser(currentUser);
+      renderProfile();
+      populateSettings();
+      showToast('Profile photo updated! 📸');
+    } catch (e) { showToast('Upload failed: ' + e.message); }
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+/* ── FOLLOW / UNFOLLOW ────────────────────────────────────── */
+async function toggleFollow(targetId, btn) {
+  if (!currentUser) { showToast('Log in to follow people.'); goTo('login'); return; }
+  const isFollowing = btn.classList.contains('unfollow');
+  btn.disabled = true;
+  try {
+    if (isFollowing) {
+      await api('DELETE', `/api/follow/${targetId}`);
+      btn.className = 'follow-btn follow';
+      btn.textContent = 'Follow';
+      showToast('Unfollowed.');
+    } else {
+      await api('POST', `/api/follow/${targetId}`);
+      btn.className = 'follow-btn unfollow';
+      btn.textContent = 'Unfollow';
+      showToast('Following! 🎉');
+    }
+    // Refresh follower count in profile if open
+    if (document.getElementById('view-profile').classList.contains('active')) renderProfile();
+  } catch (e) {
+    showToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ── SEARCH ───────────────────────────────────────────────── */
+let searchTab = 'posts', searchTimer = null;
+
+function switchSearchTab(tab) {
+  searchTab = tab;
+  document.getElementById('stab-posts').classList.toggle('active',  tab === 'posts');
+  document.getElementById('stab-people').classList.toggle('active', tab === 'people');
+  const q = document.getElementById('search-input').value.trim();
+  if (q.length >= 2) runSearch(q); else renderSearchHint();
+}
+
+function onSearchInput() {
+  clearTimeout(searchTimer);
+  const q = document.getElementById('search-input').value.trim();
+  if (q.length < 2) { renderSearchHint(); return; }
+  searchTimer = setTimeout(() => runSearch(q), 280);
+}
+
+function renderSearchHint() {
+  document.getElementById('search-results').innerHTML =
+    `<div class="search-hint"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>Type to search ${searchTab === 'posts' ? 'posts' : 'people'}</p></div>`;
+}
+
+async function runSearch(q) {
+  if (!currentUser) { showToast('Log in to search.'); goTo('login'); return; }
+  const box = document.getElementById('search-results');
+  box.innerHTML = `<div class="search-hint"><div class="spinner" style="border-color:rgba(124,107,255,.3);border-top-color:var(--accent);width:24px;height:24px;margin:0 auto 12px"></div><p>Searching…</p></div>`;
+  try {
+    const res = await api('GET', `/api/search?q=${encodeURIComponent(q)}&type=${searchTab}`);
+    // If searching people, also fetch follow status for each
+    if (searchTab === 'people' && currentUser && res.data.length) {
+      // Batch-check follow status by fetching each user's status
+      await Promise.all(res.data.map(async user => {
+        try {
+          const s = await api('GET', `/api/follow/${user.id}/status?viewerId=${currentUser.id}`);
+          user.isFollowing = s.data.isFollowing;
+        } catch (e) { user.isFollowing = false; }
+      }));
+    }
+    renderSearchResults(res.data, q);
+  } catch (e) {
+    box.innerHTML = `<div class="search-hint"><p style="color:var(--rose)">Error: ${escHtml(e.message)}</p></div>`;
+  }
+}
+
+function highlight(text, q) {
+  if (!text) return '';
+  const safe  = escHtml(text);
+  const safeQ = escHtml(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return safe.replace(new RegExp(`(${safeQ})`, 'gi'), '<mark class="hl">$1</mark>');
+}
+
+function renderSearchResults(data, q) {
+  const box = document.getElementById('search-results');
+  if (!data || !data.length) {
+    box.innerHTML = `<div class="search-hint"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No ${searchTab} found for "<strong>${escHtml(q)}</strong>"</p></div>`;
+    return;
+  }
+  if (searchTab === 'posts') {
+    box.innerHTML = data.map(post => {
+      const color  = stringToColor(post.author);
+      const avHtml = post.authorPicture
+        ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+        : escHtml(post.author.charAt(0));
+      return `<div class="post-card" style="cursor:default">
+        <div class="post-head">
+          <div class="av" style="background:${post.authorPicture ? 'transparent' : color}">${avHtml}</div>
+          <div class="post-meta"><div class="post-name">${highlight(post.author, q)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
+        </div>
+        ${post.text ? `<div class="post-body">${highlight(post.text, q)}</div>` : ''}
+        ${post.image ? `<img class="post-img" src="${post.image}" loading="lazy"/>` : ''}
+        <div class="post-actions" style="padding:8px 12px;gap:14px;font-size:12px;color:var(--txt2)">
+          <span>❤️ ${post.likeCount || 0}</span><span>💬 ${post.commentCount || 0}</span><span>🔁 ${post.repostCount || 0}</span>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    box.innerHTML = data.map(user => {
+      const color  = stringToColor(user.name);
+      const avHtml = user.picture
+        ? `<img src="${user.picture}" alt="${escHtml(user.name.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+        : escHtml(user.name.charAt(0));
+      const isOwnProfile = currentUser && currentUser.id === user.id;
+      const followBtnHtml = (!isOwnProfile && currentUser)
+        ? `<button class="follow-btn ${user.isFollowing ? 'unfollow' : 'follow'}" onclick="toggleFollow(${user.id}, this)">${user.isFollowing ? 'Unfollow' : 'Follow'}</button>`
+        : '';
+      return `<div class="people-card">
+        <div class="av" style="background:${user.picture ? 'transparent' : color}">${avHtml}</div>
+        <div class="people-card-info">
+          <div class="people-card-name">${highlight(user.name, q)}</div>
+          <div class="people-card-email">${highlight(user.email, q)}</div>
+          <div class="people-card-posts">${user.postCount || 0} post${user.postCount === 1 ? '' : 's'} · ${user.followerCount || 0} followers</div>
+        </div>
+        ${followBtnHtml}
+      </div>`;
+    }).join('');
+  }
+}
+
+/* ── NOTIFICATIONS ────────────────────────────────────────── */
+let notifPollTimer = null;
+
+const NOTIF_ICONS = {
+  like:    `<svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
+  comment: `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
+  repost:  `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>`,
+  follow:  `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>`,
+};
+const NOTIF_COPY = {
+  like:    name => `<strong>${escHtml(name)}</strong> liked your post`,
+  comment: name => `<strong>${escHtml(name)}</strong> commented on your post`,
+  repost:  name => `<strong>${escHtml(name)}</strong> reposted your post`,
+  follow:  name => `<strong>${escHtml(name)}</strong> started following you`,
+};
+
+async function fetchNotifications() {
+  if (!currentUser) return;
+  try {
+    const res = await api('GET', `/api/notifications/${currentUser.id}`);
+    renderNotifList(res.data);
+    updateNotifBadge(res.data.filter(n => !n.isRead).length);
+  } catch (e) { /* silent */ }
+}
+
+async function fetchUnreadCount() {
+  if (!currentUser) return;
+  try {
+    const res = await api('GET', `/api/notifications/${currentUser.id}/unread-count`);
+    updateNotifBadge(res.data.count);
+  } catch (e) { /* silent */ }
+}
+
+function updateNotifBadge(count) {
+  const b1 = document.getElementById('topbar-notif-badge');
+  const b2 = document.getElementById('snav-notif-badge');
+  if (b1) { b1.textContent = count > 99 ? '99+' : (count > 0 ? count : ''); b1.classList.toggle('show', count > 0); }
+  if (b2) { b2.textContent = count > 99 ? '99+' : (count > 0 ? count : ''); b2.classList.toggle('show', count > 0); }
+}
+
+function renderNotifList(notifs) {
+  const list = document.getElementById('notif-list');
+  if (!notifs || !notifs.length) {
+    list.innerHTML = `<div class="notif-empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><p>No notifications yet</p></div>`;
+    return;
+  }
+  list.innerHTML = notifs.map(n => {
+    const color  = stringToColor(n.actorName || '?');
+    const avHtml = n.actorPicture
+      ? `<img src="${n.actorPicture}" alt="${escHtml((n.actorName || '?').charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+      : escHtml((n.actorName || '?').charAt(0));
+    return `<div class="notif-item${n.isRead ? '' : ' unread'}" onclick="onNotifClick(${n.id}, ${n.postId || 'null'})">
+      <div class="av sm" style="background:${n.actorPicture ? 'transparent' : color}">${avHtml}</div>
+      <div class="notif-body">
+        <div class="notif-text">${(NOTIF_COPY[n.type] || NOTIF_COPY.like)(n.actorName || 'Someone')}</div>
+        ${n.postSnippet ? `<div class="notif-snippet">"${escHtml(n.postSnippet)}"</div>` : ''}
+        <div class="notif-time">${formatTime(n.createdAt)}</div>
+      </div>
+      <div class="notif-icon ${n.type}">${NOTIF_ICONS[n.type] || ''}</div>
+      ${!n.isRead ? '<div class="notif-dot"></div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+async function onNotifClick(notifId, postId) {
+  try { await api('PUT', `/api/notifications/${notifId}/read`); } catch (e) { /* silent */ }
+  closeNotifPanel();
+  goTo('feed');
+  if (postId) {
+    setTimeout(() => {
+      const card = document.querySelector(`[data-post-id="${postId}"]`);
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 400);
+  }
+  fetchNotifications();
+}
+
+async function markAllRead() {
+  if (!currentUser) return;
+  try {
+    await api('PUT', `/api/notifications/${currentUser.id}/read-all`);
+    fetchNotifications();
+    showToast('All notifications marked as read ✓');
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+function openNotifPanel() {
+  if (!currentUser) { showToast('Log in to see notifications.'); return; }
+  fetchNotifications();
+  document.getElementById('notif-panel').classList.add('open');
+  document.getElementById('notif-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeNotifPanel() {
+  document.getElementById('notif-panel').classList.remove('open');
+  document.getElementById('notif-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function startNotifPolling() { stopNotifPolling(); fetchUnreadCount(); notifPollTimer = setInterval(fetchUnreadCount, 30_000); }
+function stopNotifPolling()  { if (notifPollTimer) { clearInterval(notifPollTimer); notifPollTimer = null; } }
+
+/* ── HELPERS ──────────────────────────────────────────────── */
+
+/* -- REPORT POST -------------------------------------------- */
+let reportTargetPostId = null;
+
+function reportPost(postId) {
+  if (!currentUser) { showToast('Log in to report posts.'); goTo('login'); return; }
+  reportTargetPostId = postId;
+  document.getElementById('report-reason-select').value = '';
+  document.getElementById('report-other-field').style.display = 'none';
+  document.getElementById('report-other-text').value = '';
+  document.getElementById('report-modal').classList.add('open');
+}
+
+function onReportReasonChange() {
+  const val = document.getElementById('report-reason-select').value;
+  document.getElementById('report-other-field').style.display = val === 'Other' ? 'block' : 'none';
+}
+
+function closeReportModal(e) {
+  if (e && e.target !== document.getElementById('report-modal')) return;
+  document.getElementById('report-modal').classList.remove('open');
+  reportTargetPostId = null;
+}
+
+async function submitReport() {
+  if (!reportTargetPostId) return;
+  let reason = document.getElementById('report-reason-select').value;
+  if (!reason) { showToast('Please select a reason.'); return; }
+  if (reason === 'Other') {
+    const other = document.getElementById('report-other-text').value.trim();
+    if (!other || other.length < 5) { showToast('Please describe the issue (min 5 chars).'); return; }
+    reason = other;
+  }
+  const btn = document.getElementById('report-submit-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    await api('POST', '/api/admin/reports', { postId: reportTargetPostId, reason });
+    document.getElementById('report-modal').classList.remove('open');
+    reportTargetPostId = null;
+    showToast('Report submitted. Thank you for keeping Circle safe!');
+  } catch (e) { showToast('Error: ' + e.message); }
+  finally { btn.disabled = false; btn.innerHTML = 'Submit Report'; }
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+function formatTime(date) { const d = new Date(date), now = new Date(), diff = Math.floor((now - d) / 1000); if (diff < 60) return 'just now'; if (diff < 3600) return Math.floor(diff / 60) + 'm ago'; if (diff < 86400) return Math.floor(diff / 3600) + 'h ago'; return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function showAlert(el, msg, type) { el.textContent = msg; el.className = 'alert ' + type; }
+let _tt; function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 2800); }
+function stringToColor(s) { const c = ['#7c6bff','#ff5f7a','#22d48f','#f5a623','#00b4d8','#e040fb','#26c6da','#ff7043']; let h = 0; for (let i = 0; i < s.length; i++) h = s.charCodeAt(i) + ((h << 5) - h); return c[Math.abs(h) % c.length]; }
+
+/* ── BOOT ─────────────────────────────────────────────────── */
+(function boot() {
+  applyTheme(localStorage.getItem('circle_theme') || 'dark');
+  try { const s = localStorage.getItem('circle_user'); if (s) setCurrentUser(JSON.parse(s)); } catch (e) { localStorage.removeItem('circle_user'); }
+})();
+loadPosts();
+</script>
+</body>
+</html>

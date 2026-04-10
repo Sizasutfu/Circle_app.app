@@ -17,7 +17,6 @@
         --font-body: "Plus Jakarta Sans", sans-serif;
         --font-head: "Bricolage Grotesque", sans-serif;
       }
-
       [data-theme="dark"] {
         --bg: #0a0a0d;
         --surface: #111116;
@@ -41,7 +40,6 @@
         --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
         --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.6);
       }
-
       [data-theme="light"] {
         --bg: #f2f2f7;
         --surface: #ffffff;
@@ -65,7 +63,6 @@
         --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
         --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.14);
       }
-
       *,
       *::before,
       *::after {
@@ -73,7 +70,6 @@
         margin: 0;
         padding: 0;
       }
-
       body {
         font-family: var(--font-body);
         background: var(--bg);
@@ -85,12 +81,10 @@
           background 0.3s,
           color 0.3s;
       }
-
       img {
         display: block;
         max-width: 100%;
       }
-
       button {
         cursor: pointer;
         border: none;
@@ -98,19 +92,16 @@
         font-family: inherit;
         color: inherit;
       }
-
       input,
       textarea,
       select {
         font-family: inherit;
         color: inherit;
       }
-
       .shell {
         display: flex;
         min-height: 100vh;
       }
-
       .sidebar {
         width: 72px;
         flex-shrink: 0;
@@ -129,12 +120,10 @@
           background 0.3s;
         z-index: 100;
       }
-
       .sidebar:hover,
       .sidebar.expanded {
         width: 240px;
       }
-
       .sidebar:hover .nav-label,
       .sidebar.expanded .nav-label,
       .sidebar:hover .logo-text,
@@ -145,7 +134,6 @@
         width: auto;
         pointer-events: auto;
       }
-
       .logo-wrap {
         display: flex;
         align-items: center;
@@ -156,7 +144,6 @@
         overflow: hidden;
         white-space: nowrap;
       }
-
       .logo-mark {
         width: 36px;
         height: 36px;
@@ -167,13 +154,11 @@
         place-items: center;
         box-shadow: 0 0 20px var(--accent-glow);
       }
-
       .logo-mark svg {
         width: 18px;
         height: 18px;
         fill: #fff;
       }
-
       .logo-text {
         font-family: var(--font-head);
         font-size: 20px;
@@ -185,7 +170,6 @@
         transition: opacity var(--tr);
         white-space: nowrap;
       }
-
       .nav {
         flex: 1;
         display: flex;
@@ -194,7 +178,6 @@
         width: 100%;
         padding: 0 10px;
       }
-
       .nav-item {
         display: flex;
         align-items: center;
@@ -212,30 +195,25 @@
         white-space: nowrap;
         overflow: hidden;
       }
-
       .nav-item:hover {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .nav-item.active {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .nav-item svg {
         width: 20px;
         height: 20px;
         flex-shrink: 0;
       }
-
       .nav-label {
         opacity: 0;
         width: 0;
         pointer-events: none;
         transition: opacity var(--tr);
       }
-
       .sidebar-bottom {
         width: 100%;
         padding: 0 10px;
@@ -243,7 +221,6 @@
         padding-top: 14px;
         margin-top: 14px;
       }
-
       .user-chip {
         display: flex;
         align-items: center;
@@ -255,11 +232,9 @@
         overflow: hidden;
         white-space: nowrap;
       }
-
       .user-chip:hover {
         background: var(--accent-bg);
       }
-
       .user-info {
         opacity: 0;
         width: 0;
@@ -267,7 +242,6 @@
         transition: opacity var(--tr);
         min-width: 0;
       }
-
       .user-info-name {
         font-size: 13px;
         font-weight: 700;
@@ -275,12 +249,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-
       .user-info-sub {
         font-size: 11px;
         color: var(--txt2);
       }
-
       .av {
         width: 36px;
         height: 36px;
@@ -294,13 +266,11 @@
         font-weight: 800;
         color: #fff;
       }
-
       .av.sm {
         width: 28px;
         height: 28px;
         font-size: 11px;
       }
-
       .av.lg {
         width: 68px;
         height: 68px;
@@ -310,19 +280,16 @@
           0 0 0 3px var(--bg),
           0 0 0 5px var(--accent);
       }
-
       .main {
         flex: 1;
         min-width: 0;
       }
-
       .content {
         max-width: 620px;
         margin: 0 auto;
         padding: 28px 20px 80px;
         width: 100%;
       }
-
       .topbar {
         display: none;
         position: sticky;
@@ -335,26 +302,22 @@
         gap: 12px;
         transition: background 0.3s;
       }
-
       .topbar-logo {
         display: flex;
         align-items: center;
         gap: 9px;
         flex: 1;
       }
-
       .topbar-logo span {
         font-family: var(--font-head);
         font-size: 18px;
         font-weight: 800;
       }
-
       .topbar-actions {
         display: flex;
         gap: 8px;
         align-items: center;
       }
-
       .icon-btn {
         width: 36px;
         height: 36px;
@@ -366,21 +329,17 @@
           background var(--tr),
           color var(--tr);
       }
-
       .icon-btn:hover {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .icon-btn svg {
         width: 18px;
         height: 18px;
       }
-
       .page-header {
         margin-bottom: 24px;
       }
-
       .page-header h1 {
         font-family: var(--font-head);
         font-size: 26px;
@@ -388,43 +347,35 @@
         letter-spacing: -0.5px;
         line-height: 1.2;
       }
-
       .page-header h1 em {
         font-style: normal;
         color: var(--accent);
       }
-
       .page-header p {
         font-size: 14px;
         color: var(--txt2);
         margin-top: 4px;
       }
-
       .view {
         display: none;
         animation: fadeUp 0.28s ease both;
       }
-
       .view.active {
         display: block;
       }
-
       @keyframes fadeUp {
         from {
           opacity: 0;
           transform: translateY(14px);
         }
-
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
-
       .field {
         margin-bottom: 16px;
       }
-
       .field label {
         display: block;
         font-size: 11.5px;
@@ -434,7 +385,6 @@
         letter-spacing: 0.06em;
         margin-bottom: 7px;
       }
-
       .field input,
       .field textarea,
       .field select {
@@ -451,18 +401,15 @@
         resize: none;
         color: var(--txt);
       }
-
       .field input:focus,
       .field textarea:focus {
         border-color: var(--accent);
         box-shadow: 0 0 0 3px var(--accent-bg);
       }
-
       .field input::placeholder,
       .field textarea::placeholder {
         color: var(--txt3);
       }
-
       .btn {
         display: inline-flex;
         align-items: center;
@@ -475,59 +422,48 @@
         transition: all var(--tr);
         cursor: pointer;
       }
-
       .btn-primary {
         background: var(--accent);
         color: #fff;
         box-shadow: 0 4px 16px var(--accent-glow);
       }
-
       .btn-primary:hover {
         background: var(--accent-h);
         transform: translateY(-1px);
         box-shadow: 0 6px 22px var(--accent-glow);
       }
-
       .btn-ghost {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .btn-ghost:hover {
         background: var(--accent);
         color: #fff;
       }
-
       .btn-danger {
         background: var(--rose-bg);
         color: var(--rose);
       }
-
       .btn-danger:hover {
         background: var(--rose);
         color: #fff;
       }
-
       .btn-outline {
         border: 1.5px solid var(--border);
         color: var(--txt2);
       }
-
       .btn-outline:hover {
         border-color: var(--accent);
         color: var(--accent);
         background: var(--accent-bg);
       }
-
       .btn-full {
         width: 100%;
       }
-
       .auth-wrap {
         max-width: 420px;
         margin: 20px auto;
       }
-
       .auth-card {
         background: var(--card);
         border: 1px solid var(--border);
@@ -536,14 +472,12 @@
         box-shadow: var(--shadow-lg);
         transition: background 0.3s;
       }
-
       .auth-brand {
         display: flex;
         align-items: center;
         gap: 10px;
         margin-bottom: 28px;
       }
-
       .auth-brand-icon {
         width: 40px;
         height: 40px;
@@ -553,50 +487,42 @@
         place-items: center;
         box-shadow: 0 0 20px var(--accent-glow);
       }
-
       .auth-brand-icon svg {
         width: 20px;
         height: 20px;
         fill: #fff;
       }
-
       .auth-brand span {
         font-family: var(--font-head);
         font-size: 22px;
         font-weight: 800;
       }
-
       .auth-card h2 {
         font-family: var(--font-head);
         font-size: 22px;
         font-weight: 800;
         margin-bottom: 4px;
       }
-
       .auth-card p.sub {
         color: var(--txt2);
         font-size: 14px;
         margin-bottom: 24px;
       }
-
       .auth-switch {
         text-align: center;
         margin-top: 18px;
         font-size: 13.5px;
         color: var(--txt2);
       }
-
       .auth-switch button {
         color: var(--accent);
         font-weight: 700;
         font-size: 13.5px;
         cursor: pointer;
       }
-
       .auth-switch button:hover {
         text-decoration: underline;
       }
-
       .alert {
         padding: 11px 14px;
         border-radius: var(--radius-sm);
@@ -605,21 +531,18 @@
         display: none;
         font-weight: 500;
       }
-
       .alert.error {
         background: var(--rose-bg);
         border: 1px solid var(--rose);
         color: var(--rose);
         display: block;
       }
-
       .alert.success {
         background: var(--green-bg);
         border: 1px solid var(--green);
         color: var(--green);
         display: block;
       }
-
       .compose {
         background: var(--card);
         border: 1px solid var(--border);
@@ -630,17 +553,14 @@
           border-color var(--tr),
           background 0.3s;
       }
-
       .compose:focus-within {
         border-color: var(--accent);
       }
-
       .compose-row {
         display: flex;
         gap: 13px;
         align-items: flex-start;
       }
-
       .compose-field {
         flex: 1;
         background: transparent;
@@ -653,11 +573,9 @@
         line-height: 1.6;
         font-family: var(--font-body);
       }
-
       .compose-field::placeholder {
         color: var(--txt3);
       }
-
       .compose-bar {
         display: flex;
         align-items: center;
@@ -666,7 +584,6 @@
         padding-top: 14px;
         border-top: 1px solid var(--border);
       }
-
       .compose-action {
         display: flex;
         align-items: center;
@@ -681,17 +598,14 @@
           color var(--tr);
         cursor: pointer;
       }
-
       .compose-action:hover {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .compose-action svg {
         width: 16px;
         height: 16px;
       }
-
       .post-btn {
         margin-left: auto;
         background: var(--accent);
@@ -705,31 +619,26 @@
         border: none;
         cursor: pointer;
       }
-
       .post-btn:hover {
         background: var(--accent-h);
         transform: translateY(-1px);
       }
-
       .post-btn:disabled {
         opacity: 0.5;
         transform: none;
         cursor: not-allowed;
       }
-
       .img-preview-wrap {
         position: relative;
         margin-top: 12px;
         display: none;
       }
-
       .img-preview-wrap img {
         width: 100%;
         max-height: 240px;
         object-fit: cover;
         border-radius: 10px;
       }
-
       .img-remove {
         position: absolute;
         top: 8px;
@@ -747,15 +656,12 @@
         cursor: pointer;
         border: none;
       }
-
       .img-remove:hover {
         background: var(--rose);
       }
-
       input[type="file"].hidden {
         display: none;
       }
-
       .login-nudge {
         background: var(--card);
         border: 1px solid var(--border);
@@ -769,7 +675,6 @@
         color: var(--txt2);
         transition: background 0.3s;
       }
-
       .login-nudge-icon {
         width: 40px;
         height: 40px;
@@ -780,12 +685,10 @@
         flex-shrink: 0;
         color: var(--accent);
       }
-
       .login-nudge-icon svg {
         width: 20px;
         height: 20px;
       }
-
       .link {
         color: var(--accent);
         font-weight: 700;
@@ -795,13 +698,11 @@
         font-family: inherit;
         font-size: inherit;
       }
-
       .feed {
         display: flex;
         flex-direction: column;
         gap: 12px;
       }
-
       .post-card {
         background: var(--card);
         border: 1px solid var(--border);
@@ -813,12 +714,10 @@
           background 0.3s;
         animation: fadeUp 0.28s ease both;
       }
-
       .post-card:hover {
         border-color: var(--border2);
         box-shadow: var(--shadow);
       }
-
       .repost-strip {
         display: flex;
         align-items: center;
@@ -828,35 +727,34 @@
         font-weight: 700;
         color: var(--green);
       }
-
       .repost-strip svg {
         width: 13px;
         height: 13px;
       }
-
       .post-head {
         display: flex;
         align-items: center;
         gap: 11px;
         padding: 14px 16px 0;
       }
-
       .post-meta {
         flex: 1;
         min-width: 0;
       }
-
       .post-name {
         font-size: 14px;
         font-weight: 700;
+        cursor: pointer;
       }
-
+      .post-name:hover {
+        color: var(--accent);
+        text-decoration: underline;
+      }
       .post-time {
         font-size: 12px;
         color: var(--txt2);
         margin-top: 1px;
       }
-
       .post-del {
         color: var(--txt3);
         padding: 5px 7px;
@@ -868,31 +766,28 @@
         border: none;
         background: none;
       }
-
       .post-del:hover {
         background: var(--rose-bg);
         color: var(--rose);
       }
-
       .post-del svg {
         width: 14px;
         height: 14px;
       }
-
       .post-body {
         padding: 10px 16px;
         font-size: 15px;
         line-height: 1.65;
         color: var(--txt);
       }
-
       .post-img {
         width: 100%;
         max-height: 600px;
         object-fit: cover;
-        border-radius: 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 20px;
       }
-
       .repost-embed {
         margin: 0 16px 12px;
         background: var(--bg);
@@ -900,7 +795,6 @@
         border-radius: var(--radius-sm);
         padding: 12px 14px;
       }
-
       .repost-embed-name {
         font-size: 12px;
         font-weight: 700;
@@ -910,7 +804,6 @@
         align-items: center;
         gap: 6px;
       }
-
       .repost-embed-name::before {
         content: "";
         display: inline-block;
@@ -919,21 +812,18 @@
         border-radius: 50%;
         background: var(--accent);
       }
-
       .repost-embed-text {
         font-size: 13.5px;
         line-height: 1.55;
         color: var(--txt);
       }
-
       .repost-embed-img {
         width: 100%;
-        max-height: 120px;
+        max-height: 600px;
         object-fit: cover;
         border-radius: 7px;
         margin-top: 8px;
       }
-
       .post-actions {
         display: flex;
         align-items: center;
@@ -941,7 +831,6 @@
         padding: 10px 12px;
         border-top: 1px solid var(--border);
       }
-
       .act-btn {
         display: flex;
         align-items: center;
@@ -958,40 +847,32 @@
         border: none;
         background: none;
       }
-
       .act-btn:hover {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .act-btn.liked {
         color: var(--rose);
       }
-
       .act-btn.liked svg {
         fill: var(--rose);
       }
-
       .act-btn.reposted {
         color: var(--green);
       }
-
       .act-btn.report:hover {
         background: var(--rose-bg);
         color: var(--rose);
       }
-
       .act-btn.report:hover {
         background: var(--rose-bg);
         color: var(--rose);
       }
-
       .act-btn svg {
         width: 15px;
         height: 15px;
         transition: fill var(--tr);
       }
-
       .comments-panel {
         border-top: 1px solid var(--border);
         padding: 14px 16px;
@@ -999,42 +880,36 @@
         flex-direction: column;
         gap: 11px;
       }
-
       .comments-panel.open {
         display: flex;
       }
-
       .comment-row {
         display: flex;
         gap: 10px;
       }
-
       .comment-bubble {
         flex: 1;
         background: var(--bg);
         border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
         padding: 9px 13px;
+        margin: 10px;
       }
-
       .comment-name {
         font-size: 12.5px;
         font-weight: 700;
         margin-bottom: 3px;
       }
-
       .comment-txt {
         font-size: 13.5px;
         color: var(--txt2);
         line-height: 1.5;
       }
-
       .comment-input-row {
         display: flex;
         gap: 9px;
         align-items: center;
         margin-top: 4px;
       }
-
       .comment-input {
         flex: 1;
         background: var(--bg);
@@ -1046,15 +921,12 @@
         outline: none;
         transition: border-color var(--tr);
       }
-
       .comment-input:focus {
         border-color: var(--accent);
       }
-
       .comment-input::placeholder {
         color: var(--txt3);
       }
-
       .send-btn {
         width: 34px;
         height: 34px;
@@ -1069,23 +941,19 @@
         border: none;
         cursor: pointer;
       }
-
       .send-btn:hover {
         background: var(--accent-h);
         transform: scale(1.08);
       }
-
       .send-btn svg {
         width: 14px;
         height: 14px;
       }
-
       .empty {
         text-align: center;
         padding: 64px 20px;
         color: var(--txt2);
       }
-
       .empty-icon {
         width: 60px;
         height: 60px;
@@ -1096,12 +964,10 @@
         place-items: center;
         color: var(--accent);
       }
-
       .empty-icon svg {
         width: 28px;
         height: 28px;
       }
-
       .empty h3 {
         font-family: var(--font-head);
         font-size: 17px;
@@ -1109,11 +975,9 @@
         color: var(--txt);
         margin-bottom: 6px;
       }
-
       .empty p {
         font-size: 14px;
       }
-
       .profile-hero {
         background: var(--card);
         border: 1px solid var(--border);
@@ -1124,7 +988,6 @@
         overflow: hidden;
         transition: background 0.3s;
       }
-
       .profile-hero::before {
         content: "";
         position: absolute;
@@ -1136,30 +999,25 @@
         );
         pointer-events: none;
       }
-
       .profile-hero-top {
         display: flex;
         align-items: flex-start;
         gap: 16px;
         position: relative;
       }
-
       .profile-info {
         flex: 1;
       }
-
       .profile-name {
         font-family: var(--font-head);
         font-size: 22px;
         font-weight: 800;
         margin-bottom: 3px;
       }
-
       .profile-email {
         font-size: 13px;
         color: var(--txt2);
       }
-
       .profile-stats {
         display: flex;
         gap: 0;
@@ -1168,19 +1026,16 @@
         border-top: 1px solid var(--border);
         position: relative;
       }
-
       .stat {
         text-align: center;
         flex: 1;
         cursor: default;
       }
-
       .stat-n {
         font-family: var(--font-head);
         font-size: 22px;
         font-weight: 800;
       }
-
       .stat-l {
         font-size: 11px;
         font-weight: 700;
@@ -1189,7 +1044,6 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
       }
-
       .profile-actions {
         display: flex;
         gap: 9px;
@@ -1197,7 +1051,6 @@
         position: relative;
         flex-wrap: wrap;
       }
-
       .logout-btn-sm {
         padding: 8px 16px;
         border-radius: 8px;
@@ -1212,17 +1065,14 @@
         cursor: pointer;
         border: none;
       }
-
       .logout-btn-sm:hover {
         background: var(--rose);
         color: #fff;
       }
-
       .logout-btn-sm svg {
         width: 14px;
         height: 14px;
       }
-
       .settings-section {
         background: var(--card);
         border: 1px solid var(--border);
@@ -1231,7 +1081,6 @@
         margin-bottom: 16px;
         transition: background 0.3s;
       }
-
       .settings-section-title {
         padding: 16px 20px 12px;
         font-size: 11px;
@@ -1241,7 +1090,6 @@
         letter-spacing: 0.1em;
         border-bottom: 1px solid var(--border);
       }
-
       .settings-row {
         display: flex;
         align-items: center;
@@ -1251,15 +1099,12 @@
         transition: background var(--tr);
         cursor: default;
       }
-
       .settings-row:last-child {
         border-bottom: none;
       }
-
       .settings-row:hover {
         background: var(--card-hover);
       }
-
       .settings-row-icon {
         width: 38px;
         height: 38px;
@@ -1268,52 +1113,42 @@
         place-items: center;
         flex-shrink: 0;
       }
-
       .settings-row-icon svg {
         width: 18px;
         height: 18px;
       }
-
       .settings-row-icon.purple {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .settings-row-icon.green {
         background: var(--green-bg);
         color: var(--green);
       }
-
       .settings-row-icon.amber {
         background: var(--amber-bg);
         color: var(--amber);
       }
-
       .settings-row-icon.rose {
         background: var(--rose-bg);
         color: var(--rose);
       }
-
       .settings-row-body {
         flex: 1;
         min-width: 0;
       }
-
       .settings-row-title {
         font-size: 14px;
         font-weight: 700;
       }
-
       .settings-row-sub {
         font-size: 12px;
         color: var(--txt2);
         margin-top: 2px;
       }
-
       .settings-row-end {
         flex-shrink: 0;
       }
-
       .toggle {
         position: relative;
         width: 46px;
@@ -1321,14 +1156,12 @@
         cursor: pointer;
         display: inline-block;
       }
-
       .toggle input {
         opacity: 0;
         width: 0;
         height: 0;
         position: absolute;
       }
-
       .toggle-track {
         position: absolute;
         inset: 0;
@@ -1336,11 +1169,9 @@
         border-radius: 13px;
         transition: background var(--tr);
       }
-
       .toggle input:checked + .toggle-track {
         background: var(--accent);
       }
-
       .toggle-thumb {
         position: absolute;
         top: 3px;
@@ -1352,15 +1183,12 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         transition: transform var(--tr-spring);
       }
-
       .toggle input:checked ~ .toggle-thumb {
         transform: translateX(20px);
       }
-
       .settings-edit-form {
         padding: 20px;
       }
-
       .settings-save-row {
         display: flex;
         justify-content: flex-end;
@@ -1369,7 +1197,6 @@
         padding-top: 18px;
         border-top: 1px solid var(--border);
       }
-
       .danger-zone {
         background: var(--rose-bg);
         border: 1px solid var(--rose);
@@ -1377,7 +1204,6 @@
         padding: 20px;
         margin-bottom: 16px;
       }
-
       .danger-zone h3 {
         font-family: var(--font-head);
         font-size: 15px;
@@ -1388,13 +1214,11 @@
         align-items: center;
         gap: 8px;
       }
-
       .danger-zone p {
         font-size: 13px;
         color: var(--txt2);
         margin-bottom: 14px;
       }
-
       .modal-backdrop {
         position: fixed;
         inset: 0;
@@ -1405,21 +1229,17 @@
         place-items: center;
         animation: fadeIn 0.18s ease;
       }
-
       .modal-backdrop.open {
         display: grid;
       }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
         }
-
         to {
           opacity: 1;
         }
       }
-
       .modal {
         background: var(--card);
         border: 1px solid var(--border2);
@@ -1429,19 +1249,16 @@
         box-shadow: var(--shadow-lg);
         animation: slideUp 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
       }
-
       @keyframes slideUp {
         from {
           opacity: 0;
           transform: translateY(24px) scale(0.96);
         }
-
         to {
           opacity: 1;
           transform: none;
         }
       }
-
       .modal-title {
         font-family: var(--font-head);
         font-size: 17px;
@@ -1451,11 +1268,136 @@
         align-items: center;
         gap: 9px;
       }
-
       .modal-title svg {
         width: 18px;
         height: 18px;
         color: var(--green);
+      }
+      /* ── Post Detail View ─────────────────────────────────── */
+      .post-detail-card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 20px 16px 12px;
+        margin-bottom: 2px;
+        overflow: hidden;
+        max-width: 100%;
+        box-sizing: border-box;
+        
+      }
+      .post-detail-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .post-detail-author {
+        display: flex;
+        flex-direction: column;
+      }
+      .post-detail-name {
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        color: var(--txt);
+      }
+      .post-detail-name:hover {
+        color: var(--accent);
+      }
+      .post-detail-time {
+        font-size: 13px;
+        color: var(--txt3);
+        margin-top: 2px;
+      }
+      .post-detail-body {
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--txt);
+        margin-bottom: 14px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      .post-detail-img {
+        width: 100%;
+        border-radius: var(--radius-sm);
+        margin-bottom: 14px;
+        object-fit: cover;
+        max-height: 500px;
+        cursor: pointer;
+      }
+      .post-detail-stats {
+        display: flex;
+        gap: 20px;
+        padding: 12px 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 4px;
+      }
+      .post-detail-stat {
+        font-size: 14px;
+        color: var(--txt2);
+      }
+      .post-detail-stat strong {
+        color: var(--txt);
+        font-weight: 700;
+      }
+      .post-detail-actions {
+        display: flex;
+        gap: 8px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .post-detail-actions .act-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 10px;
+        border-radius: var(--radius-sm);
+      }
+      .post-detail-comments-section {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 0 16px;
+        margin-top: 8px;
+      }
+      .post-detail-comments-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--txt3);
+        padding: 14px 0 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .post-detail-comment-row {
+        display: flex;
+        gap: 10px;
+        padding: 12px 0;
+        border-top: 1px solid var(--border);
+      }
+      .post-detail-comment-bubble {
+        flex: 1;
+      }
+      .post-detail-comment-name {
+        font-weight: 700;
+        font-size: 13.5px;
+        color: var(--txt);
+        margin-bottom: 3px;
+      }
+      .post-detail-comment-text {
+        font-size: 14px;
+        color: var(--txt2);
+        line-height: 1.5;
+        word-break: break-word;
+      }
+      .post-detail-comment-time {
+        font-size: 11.5px;
+        color: var(--txt3);
+        margin-top: 4px;
+      }
+      .post-detail-no-comments {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--txt3);
+        font-size: 14px;
       }
 
       .repost-preview {
@@ -1465,7 +1407,6 @@
         padding: 14px;
         margin-bottom: 14px;
       }
-
       .repost-preview-name {
         font-size: 13px;
         font-weight: 700;
@@ -1475,7 +1416,6 @@
         align-items: center;
         gap: 7px;
       }
-
       .repost-preview-name::before {
         content: "";
         display: inline-block;
@@ -1484,12 +1424,10 @@
         border-radius: 50%;
         background: var(--accent);
       }
-
       .repost-preview-text {
         font-size: 14px;
         line-height: 1.55;
       }
-
       .repost-preview-img {
         width: 100%;
         max-height: 130px;
@@ -1497,7 +1435,6 @@
         border-radius: 7px;
         margin-top: 8px;
       }
-
       .modal textarea {
         width: 100%;
         background: var(--bg);
@@ -1514,22 +1451,18 @@
         font-family: var(--font-body);
         transition: border-color var(--tr);
       }
-
       .modal textarea:focus {
         border-color: var(--accent);
         box-shadow: 0 0 0 3px var(--accent-bg);
       }
-
       .modal textarea::placeholder {
         color: var(--txt3);
       }
-
       .modal-actions {
         display: flex;
         gap: 10px;
         justify-content: flex-end;
       }
-
       .modal-cancel {
         padding: 9px 18px;
         border-radius: 8px;
@@ -1539,12 +1472,10 @@
         transition: all var(--tr);
         cursor: pointer;
       }
-
       .modal-cancel:hover {
         background: var(--card-hover);
         color: var(--txt);
       }
-
       .modal-confirm {
         padding: 9px 22px;
         border-radius: 8px;
@@ -1560,12 +1491,10 @@
         align-items: center;
         gap: 6px;
       }
-
       .modal-confirm:hover {
         background: #2ae89c;
         transform: translateY(-1px);
       }
-
       .spinner {
         display: inline-block;
         width: 16px;
@@ -1575,10 +1504,210 @@
         border-radius: 50%;
         animation: spin 0.6s linear infinite;
       }
-
       @keyframes spin {
         to {
           transform: rotate(360deg);
+        }
+      }
+      /* ── SUGGESTED USERS WIDGET ──────────────────────────────── */
+      .suggestions-widget {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+        margin-bottom: 20px;
+        transition: background 0.3s;
+      }
+      .suggestions-section {
+        margin-bottom: 20px;
+      }
+      .sug-score {
+        font-size: 11px;
+        color: var(--txt3);
+      }
+      .suggestions-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+      .suggestions-title {
+        font-family: var(--font-head);
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .suggestions-refresh {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: var(--txt3);
+        transition: all var(--tr);
+        cursor: pointer;
+        background: none;
+        border: none;
+      }
+      .suggestions-refresh:hover {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .suggestions-refresh svg {
+        width: 14px;
+        height: 14px;
+      }
+      .suggestions-refresh.spinning svg {
+        animation: sug-spin 0.6s linear infinite;
+      }
+      @keyframes sug-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .suggestions-scroll {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+      }
+      .suggestions-scroll::-webkit-scrollbar {
+        display: none;
+      }
+      .sug-card {
+        flex-shrink: 0;
+        width: 120px;
+        background: var(--card-hover);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+        transition:
+          border-color var(--tr),
+          transform var(--tr);
+      }
+      .sug-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .sug-av {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: grid;
+        place-items: center;
+        font-family: var(--font-head);
+        font-size: 17px;
+        font-weight: 800;
+        color: #fff;
+        flex-shrink: 0;
+        cursor: pointer;
+        overflow: hidden;
+        transition: opacity var(--tr);
+      }
+      .sug-av:hover {
+        opacity: 0.85;
+      }
+      .sug-av img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      .sug-name {
+        font-size: 12.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        cursor: pointer;
+      }
+      .sug-name:hover {
+        color: var(--accent);
+      }
+      .sug-follow-btn {
+        width: 100%;
+        padding: 5px 0;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--tr);
+        border: none;
+      }
+      .sug-follow-btn.follow {
+        background: var(--accent);
+        color: #fff;
+      }
+      .sug-follow-btn.follow:hover {
+        background: var(--accent-h);
+      }
+      .sug-follow-btn.unfollow {
+        background: transparent;
+        border: 1.5px solid var(--border);
+        color: var(--txt2);
+      }
+      .sug-follow-btn.unfollow:hover {
+        border-color: var(--rose);
+        color: var(--rose);
+      }
+      .sug-follow-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .suggestions-empty {
+        font-size: 13px;
+        color: var(--txt3);
+        text-align: center;
+        padding: 12px 0;
+      }
+      .sug-skeleton {
+        flex-shrink: 0;
+        width: 120px;
+        background: var(--card-hover);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .sug-skel-av {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: var(--border);
+        animation: sug-shimmer 1.4s infinite;
+      }
+      .sug-skel-line {
+        height: 10px;
+        border-radius: 5px;
+        background: var(--border);
+        animation: sug-shimmer 1.4s infinite;
+      }
+      .sug-skel-btn {
+        width: 100%;
+        height: 26px;
+        border-radius: 20px;
+        background: var(--border);
+        animation: sug-shimmer 1.4s infinite;
+        margin-top: 2px;
+      }
+      @keyframes sug-shimmer {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
         }
       }
 
@@ -1603,12 +1732,10 @@
         white-space: nowrap;
         pointer-events: none;
       }
-
       #toast.show {
         transform: translateX(-50%) translateY(0);
         opacity: 1;
       }
-
       .mobile-nav {
         display: none;
         position: fixed;
@@ -1622,7 +1749,6 @@
         justify-content: space-around;
         transition: background 0.3s;
       }
-
       .mnav-item {
         display: flex;
         flex-direction: column;
@@ -1638,16 +1764,13 @@
         flex: 1;
         text-align: center;
       }
-
       .mnav-item svg {
         width: 22px;
         height: 22px;
       }
-
       .mnav-item.active {
         color: var(--accent);
       }
-
       .section-label {
         font-family: var(--font-head);
         font-size: 12px;
@@ -1657,18 +1780,15 @@
         text-transform: uppercase;
         letter-spacing: 0.07em;
       }
-
       .av-upload-wrap {
         position: relative;
         display: inline-block;
         cursor: pointer;
         flex-shrink: 0;
       }
-
       .av-upload-wrap input[type="file"] {
         display: none;
       }
-
       .av-upload-overlay {
         position: absolute;
         inset: 0;
@@ -1680,13 +1800,11 @@
         transition: opacity var(--tr);
         color: #fff;
       }
-
       .av-upload-overlay svg {
         width: 20px;
         height: 20px;
         filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
       }
-
       .av-upload-badge {
         position: absolute;
         bottom: -3px;
@@ -1701,21 +1819,17 @@
         box-shadow: 0 2px 6px var(--accent-glow);
         transition: transform var(--tr-spring);
       }
-
       .av-upload-badge svg {
         width: 11px;
         height: 11px;
         fill: #fff;
       }
-
       .av-upload-wrap:hover .av-upload-overlay {
         opacity: 1;
       }
-
       .av-upload-wrap:hover .av-upload-badge {
         transform: scale(1.15);
       }
-
       .av img,
       .av.lg img {
         width: 100%;
@@ -1724,24 +1838,20 @@
         object-fit: cover;
         display: block;
       }
-
       .settings-av-preview {
         display: flex;
         align-items: center;
         gap: 16px;
         padding: 20px 20px 0;
       }
-
       .settings-av-preview .av-upload-wrap .av.lg {
         width: 72px;
         height: 72px;
         font-size: 28px;
       }
-
       .settings-av-info {
         flex: 1;
       }
-
       .settings-av-info p {
         font-size: 13px;
         color: var(--txt2);
@@ -1766,17 +1876,14 @@
         background: none;
         flex-shrink: 0;
       }
-
       .notif-btn:hover {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .notif-btn svg {
         width: 18px;
         height: 18px;
       }
-
       .notif-badge {
         position: absolute;
         top: 4px;
@@ -1794,11 +1901,9 @@
         border: 2px solid var(--bg);
         line-height: 1;
       }
-
       .notif-badge.show {
         display: grid;
       }
-
       .notif-panel {
         position: fixed;
         top: 0;
@@ -1814,11 +1919,9 @@
         flex-direction: column;
         box-shadow: -8px 0 32px rgba(0, 0, 0, 0.3);
       }
-
       .notif-panel.open {
         transform: translateX(0);
       }
-
       .notif-panel-backdrop {
         position: fixed;
         inset: 0;
@@ -1827,11 +1930,9 @@
         display: none;
         backdrop-filter: blur(2px);
       }
-
       .notif-panel-backdrop.open {
         display: block;
       }
-
       .notif-panel-head {
         display: flex;
         align-items: center;
@@ -1840,14 +1941,12 @@
         gap: 12px;
         flex-shrink: 0;
       }
-
       .notif-panel-head h2 {
         font-family: var(--font-head);
         font-size: 17px;
         font-weight: 800;
         flex: 1;
       }
-
       .notif-mark-all {
         font-size: 12px;
         font-weight: 700;
@@ -1859,11 +1958,9 @@
         border-radius: 8px;
         transition: background var(--tr);
       }
-
       .notif-mark-all:hover {
         background: var(--accent-bg);
       }
-
       .notif-close {
         width: 32px;
         height: 32px;
@@ -1878,23 +1975,19 @@
           background var(--tr),
           color var(--tr);
       }
-
       .notif-close:hover {
         background: var(--card-hover);
         color: var(--txt);
       }
-
       .notif-close svg {
         width: 16px;
         height: 16px;
       }
-
       .notif-list {
         flex: 1;
         overflow-y: auto;
         padding: 8px 0;
       }
-
       .notif-item {
         display: flex;
         align-items: flex-start;
@@ -1904,16 +1997,13 @@
         transition: background var(--tr);
         border-left: 3px solid transparent;
       }
-
       .notif-item:hover {
         background: var(--card-hover);
       }
-
       .notif-item.unread {
         background: var(--accent-bg);
         border-left-color: var(--accent);
       }
-
       .notif-icon {
         width: 34px;
         height: 34px;
@@ -1922,42 +2012,34 @@
         place-items: center;
         flex-shrink: 0;
       }
-
       .notif-icon.like {
         background: var(--rose-bg);
         color: var(--rose);
       }
-
       .notif-icon.comment {
         background: var(--accent-bg);
         color: var(--accent);
       }
-
       .notif-icon.repost {
         background: var(--green-bg);
         color: var(--green);
       }
-
       .notif-icon.follow {
         background: var(--amber-bg);
         color: var(--amber);
       }
-
       .notif-body {
         flex: 1;
         min-width: 0;
       }
-
       .notif-text {
         font-size: 13.5px;
         line-height: 1.5;
         color: var(--txt);
       }
-
       .notif-text strong {
         font-weight: 700;
       }
-
       .notif-snippet {
         font-size: 12px;
         color: var(--txt2);
@@ -1966,13 +2048,11 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-
       .notif-time {
         font-size: 11px;
         color: var(--txt3);
         margin-top: 4px;
       }
-
       .notif-dot {
         width: 8px;
         height: 8px;
@@ -1981,13 +2061,11 @@
         flex-shrink: 0;
         margin-top: 5px;
       }
-
       .notif-empty {
         text-align: center;
         padding: 64px 20px;
         color: var(--txt2);
       }
-
       .notif-empty svg {
         width: 40px;
         height: 40px;
@@ -1995,11 +2073,9 @@
         display: block;
         color: var(--txt3);
       }
-
       .notif-empty p {
         font-size: 14px;
       }
-
       .nav-item .nav-badge {
         min-width: 18px;
         height: 18px;
@@ -2014,7 +2090,6 @@
         justify-content: center;
         margin-left: auto;
       }
-
       .nav-item .nav-badge.show {
         display: flex;
       }
@@ -2032,30 +2107,25 @@
         border: none;
         transition: all var(--tr);
       }
-
       .follow-btn.follow {
         background: var(--accent);
         color: #fff;
         box-shadow: 0 2px 12px var(--accent-glow);
       }
-
       .follow-btn.follow:hover {
         background: var(--accent-h);
         transform: translateY(-1px);
       }
-
       .follow-btn.unfollow {
         background: var(--card);
         color: var(--txt2);
         border: 1.5px solid var(--border);
       }
-
       .follow-btn.unfollow:hover {
         background: var(--rose-bg);
         color: var(--rose);
         border-color: var(--rose);
       }
-
       .follow-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -2068,7 +2138,6 @@
         gap: 6px;
         margin-bottom: 16px;
       }
-
       .feed-tab {
         flex: 1;
         padding: 9px;
@@ -2082,7 +2151,6 @@
         transition: all var(--tr);
         text-align: center;
       }
-
       .feed-tab.active {
         background: var(--accent-bg);
         border-color: var(--accent);
@@ -2094,7 +2162,6 @@
         position: relative;
         margin-bottom: 20px;
       }
-
       .search-bar-wrap .search-icon {
         position: absolute;
         left: 14px;
@@ -2105,7 +2172,6 @@
         color: var(--txt3);
         pointer-events: none;
       }
-
       .search-bar {
         width: 100%;
         background: var(--card);
@@ -2119,22 +2185,18 @@
           border-color var(--tr),
           box-shadow var(--tr);
       }
-
       .search-bar:focus {
         border-color: var(--accent);
         box-shadow: 0 0 0 3px var(--accent-bg);
       }
-
       .search-bar::placeholder {
         color: var(--txt3);
       }
-
       .search-tabs {
         display: flex;
         gap: 6px;
         margin-bottom: 18px;
       }
-
       .search-tab {
         flex: 1;
         padding: 9px;
@@ -2148,25 +2210,21 @@
         transition: all var(--tr);
         text-align: center;
       }
-
       .search-tab.active {
         background: var(--accent-bg);
         border-color: var(--accent);
         color: var(--accent);
       }
-
       .search-results {
         display: flex;
         flex-direction: column;
         gap: 10px;
       }
-
       .search-hint {
         text-align: center;
         padding: 48px 20px;
         color: var(--txt2);
       }
-
       .search-hint svg {
         width: 40px;
         height: 40px;
@@ -2174,11 +2232,9 @@
         display: block;
         color: var(--txt3);
       }
-
       .search-hint p {
         font-size: 14px;
       }
-
       .people-card {
         background: var(--card);
         border: 1px solid var(--border);
@@ -2191,34 +2247,28 @@
           border-color var(--tr),
           box-shadow var(--tr);
       }
-
       .people-card:hover {
         border-color: var(--border2);
         box-shadow: var(--shadow);
       }
-
       .people-card-info {
         flex: 1;
         min-width: 0;
       }
-
       .people-card-name {
         font-size: 14px;
         font-weight: 700;
       }
-
       .people-card-email {
         font-size: 12px;
         color: var(--txt2);
         margin-top: 2px;
       }
-
       .people-card-posts {
         font-size: 11px;
         color: var(--txt3);
         margin-top: 4px;
       }
-
       mark.hl {
         background: var(--accent-bg);
         color: var(--accent);
@@ -2231,199 +2281,656 @@
         .topbar {
           display: none !important;
         }
-
         .mobile-nav {
           display: none !important;
         }
       }
-
       @media (max-width: 768px) {
         .sidebar {
           display: none !important;
         }
-
         .topbar {
           display: flex;
         }
-
         .mobile-nav {
           display: flex;
         }
-
         .shell {
           flex-direction: column;
         }
-
         .main {
           width: 100%;
           min-width: 0;
         }
-
         .content {
           padding: 16px 12px 100px;
           max-width: 100%;
         }
-
         .page-header {
           margin-bottom: 18px;
         }
-
         .page-header h1 {
           font-size: 22px;
         }
-
         .auth-wrap {
           margin: 8px auto;
         }
-
         .auth-card {
           padding: 24px 18px;
           border-radius: 14px;
         }
-
         .compose {
           padding: 14px;
         }
-
         .post-body {
           font-size: 14px;
           padding: 8px 13px;
         }
-
         .post-head {
           padding: 12px 13px 0;
         }
-
         .post-actions {
           padding: 8px 10px;
           gap: 0;
         }
-
         .act-btn {
           padding: 7px 8px;
           font-size: 12px;
           gap: 4px;
         }
-
         .act-btn svg {
           width: 14px;
           height: 14px;
         }
-
         .comments-panel {
           padding: 12px 13px;
         }
-
         .profile-hero {
           padding: 20px 16px;
         }
-
         .av.lg {
           width: 56px;
           height: 56px;
           font-size: 22px;
           border-radius: 16px;
         }
-
         .profile-name {
           font-size: 18px;
         }
-
         .settings-row {
           padding: 13px 14px;
           gap: 11px;
         }
-
         .settings-edit-form {
           padding: 14px;
         }
-
         .settings-save-row {
           flex-direction: column-reverse;
           gap: 8px;
         }
-
         .settings-save-row .btn {
           width: 100%;
           justify-content: center;
         }
-
         .danger-zone {
           padding: 16px;
         }
-
         .danger-zone .btn {
           width: 100%;
           justify-content: center;
         }
-
         .modal-backdrop {
           align-items: flex-end;
         }
-
         .modal {
           width: 100%;
           border-radius: var(--radius) var(--radius) 0 0;
           padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
           animation: slideUpMobile 0.28s cubic-bezier(0.34, 1.2, 0.64, 1);
         }
-
         @keyframes slideUpMobile {
           from {
             opacity: 0;
             transform: translateY(100%);
           }
-
           to {
             opacity: 1;
             transform: translateY(0);
           }
         }
-
         #toast {
           bottom: 80px;
         }
-
         .feed-tabs {
           gap: 4px;
         }
-
         .feed-tab {
           font-size: 12px;
           padding: 8px;
         }
       }
-
       @media (max-width: 380px) {
         .content {
           padding: 12px 10px 100px;
         }
-
         .page-header h1 {
           font-size: 20px;
         }
-
         .auth-card {
           padding: 20px 14px;
         }
-
         .act-btn {
           padding: 6px 6px;
           font-size: 11px;
         }
       }
+
+      /* Lightbox thumbnail hover affordance */
+      .lb-thumb {
+        cursor: zoom-in !important;
+        transition:
+          transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+          box-shadow 0.22s ease,
+          filter 0.22s ease;
+      }
+      .lb-thumb:hover {
+        transform: scale(1.012);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+        filter: brightness(1.04);
+      }
+      .lb-thumb:active {
+        transform: scale(0.98);
+      }
+      @keyframes lbFadeSlideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px) scale(0.94);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* ═══════════════════ DM STYLES ═══════════════════ */
+      .dm-shell {
+        display: flex;
+        gap: 0;
+        height: calc(100vh - 60px);
+        min-height: 0;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+      }
+      .dm-inbox {
+        width: 300px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        transition: background 0.3s;
+      }
+      .dm-inbox-head {
+        padding: 18px 16px 12px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .dm-inbox-head h2 {
+        font-family: var(--font-head);
+        font-size: 17px;
+        font-weight: 800;
+        margin-bottom: 10px;
+      }
+      .dm-inbox-search {
+        position: relative;
+      }
+      .dm-inbox-search input {
+        width: 100%;
+        background: var(--bg);
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        padding: 8px 12px 8px 34px;
+        font-size: 13px;
+        color: var(--txt);
+        outline: none;
+        transition: border-color var(--tr);
+        font-family: inherit;
+      }
+      .dm-inbox-search input:focus {
+        border-color: var(--accent);
+      }
+      .dm-inbox-search input::placeholder {
+        color: var(--txt3);
+      }
+      .dm-inbox-search svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        color: var(--txt3);
+        pointer-events: none;
+      }
+      .dm-conv-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 6px 0;
+      }
+      .dm-conv-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 11px 14px;
+        cursor: pointer;
+        transition: background var(--tr);
+        position: relative;
+      }
+      .dm-conv-item:hover {
+        background: var(--card-hover);
+      }
+      .dm-conv-item.active {
+        background: var(--accent-bg);
+      }
+      .dm-conv-item.unread .dm-conv-name {
+        color: var(--txt);
+        font-weight: 800;
+      }
+      .dm-conv-item.unread .dm-conv-preview {
+        color: var(--txt2);
+        font-weight: 600;
+      }
+      .dm-conv-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .dm-conv-name {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--txt);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dm-conv-preview {
+        font-size: 12px;
+        color: var(--txt3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 2px;
+      }
+      .dm-conv-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .dm-conv-time {
+        font-size: 10.5px;
+        color: var(--txt3);
+      }
+      .dm-unread-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .dm-conv-empty {
+        text-align: center;
+        padding: 40px 16px;
+        color: var(--txt2);
+      }
+      .dm-conv-empty svg {
+        width: 36px;
+        height: 36px;
+        margin: 0 auto 10px;
+        display: block;
+        color: var(--txt3);
+      }
+      .dm-conv-empty p {
+        font-size: 13px;
+      }
+
+      .dm-chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        background: var(--card);
+        transition: background 0.3s;
+      }
+      .dm-chat-empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--txt2);
+        gap: 10px;
+        padding: 32px;
+      }
+      .dm-chat-empty svg {
+        width: 52px;
+        height: 52px;
+        color: var(--txt3);
+      }
+      .dm-chat-empty h3 {
+        font-family: var(--font-head);
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--txt);
+      }
+      .dm-chat-empty p {
+        font-size: 13.5px;
+        text-align: center;
+        max-width: 220px;
+        line-height: 1.5;
+      }
+      .dm-chat-empty .btn {
+        margin-top: 8px;
+      }
+
+      .dm-chat-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        background: var(--surface);
+        transition: background 0.3s;
+      }
+      .dm-chat-head-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .dm-chat-head-name {
+        font-size: 15px;
+        font-weight: 800;
+        font-family: var(--font-head);
+      }
+      .dm-chat-head-status {
+        font-size: 12px;
+        color: var(--green);
+        margin-top: 1px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .dm-chat-head-status::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--green);
+        display: inline-block;
+      }
+
+      .dm-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 18px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .dm-date-divider {
+        text-align: center;
+        font-size: 11px;
+        color: var(--txt3);
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin: 10px 0 4px;
+        text-transform: uppercase;
+      }
+      .dm-msg {
+        display: flex;
+        gap: 9px;
+        align-items: flex-end;
+        animation: fadeUp 0.2s ease both;
+      }
+      .dm-msg.mine {
+        flex-direction: row-reverse;
+      }
+      .dm-bubble {
+        max-width: 68%;
+        padding: 10px 14px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.55;
+        word-break: break-word;
+        position: relative;
+      }
+      .dm-msg.theirs .dm-bubble {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--txt);
+        border-bottom-left-radius: 5px;
+      }
+      .dm-msg.mine .dm-bubble {
+        background: var(--accent);
+        color: #fff;
+        border-bottom-right-radius: 5px;
+        box-shadow: 0 3px 14px var(--accent-glow);
+      }
+      .dm-bubble-time {
+        font-size: 10px;
+        margin-top: 4px;
+        opacity: 0.55;
+        display: block;
+        text-align: right;
+      }
+      .dm-msg.theirs .dm-bubble-time {
+        text-align: left;
+      }
+
+      .dm-compose {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        flex-shrink: 0;
+        background: var(--surface);
+        transition: background 0.3s;
+      }
+      .dm-compose-input {
+        flex: 1;
+        background: var(--bg);
+        border: 1.5px solid var(--border);
+        border-radius: 22px;
+        padding: 10px 16px;
+        font-size: 14px;
+        color: var(--txt);
+        outline: none;
+        resize: none;
+        max-height: 120px;
+        overflow-y: auto;
+        line-height: 1.5;
+        font-family: inherit;
+        transition: border-color var(--tr);
+      }
+      .dm-compose-input:focus {
+        border-color: var(--accent);
+      }
+      .dm-compose-input::placeholder {
+        color: var(--txt3);
+      }
+      .dm-send-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        transition: all var(--tr);
+        box-shadow: 0 3px 12px var(--accent-glow);
+        border: none;
+        cursor: pointer;
+      }
+      .dm-send-btn:hover {
+        background: var(--accent-h);
+        transform: scale(1.08);
+      }
+      .dm-send-btn:disabled {
+        opacity: 0.4;
+        transform: none;
+        cursor: not-allowed;
+      }
+      .dm-send-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* New DM Modal */
+      .dm-new-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 600;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+      }
+      .dm-new-modal.open {
+        display: flex;
+      }
+      .dm-new-box {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        width: 380px;
+        max-width: 94vw;
+        box-shadow: var(--shadow-lg);
+        animation: fadeUp 0.22s ease both;
+        overflow: hidden;
+      }
+      .dm-new-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+      .dm-new-head h3 {
+        font-family: var(--font-head);
+        font-size: 16px;
+        font-weight: 800;
+        flex: 1;
+      }
+      .dm-new-search-wrap {
+        padding: 14px 16px 8px;
+      }
+      .dm-new-search-wrap input {
+        width: 100%;
+        background: var(--bg);
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        padding: 9px 16px;
+        font-size: 14px;
+        color: var(--txt);
+        outline: none;
+        font-family: inherit;
+        transition: border-color var(--tr);
+      }
+      .dm-new-search-wrap input:focus {
+        border-color: var(--accent);
+      }
+      .dm-new-search-wrap input::placeholder {
+        color: var(--txt3);
+      }
+      .dm-new-results {
+        max-height: 280px;
+        overflow-y: auto;
+        padding: 4px 0 8px;
+      }
+      .dm-new-result {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 10px 16px;
+        cursor: pointer;
+        transition: background var(--tr);
+      }
+      .dm-new-result:hover {
+        background: var(--accent-bg);
+      }
+      .dm-new-result-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .dm-new-result-name {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .dm-new-result-email {
+        font-size: 12px;
+        color: var(--txt2);
+        margin-top: 1px;
+      }
+      .dm-new-empty {
+        text-align: center;
+        padding: 28px 16px;
+        color: var(--txt3);
+        font-size: 13.5px;
+      }
+
+      /* mobile: stack the DM shell */
+      @media (max-width: 768px) {
+        .dm-shell {
+          height: calc(100vh - 120px);
+          border-radius: 12px;
+        }
+        .dm-inbox {
+          width: 100%;
+          border-right: none;
+        }
+        .dm-inbox.hidden-mobile {
+          display: none;
+        }
+        .dm-chat {
+          display: none;
+        }
+        .dm-chat.visible-mobile {
+          display: flex;
+        }
+        .dm-chat-back {
+          display: flex !important;
+        }
+      }
+      .dm-chat-back {
+        display: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        align-items: center;
+        justify-content: center;
+        color: var(--txt2);
+        background: var(--accent-bg);
+        flex-shrink: 0;
+        cursor: pointer;
+        border: none;
+      }
+      .dm-chat-back svg {
+        width: 18px;
+        height: 18px;
+      }
     </style>
   </head>
-
   <body>
     <div class="shell">
       <!-- SIDEBAR -->
       <aside class="sidebar">
         <div class="logo-wrap">
           <div class="logo-mark">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="9" />
-            </svg>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /></svg>
           </div>
           <span class="logo-text">Circle</span>
         </div>
@@ -2476,6 +2983,20 @@
             </svg>
             <span class="nav-label">Notifications</span>
             <span class="nav-badge" id="snav-notif-badge">0</span>
+          </div>
+          <div class="nav-item" onclick="goTo('messages')" id="snav-messages">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+            <span class="nav-badge" id="snav-dm-badge">0</span>
           </div>
           <div class="nav-item" onclick="goTo('settings')" id="snav-settings">
             <svg
@@ -2667,6 +3188,37 @@
                 post and interact.
               </div>
             </div>
+            <!-- SUGGESTED USERS -->
+            <div
+              class="suggestions-section"
+              id="suggestions-section"
+              style="display: none"
+            >
+              <div class="suggestions-header">
+                <span class="suggestions-title"
+                  >&#10024; Suggested for you</span
+                >
+                <button
+                  class="suggestions-refresh"
+                  id="sug-refresh-btn"
+                  onclick="loadSuggestions(true)"
+                  title="Refresh suggestions"
+                >
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+                  </svg>
+                  Refresh
+                </button>
+              </div>
+              <div class="suggestions-scroll" id="suggestions-list"></div>
+            </div>
+
             <div class="feed" id="feed-list"></div>
           </div>
 
@@ -2763,8 +3315,93 @@
                   Sign In
                 </button>
                 <div class="auth-switch">
+                  <button onclick="goTo('reset-password')">
+                    Forgot Password?
+                  </button>
+                </div>
+                <div class="auth-switch">
                   No account?
                   <button onclick="goTo('register')">Create one</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESET PASSWORD -->
+          <div class="view" id="view-reset-password">
+            <div class="auth-wrap">
+              <div class="auth-card">
+                <div class="auth-brand">
+                  <div class="auth-brand-icon">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="9" />
+                    </svg>
+                  </div>
+                  <span>Circle</span>
+                </div>
+                <h2>Reset Password</h2>
+                <p class="sub">Enter your email to receive a reset link</p>
+                <div class="alert" id="reset-alert"></div>
+                <div class="field">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    id="reset-email"
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <button
+                  class="btn btn-primary btn-full"
+                  onclick="sendResetEmail()"
+                >
+                  Send Reset Link
+                </button>
+                <div class="auth-switch">
+                  Remembered? <button onclick="goTo('login')">Sign in</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NEW PASSWORD -->
+          <div class="view" id="view-new-password">
+            <div class="auth-wrap">
+              <div class="auth-card">
+                <div class="auth-brand">
+                  <div class="auth-brand-icon">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="9" />
+                    </svg>
+                  </div>
+                  <span>Circle</span>
+                </div>
+                <h2>New Password</h2>
+                <p class="sub">Choose a strong new password</p>
+                <div class="alert" id="newpw-alert"></div>
+                <div class="field">
+                  <label>New Password</label>
+                  <input
+                    type="password"
+                    id="newpw-password"
+                    placeholder="Min. 6 characters"
+                  />
+                </div>
+                <div class="field">
+                  <label>Confirm Password</label>
+                  <input
+                    type="password"
+                    id="newpw-confirm"
+                    placeholder="Repeat your password"
+                  />
+                </div>
+                <button
+                  class="btn btn-primary btn-full"
+                  onclick="setNewPassword()"
+                >
+                  Update Password
+                </button>
+                <div class="auth-switch">
+                  Remembered? <button onclick="goTo('login')">Sign in</button>
                 </div>
               </div>
             </div>
@@ -2820,7 +3457,80 @@
           </div>
 
           <!-- PROFILE -->
-           <div class="view" id="view-profile">
+          <!--  <div class="view" id="view-profile">
+            <div class="page-header" id="profile-page-header">
+              <div
+                id="profile-back-row"
+                style="display: none; margin-bottom: 12px"
+              >
+                <button
+                  onclick="goTo('feed')"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    color: var(--txt2);
+                    font-size: 13px;
+                    font-weight: 600;
+                    padding: 0;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                  "
+                  onmouseover="this.style.color = 'var(--accent)'"
+                  onmouseout="this.style.color = 'var(--txt2)'"
+                >
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                  >
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                  Back
+                </button>
+              </div>
+              <h1><em>Profile</em></h1>
+            </div>
+            <div class="profile-hero">
+              <div class="profile-hero-top">
+                <div id="profile-av-wrap">
+                  <div class="av lg" id="profile-av">?</div>
+                </div>
+                <div class="profile-info">
+                  <div class="profile-name" id="profile-name">—</div>
+                  <div class="profile-email" id="profile-email">—</div>
+                </div>
+              </div>
+              <div class="profile-stats">
+                <div class="stat">
+                  <div class="stat-n" id="stat-posts">0</div>
+                  <div class="stat-l">Posts</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-n" id="stat-followers">0</div>
+                  <div class="stat-l">Followers</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-n" id="stat-following">0</div>
+                  <div class="stat-l">Following</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-n" id="stat-likes">0</div>
+                  <div class="stat-l">Likes</div>
+                </div>
+              </div>
+              <div class="profile-actions" id="profile-actions"></div>
+            </div>
+            <div class="section-label" id="profile-posts-label">Posts</div>
+            <div class="feed" id="profile-feed"></div>
+          </div> -->
+
+          <!-- PROFILE -->
+          <div class="view" id="view-profile">
             <div class="page-header">
               <h1><em>Profile</em></h1>
             </div>
@@ -2917,7 +3627,10 @@
                 </button>
               </div>
             </div>
-            <div class="section-label">My Posts</div>
+            <!-- <div class="section-label">My Posts</div>
+            <div class="feed" id="profile-feed"></div>
+          </div>-->
+            <div class="section-label" id="profile-posts-label">Posts</div>
             <div class="feed" id="profile-feed"></div>
           </div>
 
@@ -2950,9 +3663,7 @@
                     </svg>
                   </div>
                   <div class="av-upload-badge">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M12 5v14M5 12h14" />
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
                   </div>
                   <input
                     type="file"
@@ -3056,11 +3767,10 @@
                     ><input
                       type="checkbox"
                       id="theme-toggle"
-                      onchange="toggleTheme()"
-                    />
+                      onchange="toggleTheme()" />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
             </div>
@@ -3089,8 +3799,8 @@
                   <label class="toggle"
                     ><input type="checkbox" id="notif-likes" checked />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
               <div class="settings-row">
@@ -3116,8 +3826,8 @@
                   <label class="toggle"
                     ><input type="checkbox" id="notif-comments" checked />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
               <div class="settings-row">
@@ -3144,8 +3854,8 @@
                   <label class="toggle"
                     ><input type="checkbox" id="notif-reposts" checked />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
               <div class="settings-row">
@@ -3170,8 +3880,8 @@
                   <label class="toggle"
                     ><input type="checkbox" id="notif-push" />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
             </div>
@@ -3198,8 +3908,8 @@
                   <label class="toggle"
                     ><input type="checkbox" id="priv-account" />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
               <div class="settings-row">
@@ -3224,8 +3934,8 @@
                   <label class="toggle"
                     ><input type="checkbox" id="priv-activity" checked />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
             </div>
@@ -3265,6 +3975,251 @@
                   <line x1="21" y1="12" x2="9" y2="12" /></svg
                 >Log Out
               </button>
+            </div>
+          </div>
+          <!-- MESSAGES (DM) -->
+          <div class="view" id="view-messages">
+            <div
+              class="page-header"
+              style="
+                margin-bottom: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              "
+            >
+              <div>
+                <h1><em>Messages</em></h1>
+                <p>Private conversations</p>
+              </div>
+              <button
+                class="btn btn-ghost"
+                style="font-size: 13px; padding: 8px 16px; gap: 7px"
+                onclick="openNewDMModal()"
+              >
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                  width="15"
+                  height="15"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                New Message
+              </button>
+            </div>
+            <div class="dm-shell" id="dm-shell">
+              <!-- Inbox list -->
+              <div class="dm-inbox" id="dm-inbox">
+                <div class="dm-inbox-head">
+                  <h2>Inbox</h2>
+                  <div class="dm-inbox-search">
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                      type="text"
+                      id="dm-inbox-search"
+                      placeholder="Search conversations…"
+                      oninput="dmFilterInbox()"
+                      autocomplete="off"
+                    />
+                  </div>
+                </div>
+                <div class="dm-conv-list" id="dm-conv-list">
+                  <div class="dm-conv-empty">
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      />
+                    </svg>
+                    <p>No conversations yet.<br />Start one!</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Chat area -->
+              <div class="dm-chat" id="dm-chat">
+                <div class="dm-chat-empty" id="dm-chat-empty">
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                    />
+                  </svg>
+                  <h3>Your Messages</h3>
+                  <p>Send a private message to anyone on Circle.</p>
+                  <button
+                    class="btn btn-primary"
+                    style="font-size: 13px; padding: 9px 20px"
+                    onclick="openNewDMModal()"
+                  >
+                    Start a conversation
+                  </button>
+                </div>
+                <div
+                  id="dm-chat-active"
+                  style="display: none; flex-direction: column; height: 100%"
+                >
+                  <div class="dm-chat-head">
+                    <button
+                      class="dm-chat-back"
+                      id="dm-back-btn"
+                      onclick="dmBackToInbox()"
+                    >
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <polyline points="15 18 9 12 15 6" />
+                      </svg>
+                    </button>
+                    <div class="av sm" id="dm-chat-av"></div>
+                    <div class="dm-chat-head-info">
+                      <div class="dm-chat-head-name" id="dm-chat-name"></div>
+                      <div class="dm-chat-head-status">Active now</div>
+                    </div>
+                    <button
+                      class="icon-btn"
+                      onclick="openNewDMModal()"
+                      title="New message"
+                      style="flex-shrink: 0"
+                    >
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
+                        />
+                        <path
+                          d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="dm-messages" id="dm-messages"></div>
+                  <div class="dm-compose">
+                    <textarea
+                      class="dm-compose-input"
+                      id="dm-compose-input"
+                      placeholder="Message…"
+                      rows="1"
+                      oninput="dmAutoResize(this)"
+                      onkeydown="dmSendOnEnter(event)"
+                    ></textarea>
+                    <button
+                      class="dm-send-btn"
+                      id="dm-send-btn"
+                      onclick="dmSendMessage()"
+                    >
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <line x1="22" y1="2" x2="11" y2="13" />
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POST DETAIL -->
+        <div class="view" id="view-post-detail">
+          <div class="content">
+            <div
+              class="page-header"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding-bottom: 12px;
+                padding-top: 0;
+              "
+            >
+              <button
+                onclick="closePostDetail()"
+                style="
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  color: var(--txt2);
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  padding: 8px 0;
+                "
+              >
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                >
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+                Back
+              </button>
+              <h1 style="font-size: 20px; margin: 0">Post</h1>
+            </div>
+            <div id="post-detail-content"></div>
+            <div id="post-detail-comments" style="margin-top: 8px"></div>
+            <div
+              class="post-detail-reply-bar"
+              id="post-detail-reply-bar"
+              style="display: none"
+            >
+              <div class="comment-input-row" style="padding: 12px 0 0">
+                <input
+                  class="comment-input"
+                  id="post-detail-reply-input"
+                  type="text"
+                  placeholder="Write a reply…"
+                  onkeydown="if (event.key === 'Enter') postDetailAddComment();"
+                />
+                <button class="send-btn" onclick="postDetailAddComment()">
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -3308,6 +4263,17 @@
           <circle cx="12" cy="7" r="4" />
         </svg>
         Profile
+      </div>
+      <div class="mnav-item" id="mnav-messages" onclick="goTo('messages')">
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+        </svg>
+        Messages
       </div>
       <div class="mnav-item" id="mnav-settings" onclick="goTo('settings')">
         <svg
@@ -3474,7 +4440,439 @@
       </div>
     </div>
 
+    <!-- NEW DM MODAL -->
+    <div
+      class="dm-new-modal"
+      id="dm-new-modal"
+      onclick="if (event.target === this) closeNewDMModal();"
+    >
+      <div class="dm-new-box">
+        <div class="dm-new-head">
+          <h3>New Message</h3>
+          <button class="notif-close" onclick="closeNewDMModal()">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="dm-new-search-wrap">
+          <input
+            type="text"
+            id="dm-new-search"
+            placeholder="Search people…"
+            oninput="dmSearchPeople()"
+            autocomplete="off"
+          />
+        </div>
+        <div class="dm-new-results" id="dm-new-results">
+          <div class="dm-new-empty">Search for someone to message</div>
+        </div>
+      </div>
+    </div>
+
     <div id="toast"></div>
+
+    <!-- ═══════════════════════════════════════════
+         LIGHTBOX OVERLAY
+    ═══════════════════════════════════════════ -->
+    <div
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image viewer"
+      onclick="if (event.target === this) closeLightbox();"
+      onwheel="lbWheel(event)"
+      onpointerdown="lbPointerDown(event)"
+      onpointermove="lbPointerMove(event)"
+      onpointerup="lbPointerUp(event)"
+      onpointercancel="lbPointerUp(event)"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(18px);
+        align-items: center;
+        justify-content: center;
+        touch-action: none;
+      "
+    >
+      <!-- Profile chip — top left -->
+      <div
+        id="lb-profile"
+        style="
+          position: absolute;
+          top: 16px;
+          left: 16px;
+          display: none;
+          align-items: center;
+          gap: 10px;
+          background: rgba(0, 0, 0, 0.55);
+          border: 1px solid rgba(255, 255, 255, 0.13);
+          padding: 7px 14px 7px 7px;
+          border-radius: 40px;
+          backdrop-filter: blur(12px);
+          cursor: pointer;
+          z-index: 10;
+          transition:
+            background 0.2s,
+            transform 0.2s;
+          animation: lbFadeSlideDown 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+        "
+        onmouseover="
+          this.style.background = 'rgba(255,255,255,0.12)';
+          this.style.transform = 'scale(1.03)';
+        "
+        onmouseout="
+          this.style.background = 'rgba(0,0,0,0.55)';
+          this.style.transform = 'scale(1)';
+        "
+      >
+        <div
+          id="lb-profile-av"
+          style="
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--accent);
+            display: grid;
+            place-items: center;
+            font-family: var(--font-head);
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+            overflow: hidden;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
+          "
+        ></div>
+        <div>
+          <div
+            id="lb-profile-name"
+            style="
+              font-family: var(--font-head);
+              font-size: 13px;
+              font-weight: 800;
+              color: #fff;
+              line-height: 1.2;
+              white-space: nowrap;
+            "
+          ></div>
+          <div
+            style="
+              font-size: 11px;
+              color: rgba(255, 255, 255, 0.5);
+              margin-top: 1px;
+            "
+          >
+            View profile
+          </div>
+        </div>
+      </div>
+
+      <!-- Close -->
+      <button
+        onclick="closeLightbox()"
+        title="Close (Esc)"
+        aria-label="Close"
+        style="
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #fff;
+          display: grid;
+          place-items: center;
+          backdrop-filter: blur(8px);
+          transition:
+            background 0.2s,
+            transform 0.2s;
+          cursor: pointer;
+          z-index: 10;
+        "
+        onmouseover="
+          this.style.background = 'rgba(255,255,255,0.2)';
+          this.style.transform = 'scale(1.1)';
+        "
+        onmouseout="
+          this.style.background = 'rgba(255,255,255,0.1)';
+          this.style.transform = 'scale(1)';
+        "
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+
+      <!-- Download -->
+      <button
+        onclick="lbDownload()"
+        title="Download"
+        aria-label="Download"
+        style="
+          position: absolute;
+          top: 16px;
+          right: 70px;
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #fff;
+          display: grid;
+          place-items: center;
+          backdrop-filter: blur(8px);
+          transition:
+            background 0.2s,
+            transform 0.2s;
+          cursor: pointer;
+          z-index: 10;
+        "
+        onmouseover="
+          this.style.background = 'rgba(255,255,255,0.2)';
+          this.style.transform = 'scale(1.1)';
+        "
+        onmouseout="
+          this.style.background = 'rgba(255,255,255,0.1)';
+          this.style.transform = 'scale(1)';
+        "
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+        >
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+      </button>
+
+      <!-- Share -->
+      <button
+        onclick="lbShare()"
+        title="Share / Copy link"
+        aria-label="Share"
+        style="
+          position: absolute;
+          top: 16px;
+          right: 124px;
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #fff;
+          display: grid;
+          place-items: center;
+          backdrop-filter: blur(8px);
+          transition:
+            background 0.2s,
+            transform 0.2s;
+          cursor: pointer;
+          z-index: 10;
+        "
+        onmouseover="
+          this.style.background = 'rgba(255,255,255,0.2)';
+          this.style.transform = 'scale(1.1)';
+        "
+        onmouseout="
+          this.style.background = 'rgba(255,255,255,0.1)';
+          this.style.transform = 'scale(1)';
+        "
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+        >
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+        </svg>
+      </button>
+
+      <!-- Prev arrow -->
+      <button
+        id="lb-prev"
+        onclick="lbGoTo(_lbIndex - 1)"
+        aria-label="Previous image"
+        style="
+          display: none;
+          position: absolute;
+          left: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #fff;
+          place-items: center;
+          backdrop-filter: blur(8px);
+          transition:
+            background 0.2s,
+            transform 0.2s;
+          cursor: pointer;
+          z-index: 10;
+        "
+        onmouseover="
+          this.style.background = 'rgba(255,255,255,0.22)';
+          this.style.transform = 'translateY(-50%) scale(1.1)';
+        "
+        onmouseout="
+          this.style.background = 'rgba(255,255,255,0.12)';
+          this.style.transform = 'translateY(-50%) scale(1)';
+        "
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+        >
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+
+      <!-- Next arrow -->
+      <button
+        id="lb-next"
+        onclick="lbGoTo(_lbIndex + 1)"
+        aria-label="Next image"
+        style="
+          display: none;
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #fff;
+          place-items: center;
+          backdrop-filter: blur(8px);
+          transition:
+            background 0.2s,
+            transform 0.2s;
+          cursor: pointer;
+          z-index: 10;
+        "
+        onmouseover="
+          this.style.background = 'rgba(255,255,255,0.22)';
+          this.style.transform = 'translateY(-50%) scale(1.1)';
+        "
+        onmouseout="
+          this.style.background = 'rgba(255,255,255,0.12)';
+          this.style.transform = 'translateY(-50%) scale(1)';
+        "
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+        >
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+
+      <!-- Image -->
+      <img
+        id="lb-img"
+        ondblclick="lbDblClick()"
+        alt="Full size image"
+        style="
+          max-width: min(92vw, 1200px);
+          max-height: 90vh;
+          border-radius: 12px;
+          object-fit: contain;
+          cursor: zoom-in;
+          user-select: none;
+          -webkit-user-drag: none;
+          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+          will-change: transform;
+        "
+        draggable="false"
+      />
+
+      <!-- Counter pill -->
+      <div
+        id="lb-counter"
+        style="
+          display: none;
+          position: absolute;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #fff;
+          font-family: var(--font-body);
+          font-size: 13px;
+          font-weight: 700;
+          padding: 6px 16px;
+          border-radius: 20px;
+          backdrop-filter: blur(8px);
+          letter-spacing: 0.03em;
+          align-items: center;
+          gap: 6px;
+        "
+      ></div>
+
+      <!-- Hint -->
+      <div
+        id="lb-hint"
+        style="
+          position: absolute;
+          bottom: 60px;
+          left: 50%;
+          transform: translateX(-50%);
+          color: rgba(255, 255, 255, 0.35);
+          font-size: 11px;
+          font-family: var(--font-body);
+          white-space: nowrap;
+          pointer-events: none;
+          transition: opacity 2s;
+        "
+      >
+        Scroll or pinch to zoom · Double-click to reset · ← → to navigate
+      </div>
+    </div>
 
     <!-- NOTIFICATION PANEL -->
     <div
@@ -3527,7 +4925,192 @@
         feedHasMore = true,
         feedLoading = false;
 
-      /* ── API ──────────────────────────────────────────────────── */
+      /* ═══════════════════════════════════════════════════════════════
+         POST CACHE  —  in-memory + localStorage persistence
+         ═══════════════════════════════════════════════════════════════
+         Strategy:
+           • In-memory Map for O(1) lookups by post id
+           • localStorage snapshot for instant paint on revisit
+           • Per-feed page cursors so pagination never re-fetches seen pages
+           • TTL of 5 min per feed; stale data shown instantly then
+             background-refreshed (stale-while-revalidate)
+           • Mutations (create/delete/like/comment/repost) update both
+             the in-memory cache and the rendered DOM surgically — no
+             full re-renders unless necessary
+      ═══════════════════════════════════════════════════════════════ */
+      const PostCache = (() => {
+        const STORAGE_KEY = "circle_post_cache_v1";
+        const TTL_MS = 5 * 60 * 1000; // 5 minutes
+        const MAX_STORED = 60; // max posts kept in localStorage
+
+        // In-memory structures
+        const _byId = new Map(); // postId → post object
+        const _feeds = {}; // "global|1" → { ids[], ts, hasMore }
+        const _profiles = {}; // userId → { ids[], ts }
+
+        // ── Persistence ─────────────────────────────────────────────
+        function _save() {
+          try {
+            // Only persist the most recent posts to stay under 5MB quota
+            const recent = [..._byId.values()]
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .slice(0, MAX_STORED);
+            const payload = {
+              posts: recent,
+              feeds: _feeds,
+              profiles: _profiles,
+              savedAt: Date.now(),
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          } catch (e) {
+            // Storage quota exceeded — clear and retry once
+            try {
+              localStorage.removeItem(STORAGE_KEY);
+            } catch (_) {}
+          }
+        }
+
+        function _load() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            const { posts: stored, feeds, profiles } = JSON.parse(raw);
+            if (Array.isArray(stored)) {
+              stored.forEach((p) => _byId.set(p.id, p));
+            }
+            if (feeds) Object.assign(_feeds, feeds);
+            if (profiles) Object.assign(_profiles, profiles);
+          } catch (e) {
+            try {
+              localStorage.removeItem(STORAGE_KEY);
+            } catch (_) {}
+          }
+        }
+
+        // ── Cache key helpers ────────────────────────────────────────
+        function _feedKey(tab, page) {
+          return `${tab}|${page}`;
+        }
+        function _isStale(ts) {
+          return !ts || Date.now() - ts > TTL_MS;
+        }
+
+        // ── Public API ───────────────────────────────────────────────
+        return {
+          // Called once at boot to hydrate from localStorage
+          init() {
+            _load();
+          },
+
+          // Store a page of posts from the API
+          storeFeedPage(tab, page, newPosts, hasMore) {
+            newPosts.forEach((p) => _byId.set(p.id, p));
+            _feeds[_feedKey(tab, page)] = {
+              ids: newPosts.map((p) => p.id),
+              ts: Date.now(),
+              hasMore,
+            };
+            _save();
+          },
+
+          // Get a cached page — returns null if missing or stale
+          getFeedPage(tab, page) {
+            const entry = _feeds[_feedKey(tab, page)];
+            if (!entry || _isStale(entry.ts)) return null;
+            const resolved = entry.ids
+              .map((id) => _byId.get(id))
+              .filter(Boolean);
+            if (resolved.length !== entry.ids.length) return null; // partial — refetch
+            return { posts: resolved, hasMore: entry.hasMore };
+          },
+
+          // Check freshness without resolving posts
+          isFeedPageFresh(tab, page) {
+            const entry = _feeds[_feedKey(tab, page)];
+            return entry && !_isStale(entry.ts);
+          },
+
+          // Store profile posts
+          storeProfile(userId, profilePosts) {
+            profilePosts.forEach((p) => _byId.set(p.id, p));
+            _profiles[userId] = {
+              ids: profilePosts.map((p) => p.id),
+              ts: Date.now(),
+            };
+            _save();
+          },
+
+          // Get cached profile posts
+          getProfile(userId) {
+            const entry = _profiles[userId];
+            if (!entry || _isStale(entry.ts)) return null;
+            return entry.ids.map((id) => _byId.get(id)).filter(Boolean);
+          },
+
+          // Get a single post by id
+          getPost(id) {
+            return _byId.get(id) || null;
+          },
+
+          // Upsert a single post (create / update)
+          putPost(post) {
+            _byId.set(post.id, post);
+            _save();
+          },
+
+          // Remove a post
+          removePost(id) {
+            _byId.delete(id);
+            // Purge from all feed pages and profiles
+            Object.keys(_feeds).forEach((k) => {
+              _feeds[k].ids = _feeds[k].ids.filter((i) => i !== id);
+            });
+            Object.keys(_profiles).forEach((k) => {
+              _profiles[k].ids = _profiles[k].ids.filter((i) => i !== id);
+            });
+            _save();
+          },
+
+          // Patch a post in-place (likes, comments, reposts)
+          patchPost(id, patchFn) {
+            const post = _byId.get(id);
+            if (post) {
+              patchFn(post);
+              _save();
+            }
+          },
+
+          // Invalidate all pages for a feed tab (forces re-fetch on next load)
+          invalidateFeed(tab) {
+            Object.keys(_feeds).forEach((k) => {
+              if (k.startsWith(tab + "|")) delete _feeds[k];
+            });
+            _save();
+          },
+
+          // Invalidate everything (e.g. on logout)
+          clear() {
+            _byId.clear();
+            Object.keys(_feeds).forEach((k) => delete _feeds[k]);
+            Object.keys(_profiles).forEach((k) => delete _profiles[k]);
+            try {
+              localStorage.removeItem(STORAGE_KEY);
+            } catch (_) {}
+          },
+
+          // Debug info
+          stats() {
+            return {
+              posts: _byId.size,
+              feedKeys: Object.keys(_feeds).length,
+              profiles: Object.keys(_profiles).length,
+            };
+          },
+        };
+      })();
+      /* END PostCache ════════════════════════════════════════════════ */
+
+      /*  API  */
       async function api(method, path, body = null) {
         const opts = {
           method,
@@ -3542,7 +5125,7 @@
         return data;
       }
 
-      /* ── THEME ────────────────────────────────────────────────── */
+      /*  THEME */
       function applyTheme(theme) {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("circle_theme", theme);
@@ -3563,7 +5146,7 @@
         );
       }
 
-      /* ── NAV ──────────────────────────────────────────────────── */
+      /*NAV */
       function goTo(view) {
         document
           .querySelectorAll(".view")
@@ -3579,8 +5162,21 @@
           .forEach((n) => n.classList.remove("active"));
         const mn = document.getElementById("mnav-" + view);
         if (mn) mn.classList.add("active");
+        if (view === "messages") {
+          if (!currentUser) {
+            goTo("login");
+            return;
+          }
+          DM.renderInbox();
+        }
         if (view === "feed") loadPosts();
         if (view === "profile") renderProfile();
+        if (view === "feed" && currentUser && !_suggestionsLoaded)
+          loadSuggestions();
+        if (view === "feed" && !currentUser) {
+          const sw = document.getElementById("suggestions-widget");
+          if (sw) sw.style.display = "none";
+        }
         if (view === "settings") populateSettings();
         if (view === "search") {
           searchTab = "posts";
@@ -3590,7 +5186,7 @@
         window.scrollTo(0, 0);
       }
 
-      /* ── AUTH ─────────────────────────────────────────────────── */
+      /*AUTH  */
       async function registerUser() {
         const name = document.getElementById("reg-name").value.trim();
         const email = document.getElementById("reg-email").value.trim();
@@ -3642,6 +5238,9 @@
       function logout() {
         currentUser = null;
         localStorage.removeItem("circle_user");
+        // ── Cache: clear all cached data on logout ──────────────────
+        PostCache.clear();
+        posts = [];
         document.getElementById("sidebar-user-area").style.display = "none";
         document.getElementById("compose-box").style.display = "none";
         document.getElementById("login-nudge").style.display = "flex";
@@ -3657,6 +5256,13 @@
       }
 
       function setCurrentUser(user) {
+        _suggestionsLoaded = false;
+        if (
+          user &&
+          document.getElementById("view-feed").classList.contains("active")
+        ) {
+          setTimeout(loadSuggestions, 700);
+        }
         currentUser = user;
         localStorage.setItem("circle_user", JSON.stringify(user));
         const initial = user.name.charAt(0).toUpperCase(),
@@ -3698,9 +5304,59 @@
         const topBtn = document.getElementById("topbar-notif-btn");
         if (topBtn) topBtn.style.display = "grid";
         startNotifPolling();
+        loadSuggestions();
       }
 
-      /* ── SETTINGS ─────────────────────────────────────────────── */
+      async function sendResetEmail() {
+        const email = document.getElementById("reset-email").value.trim();
+        const el = document.getElementById("reset-alert");
+        el.className = "alert";
+        if (!email) return showAlert(el, "Please enter your email.", "error");
+        try {
+          await api("POST", "/api/users/reset-password", { email });
+          showAlert(
+            el,
+            "If that email exists, a reset link has been sent.",
+            "success",
+          );
+        } catch (e) {
+          showAlert(el, e.message, "error");
+        }
+      }
+
+      async function setNewPassword() {
+        const pw = document.getElementById("newpw-password").value;
+        const cfm = document.getElementById("newpw-confirm").value;
+        const el = document.getElementById("newpw-alert");
+        el.className = "alert";
+
+        if (!pw || pw.length < 6)
+          return showAlert(
+            el,
+            "Password must be at least 6 characters.",
+            "error",
+          );
+        if (pw !== cfm)
+          return showAlert(el, "Passwords do not match.", "error");
+
+        const token = new URLSearchParams(window.location.search).get("token");
+        if (!token)
+          return showAlert(el, "Invalid or expired reset link.", "error");
+
+        try {
+          await api("POST", "/api/users/reset-password/confirm", {
+            token,
+            password: pw,
+          });
+          showAlert(el, "Password updated! Redirecting to login…", "success");
+          history.replaceState({}, "", window.location.pathname); // strip ?token from URL
+          setTimeout(() => goTo("login"), 1400);
+        } catch (e) {
+          showAlert(el, e.message, "error");
+        }
+      }
+
+      /* SETTINGS */
       function populateSettings() {
         if (!currentUser) {
           goTo("login");
@@ -3773,7 +5429,7 @@
         }
       }
 
-      /* ── FEED TABS ────────────────────────────────────────────── */
+      /* FEED TABS */
       function switchFeedTab(tab) {
         currentFeedTab = tab;
         document
@@ -3782,10 +5438,15 @@
         document
           .getElementById("ftab-following")
           .classList.toggle("active", tab === "following");
+        // Reset pagination state — cache will serve page 1 instantly if fresh
+        feedPage = 1;
+        feedHasMore = true;
+        feedLoading = false;
+        posts = [];
         loadPosts();
       }
 
-      /* ── POSTS ────────────────────────────────────────────────── */
+      /* POSTS */
       async function loadPosts() {
         if (!currentUser) {
           goTo("login");
@@ -3795,19 +5456,90 @@
         feedHasMore = true;
         feedLoading = false;
         posts = [];
+
+        // ── Cache: paint instantly if page 1 is fresh ────────────────
+        const cached = PostCache.getFeedPage(currentFeedTab, 1);
         const c = document.getElementById("feed-list");
+        if (cached) {
+          posts = cached.posts;
+          feedHasMore = cached.hasMore;
+          feedPage = 2;
+          renderFeed();
+          updateScrollSentinel();
+          // Background refresh — update silently if data changed
+          _backgroundRefreshFeed();
+          return;
+        }
+
+        // No valid cache — show spinner and fetch
         c.innerHTML = `<div class="empty"><div class="empty-icon"><div class="spinner" style="border-color:rgba(124,107,255,.3);border-top-color:var(--accent);width:24px;height:24px"></div></div><p>Loading posts…</p></div>`;
         await fetchMorePosts(true);
       }
 
+      async function _backgroundRefreshFeed() {
+        try {
+          const qs = `?userId=${currentUser.id}&feed=${currentFeedTab}&page=1`;
+          const res = await api("GET", `/api/posts${qs}`);
+          const { posts: fresh, hasMore } = res.data;
+          PostCache.storeFeedPage(currentFeedTab, 1, fresh, hasMore);
+          // Only re-render if content actually changed
+          const currentIds = posts
+            .slice(0, fresh.length)
+            .map((p) => p.id)
+            .join(",");
+          const freshIds = fresh.map((p) => p.id).join(",");
+          if (currentIds !== freshIds) {
+            posts = fresh;
+            feedHasMore = hasMore;
+            feedPage = 2;
+            renderFeed();
+            updateScrollSentinel();
+          } else {
+            // Same posts — just patch any changed like/comment counts silently
+            fresh.forEach((fp) => {
+              const existing = posts.find((p) => p.id === fp.id);
+              if (existing) {
+                existing.likes = fp.likes;
+                existing.comments = fp.comments;
+                existing.reposts = fp.reposts;
+                PostCache.putPost(existing);
+              }
+            });
+          }
+        } catch (e) {
+          /* silent — user already sees cached data */
+        }
+      }
+
       async function fetchMorePosts(isFirstPage = false) {
         if (feedLoading || !feedHasMore) return;
+
+        // ── Cache: serve subsequent pages from cache if fresh ─────────
+        const cached = PostCache.getFeedPage(currentFeedTab, feedPage);
+        if (cached && !isFirstPage) {
+          posts = [...posts, ...cached.posts];
+          feedHasMore = cached.hasMore;
+          feedPage++;
+          const c = document.getElementById("feed-list");
+          const frag = document.createDocumentFragment();
+          cached.posts.forEach((p) => {
+            const d = document.createElement("div");
+            d.innerHTML = buildPostCard(p);
+            frag.appendChild(d.firstElementChild);
+          });
+          c.appendChild(frag);
+          updateScrollSentinel();
+          return;
+        }
+
         feedLoading = true;
         try {
           const qs = `?userId=${currentUser.id}&feed=${currentFeedTab}&page=${feedPage}`;
           const res = await api("GET", `/api/posts${qs}`);
           const { posts: newPosts, hasMore } = res.data;
           feedHasMore = hasMore;
+          // ── Store in cache ──────────────────────────────────────────
+          PostCache.storeFeedPage(currentFeedTab, feedPage, newPosts, hasMore);
           feedPage++;
           posts = isFirstPage ? newPosts : [...posts, ...newPosts];
           if (isFirstPage) {
@@ -3872,7 +5604,11 @@
             text,
             image: pendingImageDataUrl || null,
           });
-          posts.unshift(res.data);
+          const newPost = res.data;
+          // ── Cache: store new post and invalidate stale feed pages ───
+          PostCache.putPost(newPost);
+          PostCache.invalidateFeed(currentFeedTab);
+          posts.unshift(newPost);
           document.getElementById("post-text").value = "";
           removeImage();
           renderFeed();
@@ -3889,6 +5625,10 @@
         if (!currentUser) return;
         try {
           await api("DELETE", `/api/posts/${postId}`);
+          // ── Cache: remove from store and invalidate feeds ───────────
+          PostCache.removePost(postId);
+          PostCache.invalidateFeed("global");
+          PostCache.invalidateFeed("following");
           posts = posts.filter((p) => p.id !== postId);
           renderFeed();
           if (
@@ -3901,25 +5641,35 @@
         }
       }
 
-      /* ── LIKES ────────────────────────────────────────────────── */
+      /*LIKES */
       async function toggleLike(postId) {
         if (!currentUser) {
           showToast("Log in to like posts.");
           goTo("login");
           return;
         }
+        // ── Optimistic update in cache and UI ───────────────────────
+        const post = posts.find((p) => p.id === postId);
+        if (post) {
+          const i = post.likes.indexOf(currentUser.id);
+          if (i === -1) post.likes.push(currentUser.id);
+          else post.likes.splice(i, 1);
+          PostCache.putPost(post);
+          refreshLikeBtn(postId);
+        }
         try {
           await api("POST", `/api/posts/${postId}/like`, {
             userId: currentUser.id,
           });
-          const post = posts.find((p) => p.id === postId);
+        } catch (e) {
+          // Revert optimistic update on failure
           if (post) {
             const i = post.likes.indexOf(currentUser.id);
             if (i === -1) post.likes.push(currentUser.id);
             else post.likes.splice(i, 1);
+            PostCache.putPost(post);
+            refreshLikeBtn(postId);
           }
-          refreshLikeBtn(postId);
-        } catch (e) {
           showToast("Error: " + e.message);
         }
       }
@@ -3935,7 +5685,7 @@
         btn.innerHTML = `<svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><span>${post.likes.length || ""}</span>`;
       }
 
-      /* ── COMMENTS ─────────────────────────────────────────────── */
+      /* COMMENTS  */
       function toggleComments(postId) {
         document
           .querySelector(`[data-post-id="${postId}"] .comments-panel`)
@@ -3959,7 +5709,11 @@
             text,
           });
           const post = posts.find((p) => p.id === postId);
-          if (post) post.comments.push(res.data);
+          if (post) {
+            post.comments.push(res.data);
+            // ── Cache: patch comment into stored post ───────────────
+            PostCache.putPost(post);
+          }
           input.value = "";
           renderCommentList(postId);
           const ce = document.querySelector(
@@ -3995,7 +5749,7 @@
           .join("");
       }
 
-      /* ── REPOSTS ──────────────────────────────────────────────── */
+      /* REPOSTS */
       function openRepostModal(postId) {
         if (!currentUser) {
           showToast("Log in to repost.");
@@ -4065,7 +5819,7 @@
         }
       });
 
-      /* ── IMAGE ────────────────────────────────────────────────── */
+      /* IMAGE */
       function previewImage(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -4084,7 +5838,7 @@
         document.getElementById("img-input").value = "";
       }
 
-      /* ── RENDER ───────────────────────────────────────────────── */
+      /*  RENDER */
       function renderFeed() {
         const c = document.getElementById("feed-list");
         if (!posts.length) {
@@ -4098,12 +5852,202 @@
         c.innerHTML = posts.map((p) => buildPostCard(p)).join("");
       }
 
+      /* -- VIEW PROFILE (click author name/avatar) ------------------- */
+      /* -- VIEW ANOTHER USER'S PROFILE -------------------------------- */
+      /*async function viewProfile(userId) {
+        if (!userId) return;
+        // If it's our own profile, just go to profile view normally
+        if (currentUser && userId === currentUser.id) {
+          document.getElementById("profile-back-row").style.display = "none";
+          goTo("profile");
+          renderProfile();
+          return;
+        }
+        // Show back button for other people's profiles
+        document.getElementById("profile-back-row").style.display = "block";
+        goTo("profile");
+        await renderProfile(userId);
+      }*/
+      function viewProfile(userId) {
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.remove("active"));
+        document.getElementById("view-profile").classList.add("active");
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        const sn = document.getElementById("snav-profile");
+        if (sn) sn.classList.add("active");
+        document
+          .querySelectorAll(".mnav-item")
+          .forEach((n) => n.classList.remove("active"));
+        const mn = document.getElementById("mnav-profile");
+        if (mn) mn.classList.add("active");
+        window.scrollTo(0, 0);
+        renderProfile(userId);
+      }
+
+      /*  async function renderProfile(viewedUserId = null) {
+        if (!currentUser) {
+          goTo("login");
+          return;
+        }
+        const targetId = viewedUserId ? parseInt(viewedUserId) : currentUser.id;
+        const isOwnProfile = targetId === currentUser.id;
+
+        // Show/hide back button
+        const backRow = document.getElementById("profile-back-row");
+        if (backRow) backRow.style.display = isOwnProfile ? "none" : "block";
+
+        // Show/hide upload wrapper on avatar
+        const avWrap = document.getElementById("profile-av-wrap");
+        if (avWrap) {
+          if (isOwnProfile) {
+            avWrap.innerHTML = `
+        <label class="av-upload-wrap" for="profile-pic-input" title="Change profile picture">
+          <div class="av lg" id="profile-av">?</div>
+          <div class="av-upload-overlay"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <div class="av-upload-badge"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+          <input type="file" id="profile-pic-input" accept="image/*" onchange="handleProfilePicUpload(event)"/>
+        </label>`;
+          } else {
+            avWrap.innerHTML = `<div class="av lg" id="profile-av">?</div>`;
+          }
+        }
+
+        // Fetch profile data from server
+        let profileData = null;
+        try {
+          const res = await api("GET", `/api/users/${targetId}/profile`);
+          profileData = res.data;
+        } catch (e) {
+          console.error("Profile fetch error:", e);
+        }
+
+        const name =
+          profileData?.name || (isOwnProfile ? currentUser.name : "Unknown");
+        const email =
+          profileData?.email || (isOwnProfile ? currentUser.email : "");
+        const pic =
+          profileData?.picture || (isOwnProfile ? currentUser.picture : null);
+        const initial = (name || "?").charAt(0).toUpperCase();
+        const color = stringToColor(name);
+
+        // Set avatar
+        const av = document.getElementById("profile-av");
+        if (av) {
+          if (pic) {
+            av.style.background = "transparent";
+            av.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block"/>`;
+          } else {
+            av.innerHTML = initial;
+            av.style.background = color;
+          }
+        }
+
+        document.getElementById("profile-name").textContent = name;
+        document.getElementById("profile-email").textContent = isOwnProfile
+          ? email
+          : "";
+
+        // Stats
+        document.getElementById("stat-posts").textContent =
+          profileData?.postCount ?? 0;
+        document.getElementById("stat-followers").textContent =
+          profileData?.followerCount ?? 0;
+        document.getElementById("stat-following").textContent =
+          profileData?.followingCount ?? 0;
+
+        // Likes stat — only meaningful for own profile
+        const likesEl = document.getElementById("stat-likes");
+        if (likesEl) {
+          if (isOwnProfile) {
+            const liked = posts.reduce(
+              (n, p) =>
+                n + (p.likes && p.likes.includes(currentUser.id) ? 1 : 0),
+              0,
+            );
+            likesEl.textContent = liked;
+            likesEl.closest(".stat").style.display = "";
+          } else {
+            likesEl.closest(".stat").style.display = "none";
+          }
+        }
+
+        // Actions: own = Edit + Logout, other = Follow/Unfollow
+        const actionsEl = document.getElementById("profile-actions");
+        if (isOwnProfile) {
+          actionsEl.innerHTML = `
+      <button class="btn btn-ghost" onclick="goTo('settings')" style="font-size:13px;padding:8px 16px">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit Profile
+      </button>
+      <button class="logout-btn-sm" onclick="logout()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log Out
+      </button>`;
+        } else {
+          const isFollowing = profileData?.isFollowing || false;
+          // Build the profile user object for DM
+          const _profileUserForDM = JSON.stringify({ id: targetId, name, picture: profileData?.picture || null, email: profileData?.email || '' });
+          actionsEl.innerHTML = `
+      <button class="btn ${isFollowing ? "btn-outline" : "btn-primary"}"
+        style="font-size:13px;padding:8px 24px;border-radius:20px"
+        data-following="${isFollowing}"
+        onclick="toggleFollow(${targetId}, this)">
+        ${isFollowing ? "Following" : "Follow"}
+      </button>
+      <button class="btn btn-ghost" style="font-size:13px;padding:8px 18px;border-radius:20px;gap:7px;"
+        onclick='DM.startConvWithUser(${_profileUserForDM})'>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Message
+      </button>`;
+        }
+
+        // Section label
+        const labelEl = document.getElementById("profile-posts-label");
+        if (labelEl)
+          labelEl.textContent = isOwnProfile ? "My Posts" : `${name}'s Posts`;
+
+        // Load posts — fetch from API for other users (they won't be in local posts array)
+        const feedEl = document.getElementById("profile-feed");
+        feedEl.innerHTML = `<div style="text-align:center;padding:32px;color:var(--txt2)"><div class="spinner" style="margin:0 auto 12px"></div></div>`;
+
+      if (isOwnProfile) {
+          // Own posts: filter from local array (already loaded in feed)
+          const userPosts = posts.filter((p) => p.userId === targetId);
+          const sorted = [...userPosts].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+          );
+          feedEl.innerHTML = sorted.length
+            ? sorted.map((p) => buildPostCard(p, true)).join("")
+            : `<div class="empty"><div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>No posts yet</h3><p>Share your first post!</p></div>`;
+        } else {
+          // Other user's posts: fetch from API
+          try {
+            const res = await api(
+              "GET",
+              `/api/posts?userId=${targetId}&page=1`,
+            );
+            const posts2 = res.data?.posts || [];
+            feedEl.innerHTML = posts2.length
+              ? posts2.map((p) => buildPostCard(p, false)).join("")
+              : `<div class="empty"><div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>No posts yet</h3><p>Nothing posted yet.</p></div>`;
+          } catch (e) {
+            feedEl.innerHTML = `<div class="empty"><h3>Could not load posts</h3><p>${e.message}</p></div>`;
+          }
+        }
+      }*/
+
       async function renderProfile(viewedUserId = null) {
         if (!currentUser) {
           goTo("login");
           return;
         }
-        const targetId = viewedUserId || currentUser.id;
+        const targetId =
+          viewedUserId !== null && viewedUserId !== undefined
+            ? parseInt(viewedUserId, 10)
+            : currentUser.id;
         const isOwnProfile = targetId === currentUser.id;
         let profileData = null;
         try {
@@ -4169,15 +6113,15 @@
         const canDelete =
           currentUser && (currentUser.id === post.userId || showDelete);
         const color = stringToColor(post.author);
-        return `<div class="post-card" data-post-id="${post.id}">
+        return `<div class="post-card" data-post-id="${post.id}" onclick="openPostDetail(event,${post.id})" style="cursor:pointer">
     ${post.isRepost ? `<div class="repost-strip"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>${escHtml(post.author)} reposted</div>` : ""}
     <div class="post-head">
-      <div class="av" style="background:${post.authorPicture ? "transparent" : color}">${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(post.author.charAt(0))}</div>
-      <div class="post-meta"><div class="post-name">${escHtml(post.author)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
+      <div class="av" style="background:${post.authorPicture ? "transparent" : color};cursor:pointer" onclick="viewProfile(${post.userId})" title="View profile">${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(post.author.charAt(0))}</div>
+      <div class="post-meta"><div class="post-name" onclick="viewProfile(${post.userId})" style="cursor:pointer" title="View profile">${escHtml(post.author)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
       ${canDelete ? `<button class="post-del" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
     </div>
     ${post.text ? `<div class="post-body">${escHtml(post.text)}</div>` : ""}
-    ${post.isRepost && post.originalPost ? `<div class="repost-embed"><div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}${post.originalPost.image ? `<img class="repost-embed-img" src="${post.originalPost.image}" loading="lazy"/>` : ""}</div>` : !post.isRepost && post.image ? `<img class="post-img" src="${post.image}" loading="lazy"/>` : ""}
+    ${post.isRepost && post.originalPost ? `<div class="repost-embed"><div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}${post.originalPost.image ? `<img class="repost-embed-img lb-thumb" src="${post.originalPost.image}" loading="lazy" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" onclick="openLightbox(this,collectFeedImages())" title="View full image"/>` : ""}</div>` : !post.isRepost && post.image ? `<img class="post-img lb-thumb" src="${post.image}" loading="lazy" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}" onclick="openLightbox(this,collectFeedImages())" title="View full image"/>` : ""}
     <div class="post-actions">
       <button class="act-btn like-btn${liked ? " liked" : ""}" onclick="toggleLike(${post.id})">
         <svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
@@ -4200,7 +6144,7 @@
   </div>`;
       }
 
-      /* ── PROFILE PICTURE ──────────────────────────────────────── */
+      /*  PROFILE PICTURE */
       async function handleProfilePicUpload(event) {
         if (!currentUser) {
           showToast("Log in first.");
@@ -4235,53 +6179,90 @@
         event.target.value = "";
       }
 
-      /* ── VIEW ANOTHER USER'S PROFILE ─────────────────────────── */
-function viewProfile(userId) {
-  document
-    .querySelectorAll(".view")
-    .forEach((v) => v.classList.remove("active"));
-  document.getElementById("view-profile").classList.add("active");
-  document
-    .querySelectorAll(".nav-item")
-    .forEach((n) => n.classList.remove("active"));
-  const sn = document.getElementById("snav-profile");
-  if (sn) sn.classList.add("active");
-  document
-    .querySelectorAll(".mnav-item")
-    .forEach((n) => n.classList.remove("active"));
-  const mn = document.getElementById("mnav-profile");
-  if (mn) mn.classList.add("active");
-  window.scrollTo(0, 0);
-  renderProfile(userId);
-}
+      /* FOLLOW / UNFOLLOW  */
+      function buildSuggestionCard(user) {
+        const initial = (user.name || "?").charAt(0).toUpperCase();
+        const color = stringToColor(user.name);
+        const avBg = user.picture ? "transparent" : color;
+        const avInner = user.picture
+          ? '<img src="' +
+            escHtml(user.picture) +
+            '" alt="' +
+            initial +
+            '" loading="lazy" ' +
+            'onerror="this.parentElement.style.background=' +
+            color +
+            ";this.parentElement.innerHTML=" +
+            initial +
+            '"/>'
+          : initial;
+        return (
+          '<div class="sug-card" data-user-id="' +
+          user.id +
+          '">' +
+          '<div class="sug-av" style="background:' +
+          avBg +
+          '" onclick="viewProfile(' +
+          user.id +
+          ')" title="View profile">' +
+          avInner +
+          "</div>" +
+          '<div class="sug-name" onclick="viewProfile(' +
+          user.id +
+          ')" title="' +
+          escHtml(user.name) +
+          '">' +
+          escHtml(user.name) +
+          "</div>" +
+          '<div class="sug-score">' +
+          user.score +
+          " interaction" +
+          (user.score == 1 ? "" : "s") +
+          "</div>" +
+          '<button class="sug-follow-btn follow" onclick="event.stopPropagation();sugFollow(' +
+          user.id +
+          ',this)">Follow</button>' +
+          "</div>"
+        );
+      }
 
-
-      /* ── FOLLOW / UNFOLLOW ────────────────────────────────────── */
-      async function toggleFollow(targetId, btn) {
+      async function sugFollow(userId, btn) {
         if (!currentUser) {
           showToast("Log in to follow people.");
           goTo("login");
           return;
         }
-        const isFollowing = btn.classList.contains("unfollow");
+        const following = btn.classList.contains("unfollow");
         btn.disabled = true;
         try {
-          if (isFollowing) {
-            await api("DELETE", `/api/follow/${targetId}`);
-            btn.className = "follow-btn follow";
+          if (following) {
+            await api("DELETE", "/api/unfollow/" + userId);
+            btn.classList.replace("unfollow", "follow");
             btn.textContent = "Follow";
             showToast("Unfollowed.");
           } else {
-            await api("POST", `/api/follow/${targetId}`);
-            btn.className = "follow-btn unfollow";
-            btn.textContent = "Unfollow";
-            showToast("Following! 🎉");
+            await api("POST", "/api/follow/" + userId);
+            btn.classList.replace("follow", "unfollow");
+            btn.textContent = "Following";
+            showToast("Following! Refreshing feed...");
+            setTimeout(() => {
+              const card = btn.closest(".sug-card");
+              if (card) {
+                card.style.cssText +=
+                  ";transition:opacity .3s,transform .3s;opacity:0;transform:scale(.9)";
+                setTimeout(() => {
+                  card.remove();
+                  if (!document.querySelectorAll(".sug-card").length)
+                    loadSuggestions(true);
+                }, 300);
+              }
+            }, 900);
+            setTimeout(() => {
+              feedPage = 1;
+              feedHasMore = true;
+              loadPosts();
+            }, 1200);
           }
-          // Refresh follower count in profile if open
-          if (
-            document.getElementById("view-profile").classList.contains("active")
-          )
-            renderProfile();
         } catch (e) {
           showToast("Error: " + e.message);
         } finally {
@@ -4289,7 +6270,70 @@ function viewProfile(userId) {
         }
       }
 
-      /* ── SEARCH ───────────────────────────────────────────────── */
+      /*async function toggleFollow(targetId, btn) {
+  if (!currentUser) { showToast('Log in to follow people.'); goTo('login'); return; }
+  const isFollowing = btn.dataset.following === 'true' || btn.classList.contains('unfollow');
+  btn.disabled = true;
+  try {
+    if (isFollowing) {
+      await api('DELETE', `/api/follow/${targetId}`);
+      btn.className = 'follow-btn follow';
+      btn.textContent = 'Follow';
+      showToast('Unfollowed.');
+    } else {
+      await api('POST', `/api/follow/${targetId}`);
+      btn.className = 'follow-btn unfollow';
+      btn.textContent = 'Unfollow';
+      showToast('Following! 🎉');
+    }
+    // Refresh follower count in profile if open
+    if (document.getElementById('view-profile').classList.contains('active')) renderProfile();
+  } catch (e) {
+    showToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+*/
+
+      async function toggleFollow(targetId, btn) {
+        if (!currentUser) {
+          showToast("Log in to follow people.");
+          goTo("login");
+          return;
+        }
+        const isFollowing = btn.dataset.following === "true";
+        const orig = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "…";
+        try {
+          if (isFollowing) {
+            await api("DELETE", `/api/unfollow/${targetId}`);
+            btn.dataset.following = "false";
+            btn.textContent = "Follow";
+            btn.classList.remove("btn-outline", "unfollow");
+            btn.classList.add("btn-primary", "follow");
+            showToast("Unfollowed.");
+          } else {
+            await api("POST", `/api/follow/${targetId}`);
+            btn.dataset.following = "true";
+            btn.textContent = "Following";
+            btn.classList.remove("btn-primary", "follow");
+            btn.classList.add("btn-outline", "unfollow");
+            showToast("Following! 🎉");
+          }
+          const pv = document.getElementById("view-profile");
+          if (pv && pv.classList.contains("active"))
+            renderProfile(targetId === currentUser.id ? null : targetId);
+        } catch (e) {
+          btn.textContent = orig;
+          showToast("Error: " + e.message);
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      /* SEARCH */
       let searchTab = "posts",
         searchTimer = null;
 
@@ -4313,7 +6357,7 @@ function viewProfile(userId) {
           renderSearchHint();
           return;
         }
-        searchTimer = setTimeout(() => runSearch(q), 280);
+        searchTimer = setTimeout(() => runSearch(q), 400);
       }
 
       function renderSearchHint() {
@@ -4386,7 +6430,7 @@ function viewProfile(userId) {
           <div class="post-meta"><div class="post-name">${highlight(post.author, q)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
         </div>
         ${post.text ? `<div class="post-body">${highlight(post.text, q)}</div>` : ""}
-        ${post.image ? `<img class="post-img" src="${post.image}" loading="lazy"/>` : ""}
+        ${post.image ? `<img class="post-img lb-thumb" src="${post.image}" loading="lazy" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId || ""}" onclick="openLightbox(this,[this.src])" title="View full image"/>` : ""}
         <div class="post-actions" style="padding:8px 12px;gap:14px;font-size:12px;color:var(--txt2)">
           <span>❤️ ${post.likeCount || 0}</span><span>💬 ${post.commentCount || 0}</span><span>🔁 ${post.repostCount || 0}</span>
         </div>
@@ -4405,7 +6449,7 @@ function viewProfile(userId) {
                 !isOwnProfile && currentUser
                   ? `<button class="follow-btn ${user.isFollowing ? "unfollow" : "follow"}" onclick="toggleFollow(${user.id}, this)">${user.isFollowing ? "Unfollow" : "Follow"}</button>`
                   : "";
-              return `<div class="people-card">
+              return `<div class="people-card" onclick="viewProfile(${user.id})" style="cursor:pointer">
         <div class="av" style="background:${user.picture ? "transparent" : color}">${avHtml}</div>
         <div class="people-card-info">
           <div class="people-card-name">${highlight(user.name, q)}</div>
@@ -4419,7 +6463,7 @@ function viewProfile(userId) {
         }
       }
 
-      /* ── NOTIFICATIONS ────────────────────────────────────────── */
+      /*  NOTIFICATIONS */
       let notifPollTimer = null;
 
       const NOTIF_ICONS = {
@@ -4559,9 +6603,9 @@ function viewProfile(userId) {
         }
       }
 
-      /* ── HELPERS ──────────────────────────────────────────────── */
+      /* HELPERS */
 
-      /* -- REPORT POST -------------------------------------------- */
+      /*  REPORT POST */
       let reportTargetPostId = null;
 
       function reportPost(postId) {
@@ -4625,6 +6669,70 @@ function viewProfile(userId) {
         }
       }
 
+      /*  SUGGESTED USERS  */
+      let _suggestionsLoaded = false;
+
+      async function loadSuggestions(force = false) {
+        if (!currentUser) return;
+        if (_suggestionsLoaded && !force) return;
+
+        const section = document.getElementById("suggestions-section");
+        const listEl = document.getElementById("suggestions-list");
+        const refreshBtn = document.getElementById("sug-refresh-btn");
+
+        if (!section || !listEl) return;
+        section.style.display = "block";
+
+        // Skeleton loading placeholders
+        listEl.innerHTML = [1, 2, 3, 4]
+          .map(
+            () =>
+              '<div class="sug-skeleton">' +
+              '<div class="sug-skel-av"></div>' +
+              '<div class="sug-skel-line" style="width:80%"></div>' +
+              '<div class="sug-skel-line" style="width:55%"></div>' +
+              '<div class="sug-skel-btn"></div>' +
+              "</div>",
+          )
+          .join("");
+
+        if (refreshBtn) {
+          refreshBtn.classList.add("spinning");
+          refreshBtn.disabled = true;
+        }
+
+        try {
+          const res = await api(
+            "GET",
+            "/api/recommendations?userId=" + currentUser.id + "&limit=10",
+          );
+          const users = res.data || [];
+
+          if (!users.length) {
+            listEl.innerHTML =
+              '<div class="suggestions-empty">' +
+              '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="28" height="28" style="margin:0 auto 8px;display:block;color:var(--txt3)">' +
+              '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>' +
+              '<path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>' +
+              "Interact with posts to get suggestions!</div>";
+          } else {
+            listEl.innerHTML = users
+              .map((u) => buildSuggestionCard(u))
+              .join("");
+          }
+          _suggestionsLoaded = true;
+        } catch (e) {
+          listEl.innerHTML =
+            '<div class="suggestions-empty" style="color:var(--rose)">Could not load suggestions.</div>';
+          console.error("Suggestions error:", e);
+        } finally {
+          if (refreshBtn) {
+            refreshBtn.classList.remove("spinning");
+            refreshBtn.disabled = false;
+          }
+        }
+      }
+
       function escHtml(s) {
         return String(s)
           .replace(/&/g, "&amp;")
@@ -4673,8 +6781,698 @@ function viewProfile(userId) {
         return c[Math.abs(h) % c.length];
       }
 
-      /* ── BOOT ─────────────────────────────────────────────────── */
+      /* ═══════════════════════════════════════════
+         LIGHTBOX — image viewer
+      ═══════════════════════════════════════════ */
+
+      /* ── State ── */
+      let _lbImages = [],
+        _lbIndex = 0,
+        _lbScale = 1,
+        _lbOrigin = null;
+      let _lbDragStartX = 0,
+        _lbDragStartY = 0,
+        _lbTranslateX = 0,
+        _lbTranslateY = 0;
+      let _lbPinchStartDist = 0,
+        _lbPointers = new Map();
+      let _lbSwipeStartX = 0,
+        _lbSwiping = false,
+        _lbAnimating = false;
+      let _lbMeta = []; // [{name, picture, userId}] parallel to _lbImages
+
+      /* ── Render profile chip ── */
+      function _lbRenderProfile(idx) {
+        const meta = _lbMeta[idx] || {};
+        const chip = document.getElementById("lb-profile");
+        const av = document.getElementById("lb-profile-av");
+        const nm = document.getElementById("lb-profile-name");
+        if (!meta.name) {
+          chip.style.display = "none";
+          return;
+        }
+        nm.textContent = meta.name;
+        // Parse to number so strict equality works in viewProfile/renderProfile
+        const uid = meta.userId ? parseInt(meta.userId, 10) : null;
+        chip.onclick = function () {
+          closeLightbox();
+          // Wait for the lightbox fade-out (180ms) before navigating
+          if (uid)
+            setTimeout(function () {
+              viewProfile(uid);
+            }, 200);
+        };
+        if (meta.picture) {
+          av.innerHTML =
+            '<img src="' +
+            meta.picture +
+            '" alt="' +
+            escHtml(meta.name.charAt(0)) +
+            '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"/>';
+          av.style.background = "transparent";
+        } else {
+          av.innerHTML = escHtml(meta.name.charAt(0).toUpperCase());
+          av.style.background = stringToColor(meta.name);
+        }
+        chip.style.display = "flex";
+        chip.style.animation = "none";
+        chip.offsetHeight;
+        chip.style.animation =
+          "lbFadeSlideDown 0.3s cubic-bezier(0.34,1.4,0.64,1) both";
+      }
+
+      /* ── Open ── */
+      function openLightbox(imgEl, allImgsInContext) {
+        const images = allImgsInContext || [imgEl.src];
+        const idx = images.indexOf(imgEl.src);
+        _lbImages = images;
+        _lbIndex = idx >= 0 ? idx : 0;
+        _lbScale = 1;
+        _lbTranslateX = 0;
+        _lbTranslateY = 0;
+        _lbOrigin = imgEl.getBoundingClientRect();
+
+        // Build meta array from data-lb-* attributes on every .lb-thumb in the DOM
+        const _allThumbs = document.querySelectorAll(".lb-thumb");
+        _lbMeta = images.map(function (src) {
+          var found = null;
+          _allThumbs.forEach(function (el) {
+            if (el.src === src && el.dataset.lbName) found = el;
+          });
+          if (found)
+            return {
+              name: found.dataset.lbName,
+              picture: found.dataset.lbPicture || null,
+              userId: found.dataset.lbUserId || null,
+            };
+          // fallback: read from the clicked element itself
+          if (imgEl.src === src && imgEl.dataset.lbName)
+            return {
+              name: imgEl.dataset.lbName,
+              picture: imgEl.dataset.lbPicture || null,
+              userId: imgEl.dataset.lbUserId || null,
+            };
+          return {};
+        });
+
+        const lb = document.getElementById("lightbox");
+        const lbImg = document.getElementById("lb-img");
+        lb.style.display = "flex";
+
+        /* hero entry animation from thumbnail position */
+        const ox = _lbOrigin.left + _lbOrigin.width / 2 - window.innerWidth / 2;
+        const oy =
+          _lbOrigin.top + _lbOrigin.height / 2 - window.innerHeight / 2;
+        const sx = _lbOrigin.width / window.innerWidth;
+        const sy = _lbOrigin.height / window.innerHeight;
+        lbImg.style.transition = "none";
+        lbImg.style.transform = `translate(${ox}px,${oy}px) scale(${sx},${sy})`;
+        lbImg.style.opacity = "0";
+        lbImg.src = _lbImages[_lbIndex];
+        lbImg.onload = () => {
+          requestAnimationFrame(() => {
+            lbImg.style.transition =
+              "transform 0.38s cubic-bezier(0.34,1.2,0.64,1), opacity 0.22s ease";
+            lbImg.style.transform = "translate(0,0) scale(1)";
+            lbImg.style.opacity = "1";
+          });
+        };
+        if (lbImg.complete) lbImg.onload();
+
+        document.getElementById("lb-counter").textContent =
+          `${_lbIndex + 1} / ${_lbImages.length}`;
+        document.getElementById("lb-counter").style.display =
+          _lbImages.length > 1 ? "flex" : "none";
+        document.getElementById("lb-prev").style.display =
+          _lbImages.length > 1 && _lbIndex > 0 ? "flex" : "none";
+        document.getElementById("lb-next").style.display =
+          _lbImages.length > 1 && _lbIndex < _lbImages.length - 1
+            ? "flex"
+            : "none";
+        _lbRenderProfile(_lbIndex);
+
+        lb.style.opacity = "0";
+        lb.style.transition = "opacity 0.18s ease";
+        requestAnimationFrame(() => {
+          lb.style.opacity = "1";
+        });
+        document.body.style.overflow = "hidden";
+        // auto-hide hint
+        const hint = document.getElementById("lb-hint");
+        if (hint) {
+          hint.style.opacity = "1";
+          clearTimeout(hint._t);
+          hint._t = setTimeout(() => (hint.style.opacity = "0"), 3000);
+        }
+      }
+
+      function closeLightbox() {
+        const lb = document.getElementById("lightbox");
+        lb.style.transition = "opacity 0.18s ease";
+        lb.style.opacity = "0";
+        setTimeout(() => {
+          lb.style.display = "none";
+          lb.style.opacity = "";
+          document.body.style.overflow = "";
+          _lbScale = 1;
+          _lbTranslateX = 0;
+          _lbTranslateY = 0;
+          const lbImg = document.getElementById("lb-img");
+          lbImg.style.transform = "";
+          lbImg.style.transition = "";
+        }, 180);
+      }
+
+      function lbGoTo(newIdx) {
+        if (_lbAnimating || newIdx < 0 || newIdx >= _lbImages.length) return;
+        _lbAnimating = true;
+        const dir = newIdx > _lbIndex ? 1 : -1;
+        const lbImg = document.getElementById("lb-img");
+        _lbIndex = newIdx;
+        _lbScale = 1;
+        _lbTranslateX = 0;
+        _lbTranslateY = 0;
+        lbImg.style.transition =
+          "transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease";
+        lbImg.style.transform = `translateX(${-dir * 60}px) scale(0.88)`;
+        lbImg.style.opacity = "0.2";
+        setTimeout(() => {
+          lbImg.src = _lbImages[_lbIndex];
+          lbImg.style.transition = "none";
+          lbImg.style.transform = `translateX(${dir * 60}px) scale(0.88)`;
+          lbImg.style.opacity = "0.2";
+          requestAnimationFrame(() => {
+            lbImg.style.transition =
+              "transform 0.3s cubic-bezier(0.34,1.2,0.64,1), opacity 0.22s ease";
+            lbImg.style.transform = "translateX(0) scale(1)";
+            lbImg.style.opacity = "1";
+            setTimeout(() => {
+              _lbAnimating = false;
+            }, 320);
+          });
+        }, 200);
+        document.getElementById("lb-counter").textContent =
+          `${_lbIndex + 1} / ${_lbImages.length}`;
+        document.getElementById("lb-prev").style.display =
+          _lbIndex > 0 ? "flex" : "none";
+        document.getElementById("lb-next").style.display =
+          _lbIndex < _lbImages.length - 1 ? "flex" : "none";
+        _lbRenderProfile(_lbIndex);
+      }
+
+      function lbDownload() {
+        const src = _lbImages[_lbIndex];
+        const a = document.createElement("a");
+        a.href = src;
+        a.download = "image.jpg";
+        a.target = "_blank";
+        a.click();
+      }
+
+      function lbShare() {
+        const src = _lbImages[_lbIndex];
+        if (navigator.share) {
+          navigator.share({ url: src }).catch(() => {});
+        } else {
+          navigator.clipboard
+            .writeText(src)
+            .then(() => showToast("Image URL copied!"));
+        }
+      }
+
+      /* ── Touch / Pointer events for zoom & swipe ── */
+      function lbPointerDown(e) {
+        _lbPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (_lbPointers.size === 1) {
+          _lbSwipeStartX = e.clientX;
+          _lbDragStartX = e.clientX - _lbTranslateX;
+          _lbDragStartY = e.clientY - _lbTranslateY;
+          _lbSwiping = _lbScale <= 1;
+        } else if (_lbPointers.size === 2) {
+          _lbSwiping = false;
+          const pts = [..._lbPointers.values()];
+          _lbPinchStartDist = Math.hypot(
+            pts[1].x - pts[0].x,
+            pts[1].y - pts[0].y,
+          );
+        }
+      }
+
+      function lbPointerMove(e) {
+        _lbPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const lbImg = document.getElementById("lb-img");
+        if (_lbPointers.size === 2) {
+          const pts = [..._lbPointers.values()];
+          const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+          const newScale = Math.min(
+            5,
+            Math.max(1, _lbScale * (dist / _lbPinchStartDist)),
+          );
+          _lbPinchStartDist = dist;
+          _lbScale = newScale;
+          lbImg.style.transition = "none";
+          lbImg.style.transform = `translate(${_lbTranslateX}px, ${_lbTranslateY}px) scale(${_lbScale})`;
+        } else if (_lbPointers.size === 1 && _lbScale > 1) {
+          _lbTranslateX = e.clientX - _lbDragStartX;
+          _lbTranslateY = e.clientY - _lbDragStartY;
+          lbImg.style.transition = "none";
+          lbImg.style.transform = `translate(${_lbTranslateX}px, ${_lbTranslateY}px) scale(${_lbScale})`;
+        }
+      }
+
+      function lbPointerUp(e) {
+        const startX = _lbSwipeStartX;
+        _lbPointers.delete(e.pointerId);
+        if (_lbPointers.size === 0 && _lbSwiping && _lbScale <= 1) {
+          const dx = e.clientX - startX;
+          if (Math.abs(dx) > 55) {
+            lbGoTo(_lbIndex + (dx < 0 ? 1 : -1));
+          }
+          _lbSwiping = false;
+        }
+      }
+
+      /* ── Wheel zoom ── */
+      function lbWheel(e) {
+        e.preventDefault();
+        const lbImg = document.getElementById("lb-img");
+        _lbScale = Math.min(
+          5,
+          Math.max(1, _lbScale * (e.deltaY < 0 ? 1.12 : 0.9)),
+        );
+        if (_lbScale <= 1) {
+          _lbTranslateX = 0;
+          _lbTranslateY = 0;
+        }
+        lbImg.style.transition = "transform 0.12s ease";
+        lbImg.style.transform = `translate(${_lbTranslateX}px, ${_lbTranslateY}px) scale(${_lbScale})`;
+      }
+
+      /* ── Double tap/click to reset zoom ── */
+      function lbDblClick() {
+        const lbImg = document.getElementById("lb-img");
+        _lbScale = _lbScale > 1 ? 1 : 2.2;
+        _lbTranslateX = 0;
+        _lbTranslateY = 0;
+        lbImg.style.transition = "transform 0.3s cubic-bezier(0.34,1.2,0.64,1)";
+        lbImg.style.transform = _lbScale > 1 ? `scale(${_lbScale})` : "none";
+      }
+
+      /* ── Keyboard ── */
+      document.addEventListener("keydown", (e) => {
+        const lb = document.getElementById("lightbox");
+        if (lb.style.display !== "flex") return;
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowRight") lbGoTo(_lbIndex + 1);
+        if (e.key === "ArrowLeft") lbGoTo(_lbIndex - 1);
+      });
+
+      /* ── Collect all images from feed for gallery context ── */
+      function collectFeedImages() {
+        return [...document.querySelectorAll(".post-img, .repost-embed-img")]
+          .map((i) => i.src)
+          .filter(Boolean);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         DIRECT MESSAGES  —  localStorage-backed private messaging
+         ═══════════════════════════════════════════════════════════════ */
+      const DM = (() => {
+        const STORAGE_KEY = "circle_dms_v1";
+        let _conversations = {}; // convId → { participants[], messages[] }
+        let _activeConvId = null;
+        let _inboxFilter = "";
+
+        function _save() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(_conversations));
+          } catch (e) {}
+        }
+        function _load() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) _conversations = JSON.parse(raw);
+          } catch (e) {
+            _conversations = {};
+          }
+        }
+        function _convId(uid1, uid2) {
+          return [uid1, uid2].sort().join("__");
+        }
+        function _getOrCreate(otherUser) {
+          const cid = _convId(currentUser.id, otherUser.id);
+          if (!_conversations[cid]) {
+            _conversations[cid] = {
+              participants: [
+                {
+                  id: currentUser.id,
+                  name: currentUser.name,
+                  picture: currentUser.picture || null,
+                },
+                {
+                  id: otherUser.id,
+                  name: otherUser.name,
+                  picture: otherUser.picture || null,
+                },
+              ],
+              messages: [],
+              createdAt: Date.now(),
+            };
+            _save();
+          }
+          return cid;
+        }
+        function _other(conv) {
+          return (
+            conv.participants.find(
+              (p) => p.id !== (currentUser && currentUser.id),
+            ) || conv.participants[0]
+          );
+        }
+        function _unreadCount(conv) {
+          if (!currentUser) return 0;
+          return conv.messages.filter(
+            (m) => m.fromId !== currentUser.id && !m.read,
+          ).length;
+        }
+        function _totalUnread() {
+          return Object.values(_conversations).reduce(
+            (n, c) => n + _unreadCount(c),
+            0,
+          );
+        }
+        function _fmtTime(ts) {
+          const d = new Date(ts);
+          return d.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+        function _fmtDate(ts) {
+          const d = new Date(ts),
+            now = new Date();
+          if (d.toDateString() === now.toDateString()) return "Today";
+          const y = new Date(now);
+          y.setDate(now.getDate() - 1);
+          if (d.toDateString() === y.toDateString()) return "Yesterday";
+          return d.toLocaleDateString([], { month: "short", day: "numeric" });
+        }
+        function _fmtPreviewTime(ts) {
+          const d = new Date(ts),
+            now = new Date();
+          if (d.toDateString() === now.toDateString()) return _fmtTime(ts);
+          return d.toLocaleDateString([], { month: "short", day: "numeric" });
+        }
+        function _avatarHTML(person, size) {
+          const cls = size === "sm" ? "av sm" : "av";
+          const initial = person.name.charAt(0).toUpperCase();
+          const color = stringToColor(person.name);
+          if (person.picture) {
+            return `<div class="${cls}" style="background:transparent;overflow:hidden"><img src="${person.picture}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" alt="${initial}"/></div>`;
+          }
+          return `<div class="${cls}" style="background:${color}">${initial}</div>`;
+        }
+
+        function renderInbox() {
+          const list = document.getElementById("dm-conv-list");
+          if (!currentUser) {
+            list.innerHTML =
+              '<div class="dm-conv-empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="36" height="36"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><p>Log in to use messages</p></div>';
+            return;
+          }
+          const q = _inboxFilter.toLowerCase();
+          const convs = Object.entries(_conversations)
+            .filter(([, c]) =>
+              c.participants.some((p) => p.id === currentUser.id),
+            )
+            .filter(([, c]) => !q || _other(c).name.toLowerCase().includes(q))
+            .sort(([, a], [, b]) => {
+              const ta = a.messages.length
+                ? a.messages[a.messages.length - 1].ts
+                : a.createdAt;
+              const tb = b.messages.length
+                ? b.messages[b.messages.length - 1].ts
+                : b.createdAt;
+              return tb - ta;
+            });
+
+          if (!convs.length) {
+            list.innerHTML =
+              '<div class="dm-conv-empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="36" height="36"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><p>No conversations yet.<br/>Start one!</p></div>';
+            return;
+          }
+          list.innerHTML = convs
+            .map(([cid, conv]) => {
+              const other = _other(conv);
+              const last = conv.messages[conv.messages.length - 1];
+              const unread = _unreadCount(conv);
+              const preview = last
+                ? (last.fromId === currentUser.id ? "You: " : "") + last.text
+                : "No messages yet";
+              const timeStr = last ? _fmtPreviewTime(last.ts) : "";
+              const initial = other.name.charAt(0).toUpperCase();
+              const color = stringToColor(other.name);
+              const avHtml = other.picture
+                ? `<div class="av sm" style="background:transparent;overflow:hidden;flex-shrink:0"><img src="${other.picture}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${initial}"/></div>`
+                : `<div class="av sm" style="background:${color};flex-shrink:0">${initial}</div>`;
+              return `<div class="dm-conv-item${unread ? " unread" : ""}${cid === _activeConvId ? " active" : ""}" onclick="DM.openConv('${cid}')">
+              ${avHtml}
+              <div class="dm-conv-info">
+                <div class="dm-conv-name">${escHtml(other.name)}</div>
+                <div class="dm-conv-preview">${escHtml(preview.slice(0, 60))}</div>
+              </div>
+              <div class="dm-conv-meta">
+                ${timeStr ? `<div class="dm-conv-time">${timeStr}</div>` : ""}
+                ${unread ? `<div class="dm-unread-dot"></div>` : ""}
+              </div>
+            </div>`;
+            })
+            .join("");
+          updateDMBadge();
+        }
+
+        function openConv(cid) {
+          if (!currentUser) {
+            goTo("login");
+            return;
+          }
+          _activeConvId = cid;
+          const conv = _conversations[cid];
+          if (!conv) return;
+          // Mark all as read
+          conv.messages.forEach((m) => {
+            if (m.fromId !== currentUser.id) m.read = true;
+          });
+          _save();
+          renderInbox();
+          updateDMBadge();
+
+          const other = _other(conv);
+          // Mobile: hide inbox, show chat
+          document.getElementById("dm-inbox").classList.add("hidden-mobile");
+          document.getElementById("dm-chat").classList.add("visible-mobile");
+
+          // Update chat header
+          const avEl = document.getElementById("dm-chat-av");
+          if (other.picture) {
+            avEl.style.background = "transparent";
+            avEl.innerHTML = `<img src="${other.picture}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${other.name.charAt(0)}"/>`;
+          } else {
+            avEl.innerHTML = other.name.charAt(0).toUpperCase();
+            avEl.style.background = stringToColor(other.name);
+          }
+          document.getElementById("dm-chat-name").textContent = other.name;
+          document.getElementById("dm-chat-empty").style.display = "none";
+          const active = document.getElementById("dm-chat-active");
+          active.style.display = "flex";
+
+          renderMessages(conv);
+        }
+
+        function renderMessages(conv) {
+          const el = document.getElementById("dm-messages");
+          if (!conv.messages.length) {
+            el.innerHTML = `<div style="text-align:center;padding:40px 16px;color:var(--txt3);font-size:13.5px">Send a message to start the conversation ✨</div>`;
+            return;
+          }
+          let lastDate = "";
+          el.innerHTML = conv.messages
+            .map((msg) => {
+              const mine = msg.fromId === currentUser.id;
+              const dateStr = _fmtDate(msg.ts);
+              let divider = "";
+              if (dateStr !== lastDate) {
+                lastDate = dateStr;
+                divider = `<div class="dm-date-divider">${dateStr}</div>`;
+              }
+              return `${divider}<div class="dm-msg ${mine ? "mine" : "theirs"}">
+              <div class="dm-bubble">
+                ${escHtml(msg.text).replace(/\n/g, "<br>")}
+                <span class="dm-bubble-time">${_fmtTime(msg.ts)}</span>
+              </div>
+            </div>`;
+            })
+            .join("");
+          el.scrollTop = el.scrollHeight;
+        }
+
+        function sendMessage() {
+          if (!currentUser || !_activeConvId) return;
+          const input = document.getElementById("dm-compose-input");
+          const text = input.value.trim();
+          if (!text) return;
+          const conv = _conversations[_activeConvId];
+          if (!conv) return;
+          const msg = {
+            id: Date.now() + Math.random(),
+            fromId: currentUser.id,
+            text,
+            ts: Date.now(),
+            read: false,
+          };
+          conv.messages.push(msg);
+          _save();
+          input.value = "";
+          input.style.height = "";
+          renderMessages(conv);
+          renderInbox();
+        }
+
+        function filterInbox() {
+          _inboxFilter = document.getElementById("dm-inbox-search").value;
+          renderInbox();
+        }
+
+        function updateDMBadge() {
+          const count = _totalUnread();
+          const badge = document.getElementById("snav-dm-badge");
+          if (badge) {
+            badge.textContent = count > 9 ? "9+" : count;
+            badge.classList.toggle("show", count > 0);
+          }
+        }
+
+        function startConvWithUser(user) {
+          if (!currentUser) {
+            goTo("login");
+            return;
+          }
+          const cid = _getOrCreate(user);
+          goTo("messages");
+          setTimeout(() => openConv(cid), 50);
+        }
+
+        return {
+          init: _load,
+          renderInbox,
+          openConv,
+          sendMessage,
+          filterInbox,
+          updateDMBadge,
+          startConvWithUser,
+          getActiveConvId: () => _activeConvId,
+        };
+      })();
+
+      /* DM UI helpers */
+      function dmFilterInbox() {
+        DM.filterInbox();
+      }
+      function dmSendMessage() {
+        DM.sendMessage();
+      }
+      function dmAutoResize(el) {
+        el.style.height = "auto";
+        el.style.height = Math.min(el.scrollHeight, 120) + "px";
+      }
+      function dmSendOnEnter(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          DM.sendMessage();
+        }
+      }
+      function dmBackToInbox() {
+        document.getElementById("dm-inbox").classList.remove("hidden-mobile");
+        document.getElementById("dm-chat").classList.remove("visible-mobile");
+      }
+
+      /* New DM modal */
+      let _dmSearchAllUsers = [];
+      function openNewDMModal() {
+        if (!currentUser) {
+          goTo("login");
+          return;
+        }
+        document.getElementById("dm-new-modal").classList.add("open");
+        document.getElementById("dm-new-search").value = "";
+        document.getElementById("dm-new-results").innerHTML =
+          '<div class="dm-new-empty">Search for someone to message</div>';
+        setTimeout(() => document.getElementById("dm-new-search").focus(), 80);
+        // pre-fetch users list if not cached
+        if (!_dmSearchAllUsers.length) {
+          fetch(API + "/api/users")
+            .then((r) => r.json())
+            .then((d) => {
+              if (Array.isArray(d.data)) _dmSearchAllUsers = d.data;
+            })
+            .catch(() => {});
+        }
+      }
+      function closeNewDMModal() {
+        document.getElementById("dm-new-modal").classList.remove("open");
+      }
+      function dmSearchPeople() {
+        const q = document
+          .getElementById("dm-new-search")
+          .value.trim()
+          .toLowerCase();
+        const res = document.getElementById("dm-new-results");
+        if (!q) {
+          res.innerHTML =
+            '<div class="dm-new-empty">Search for someone to message</div>';
+          return;
+        }
+        const matches = _dmSearchAllUsers
+          .filter(
+            (u) =>
+              u.id !== currentUser.id &&
+              (u.name.toLowerCase().includes(q) ||
+                (u.email || "").toLowerCase().includes(q)),
+          )
+          .slice(0, 8);
+        if (!matches.length) {
+          res.innerHTML = '<div class="dm-new-empty">No users found</div>';
+          return;
+        }
+        res.innerHTML = matches
+          .map((u) => {
+            const initial = u.name.charAt(0).toUpperCase();
+            const color = stringToColor(u.name);
+            const avHtml = u.picture
+              ? `<div class="av sm" style="background:transparent;overflow:hidden;flex-shrink:0"><img src="${u.picture}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${initial}"/></div>`
+              : `<div class="av sm" style="background:${color};flex-shrink:0">${initial}</div>`;
+            return `<div class="dm-new-result" onclick="dmPickUser(${JSON.stringify(JSON.stringify(u))})">
+            ${avHtml}
+            <div class="dm-new-result-info">
+              <div class="dm-new-result-name">${escHtml(u.name)}</div>
+              <div class="dm-new-result-email">${escHtml(u.email || "")}</div>
+            </div>
+          </div>`;
+          })
+          .join("");
+      }
+      function dmPickUser(uJson) {
+        try {
+          const u = JSON.parse(uJson);
+          closeNewDMModal();
+          DM.startConvWithUser(u);
+        } catch (e) {}
+      }
+
+      /*  BOOT*/
       (function boot() {
+        PostCache.init(); // hydrate from localStorage
+        DM.init(); // hydrate DM conversations from localStorage
         applyTheme(localStorage.getItem("circle_theme") || "dark");
         try {
           const s = localStorage.getItem("circle_user");
@@ -4682,8 +7480,243 @@ function viewProfile(userId) {
         } catch (e) {
           localStorage.removeItem("circle_user");
         }
+
+        // If arriving via reset link, show new-password view and skip loadPosts
+        const resetToken = new URLSearchParams(window.location.search).get(
+          "token",
+        );
+        if (resetToken) {
+          goTo("new-password");
+          return;
+        }
+
+        loadPosts();
       })();
-      loadPosts();
+
+      /* ── POST DETAIL ──────────────────────────────────────────── */
+      let _postDetailPrevView = "feed";
+
+      function openPostDetail(e, postId) {
+        // Don't open if clicking on a button, link, avatar, or input
+        const tag = e.target.tagName.toLowerCase();
+        if (
+          [
+            "button",
+            "svg",
+            "path",
+            "polyline",
+            "line",
+            "circle",
+            "polygon",
+            "input",
+            "textarea",
+            "img",
+          ].includes(tag)
+        )
+          return;
+        if (
+          e.target.closest("button") ||
+          e.target.closest("a") ||
+          e.target.closest(".av")
+        )
+          return;
+
+        // Remember which view we came from
+        const active = document.querySelector(".view.active");
+        _postDetailPrevView = active ? active.id.replace("view-", "") : "feed";
+
+        const post =
+          posts.find((p) => p.id === postId) || PostCache.get(postId);
+        if (!post) return;
+
+        renderPostDetail(post);
+        goTo("post-detail");
+      }
+
+      function closePostDetail() {
+        goTo(_postDetailPrevView);
+      }
+
+      function renderPostDetail(post) {
+        const liked =
+          currentUser && post.likes && post.likes.includes(currentUser.id);
+        const reposted =
+          currentUser && post.reposts && post.reposts.includes(currentUser.id);
+        const canDelete = currentUser && currentUser.id === post.userId;
+        const color = stringToColor(post.author);
+
+        const avHtml = post.authorPicture
+          ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+          : escHtml(post.author.charAt(0));
+
+        const detailDate = new Date(
+          post.createdAt.includes("T")
+            ? post.createdAt
+            : post.createdAt.replace(" ", "T"),
+        );
+        const dateStr = detailDate.toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        document.getElementById("post-detail-content").innerHTML = `
+          <div class="post-detail-card">
+            ${post.isRepost ? `<div class="repost-strip" style="margin-bottom:12px"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> ${escHtml(post.author)} reposted</div>` : ""}
+            <div class="post-detail-head">
+              <div class="av" style="background:${post.authorPicture ? "transparent" : color};cursor:pointer;flex-shrink:0" onclick="viewProfile(${post.userId})">${avHtml}</div>
+              <div class="post-detail-author">
+                <span class="post-detail-name" onclick="viewProfile(${post.userId})">${escHtml(post.author)}</span>
+                <span class="post-detail-time">${dateStr}</span>
+              </div>
+              ${canDelete ? `<button class="post-del" style="margin-left:auto" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
+            </div>
+
+            ${post.text ? `<div class="post-detail-body">${escHtml(post.text)}</div>` : ""}
+
+            ${
+              post.isRepost && post.originalPost
+                ? `<div class="repost-embed" style="margin-bottom:14px">
+                  <div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>
+                  ${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}
+                  ${post.originalPost.image ? `<img class="post-detail-img" src="${post.originalPost.image}" loading="lazy"/>` : ""}
+                </div>`
+                : post.image
+                  ? `<img class="post-detail-img" src="${post.image}" loading="lazy" onclick="openLightbox(this,collectFeedImages())" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}"/>`
+                  : ""
+            }
+
+            <div class="post-detail-stats">
+              <span class="post-detail-stat"><strong>${post.reposts ? post.reposts.length : 0}</strong> Reposts</span>
+              <span class="post-detail-stat"><strong>${post.likes ? post.likes.length : 0}</strong> Likes</span>
+              <span class="post-detail-stat"><strong>${post.comments ? post.comments.length : 0}</strong> Comments</span>
+            </div>
+
+            <div class="post-detail-actions">
+              <button class="act-btn like-btn${liked ? " liked" : ""}" id="pd-like-btn" onclick="pdToggleLike(${post.id})">
+                <svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                <span id="pd-like-count">${post.likes ? post.likes.length : 0}</span>
+              </button>
+              <button class="act-btn" onclick="document.getElementById('post-detail-reply-input').focus()">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <span>Reply</span>
+              </button>
+              ${
+                !post.isRepost
+                  ? `<button class="act-btn repost-btn${reposted ? " reposted" : ""}" onclick="openRepostModal(${post.id})">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+                <span>${post.reposts ? post.reposts.length : 0}</span>
+              </button>`
+                  : ""
+              }
+            </div>
+          </div>`;
+
+        // Show reply bar only if logged in
+        document.getElementById("post-detail-reply-bar").style.display =
+          currentUser ? "block" : "none";
+
+        // Render comments
+        renderPostDetailComments(post);
+
+        // Store current post id for reply use
+        document.getElementById("post-detail-reply-input").dataset.postId =
+          post.id;
+      }
+
+      function renderPostDetailComments(post) {
+        const comments = post.comments || [];
+        const section = document.getElementById("post-detail-comments");
+
+        if (!comments.length) {
+          section.innerHTML = `<div class="post-detail-comments-section"><div class="post-detail-no-comments">No replies yet. Be the first! 💬</div></div>`;
+          return;
+        }
+
+        const items = comments
+          .map((c) => {
+            const col = stringToColor(c.author);
+            const avInner = c.authorPicture
+              ? `<img src="${c.authorPicture}" alt="${escHtml(c.author.charAt(0))}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+              : escHtml(c.author.charAt(0));
+            return `<div class="post-detail-comment-row">
+            <div class="av sm" style="background:${c.authorPicture ? "transparent" : col};flex-shrink:0">${avInner}</div>
+            <div class="post-detail-comment-bubble">
+              <div class="post-detail-comment-name">${escHtml(c.author)}</div>
+              <div class="post-detail-comment-text">${escHtml(c.text)}</div>
+              ${c.createdAt ? `<div class="post-detail-comment-time">${formatTime(c.createdAt)}</div>` : ""}
+            </div>
+          </div>`;
+          })
+          .join("");
+
+        section.innerHTML = `<div class="post-detail-comments-section">
+          <div class="post-detail-comments-title">Replies (${comments.length})</div>
+          ${items}
+        </div>`;
+      }
+
+      async function pdToggleLike(postId) {
+        if (!currentUser) {
+          showToast("Log in to like posts.");
+          goTo("login");
+          return;
+        }
+        await toggleLike(postId);
+        // Refresh the detail view with updated post
+        const post =
+          posts.find((p) => p.id === postId) || PostCache.get(postId);
+        if (post) renderPostDetail(post);
+      }
+
+      async function postDetailAddComment() {
+        const input = document.getElementById("post-detail-reply-input");
+        const postId = parseInt(input.dataset.postId);
+        const text = input.value.trim();
+        if (!text || !postId) return;
+        if (!currentUser) {
+          showToast("Log in to reply.");
+          goTo("login");
+          return;
+        }
+
+        try {
+          await api("POST", `/api/posts/${postId}/comment`, {
+            userId: currentUser.id,
+            text,
+          });
+          input.value = "";
+          // Re-fetch post to get updated comments
+          // Update locally
+          const post =
+            posts.find((p) => p.id === postId) || PostCache.get(postId);
+          if (post) {
+            post.comments = post.comments || [];
+            post.comments.push({
+              author: currentUser.name,
+              authorPicture: currentUser.picture || "",
+              text,
+              userId: currentUser.id,
+              createdAt: new Date().toISOString(),
+            });
+            renderPostDetailComments(post);
+            // Update comment count in stats
+            const stat = document.querySelector(
+              "#post-detail-content .post-detail-stat:last-child strong",
+            );
+            if (stat) stat.textContent = post.comments.length;
+            const actCount = document.querySelector(
+              "#post-detail-content .act-btn:nth-child(2) span",
+            );
+          }
+          showToast("Reply posted! 💬");
+        } catch (e) {
+          showToast("Failed to post reply: " + e.message);
+        }
+      }
     </script>
   </body>
 </html>

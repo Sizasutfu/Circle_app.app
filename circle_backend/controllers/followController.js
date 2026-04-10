@@ -3,9 +3,9 @@
 //  Handles all request/response logic for follow routes.
 // ============================================================
 
-const FollowModel       = require('../models/FollowModel');
-const UserModel         = require('../models/UserModel');
-const NotificationModel = require('../models/NotificationModel');
+const FollowModel       = require('../models/followModel');
+const UserModel         = require('../models/userModel');
+const NotificationModel = require('../models/notificationModel');
 const { sendOk, sendError } = require('../middleware/response');
 
 // POST /api/follow/:targetId

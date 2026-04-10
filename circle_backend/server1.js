@@ -1,10 +1,8 @@
-
+// ============================================================
 //  server.js  –  Circle API entry point
-
+// ============================================================
 
 require('dotenv').config();
-
-//console.log('EMAIL_USER:', process.env.EMAIL_USER, '| EMAIL_PASS:', process.env.EMAIL_PASS); 
 
 const express            = require('express');
 const { connectDB }      = require('./config/db');
@@ -17,9 +15,7 @@ const userRoutes         = require('./routes/userRoutes');
 const postRoutes         = require('./routes/postRoutes');
 const followRoutes       = require('./routes/followRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
-const searchRoutes           = require('./routes/searchRoutes');
-const recommendationRoutes   = require('./routes/recommendationRoutes');
-const dmRoutes           = require('./routes/dm')     
+const searchRoutes       = require('./routes/searchRoutes');
 
 // authRoutes is optional (Google OAuth) — only load if the file exists
 let authRoutes = null;
@@ -36,7 +32,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Health check
 app.get('/', (req, res) => res.json({
-  message: 'Circle API running',
+  message: '🔵 Circle API running',
   version: '4.0.0',
 }));
 
@@ -48,11 +44,9 @@ app.use('/api/admin',         adminRoutes);          // admin panel
 app.use('/api/users',         userRoutes);           // register / login / profile
 app.use('/api/posts',         postRoutes);           // feed / create / delete
 app.use('/api/notifications', notificationRoutes);   // notifications
-app.use('/api/search',          searchRoutes);         // search posts & people
-app.use('/api/recommendations',  recommendationRoutes);  // suggested users
+app.use('/api/search',        searchRoutes);         // search posts & people
 if (authRoutes) app.use('/api/auth', authRoutes);    // Google OAuth (optional)
 app.use('/api',               followRoutes);         // follow/unfollow — LAST
-app.use('/api/dm', dmRoutes);
 
 // 404
 app.use((req, res) => sendError(res, 404, `Route '${req.originalUrl}' not found.`));
@@ -61,10 +55,8 @@ app.use((req, res) => sendError(res, 404, `Route '${req.originalUrl}' not found.
 async function start() {
   await connectDB();
   app.listen(PORT, () => {
-    console.log(`Circle API running on http://localhost:${PORT}`);
-     console.log(`     circle frontend: open frontend/circle_app.html in browser`)
-    console.log(`     Admin panel: open admin/index.html in your browser`);
-   
+    console.log(`✅  Circle API running on http://localhost:${PORT}`);
+    console.log(`    Admin panel: open admin/index.html in your browser`);
   });
 }
 

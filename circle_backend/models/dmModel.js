@@ -1,0 +1,238 @@
+// ============================================================
+//  models/dmModel.js
+//  All database queries for Direct Messages
+// ============================================================
+
+const { db } = require('../config/db'); // adjust path to match your project
+
+// ─── Helpers ────────────────────────────────────────────────
+
+/**
+ * Returns [lowerUserId, higherUserId] so the pair is always
+ * stored the same way regardless of who starts the conversation.
+ */
+function _orderedPair(idA, idB) {
+  return idA < idB ? [idA, idB] : [idB, idA];
+}
+
+// ─── Conversations ───────────────────────────────────────────
+
+/**
+ * Find an existing conversation between two users,
+ * or create one if it does not exist yet.
+ * Returns the conversation row.
+ */
+async function getOrCreateConversation(userIdA, userIdB) {
+  const [p1, p2] = _orderedPair(Number(userIdA), Number(userIdB));
+
+  // Try to find existing
+  const [rows] = await db.query(
+    `SELECT id, participant_one_id, participant_two_id, created_at
+     FROM dm_conversations
+     WHERE participant_one_id = ? AND participant_two_id = ?`,
+    [p1, p2]
+  );
+
+  if (rows.length > 0) return rows[0];
+
+  // Create new
+  const [result] = await db.query(
+    `INSERT INTO dm_conversations (participant_one_id, participant_two_id)
+     VALUES (?, ?)`,
+    [p1, p2]
+  );
+
+  return {
+    id: result.insertId,
+    participant_one_id: p1,
+    participant_two_id: p2,
+    created_at: new Date(),
+  };
+}
+
+/**
+ * Return all conversations for a given user, enriched with:
+ *  - the other participant's name + picture
+ *  - the last message preview
+ *  - the count of unread messages directed at this user
+ * Sorted by most recent activity.
+ */
+async function getInboxForUser(userId) {
+  const uid = Number(userId);
+
+  const [rows] = await db.query(
+    `SELECT
+       c.id,
+       c.created_at,
+
+       -- Other participant info
+       u.id          AS other_id,
+       u.name        AS other_name,
+       u.picture     AS other_picture,
+
+       -- Last message
+       lm.body       AS last_message,
+       lm.sender_id  AS last_sender_id,
+       lm.created_at AS last_message_at,
+
+       -- Unread count (messages sent TO this user that are unread)
+       COALESCE(unread.cnt, 0) AS unread_count
+
+     FROM dm_conversations c
+
+     -- Join the other participant
+     JOIN users u ON u.id = IF(c.participant_one_id = ?, c.participant_two_id, c.participant_one_id)
+
+     -- Join last message via subquery
+     LEFT JOIN dm_messages lm ON lm.id = (
+       SELECT id FROM dm_messages
+       WHERE conversation_id = c.id
+       ORDER BY created_at DESC
+       LIMIT 1
+     )
+
+     -- Count unread messages sent by the OTHER user
+     LEFT JOIN (
+       SELECT conversation_id, COUNT(*) AS cnt
+       FROM dm_messages
+       WHERE is_read = 0 AND sender_id != ?
+       GROUP BY conversation_id
+     ) unread ON unread.conversation_id = c.id
+
+     WHERE c.participant_one_id = ? OR c.participant_two_id = ?
+
+     ORDER BY COALESCE(lm.created_at, c.created_at) DESC`,
+    [uid, uid, uid, uid]
+  );
+
+  return rows;
+}
+
+/**
+ * Verify that a given user is a participant in a conversation.
+ * Returns true/false.
+ */
+async function isParticipant(conversationId, userId) {
+  const [rows] = await db.query(
+    `SELECT id FROM dm_conversations
+     WHERE id = ?
+       AND (participant_one_id = ? OR participant_two_id = ?)
+     LIMIT 1`,
+    [conversationId, userId, userId]
+  );
+  return rows.length > 0;
+}
+
+// ─── Messages ────────────────────────────────────────────────
+
+/**
+ * Fetch all messages in a conversation, oldest first.
+ * Also marks all messages sent by the OTHER user as read.
+ */
+async function getMessages(conversationId, requestingUserId) {
+  const convId = Number(conversationId);
+  const uid    = Number(requestingUserId);
+
+  // Mark messages from the other person as read
+  await db.query(
+    `UPDATE dm_messages
+     SET is_read = 1
+     WHERE conversation_id = ? AND sender_id != ? AND is_read = 0`,
+    [convId, uid]
+  );
+
+  // Fetch all messages
+  const [rows] = await db.query(
+    `SELECT
+       m.id,
+       m.conversation_id,
+       m.sender_id,
+       u.name        AS sender_name,
+       u.picture     AS sender_picture,
+       m.body,
+       m.is_read,
+       m.created_at
+     FROM dm_messages m
+     JOIN users u ON u.id = m.sender_id
+     WHERE m.conversation_id = ?
+     ORDER BY m.created_at ASC`,
+    [convId]
+  );
+
+  return rows;
+}
+
+/**
+ * Insert a new message into a conversation.
+ * Returns the full new message row (joined with sender info).
+ */
+async function sendMessage(conversationId, senderId, body) {
+  const convId = Number(conversationId);
+  const sid    = Number(senderId);
+
+  const [result] = await db.query(
+    `INSERT INTO dm_messages (conversation_id, sender_id, body)
+     VALUES (?, ?, ?)`,
+    [convId, sid, body.trim()]
+  );
+
+  const [rows] = await db.query(
+    `SELECT
+       m.id,
+       m.conversation_id,
+       m.sender_id,
+       u.name        AS sender_name,
+       u.picture     AS sender_picture,
+       m.body,
+       m.is_read,
+       m.created_at
+     FROM dm_messages m
+     JOIN users u ON u.id = m.sender_id
+     WHERE m.id = ?`,
+    [result.insertId]
+  );
+
+  return rows[0];
+}
+
+/**
+ * Total count of unread messages across all conversations for a user.
+ * Useful for the nav badge.
+ */
+async function getTotalUnreadCount(userId) {
+  const uid = Number(userId);
+
+  const [rows] = await db.query(
+    `SELECT COUNT(*) AS total
+     FROM dm_messages m
+     JOIN dm_conversations c ON c.id = m.conversation_id
+     WHERE m.is_read = 0
+       AND m.sender_id != ?
+       AND (c.participant_one_id = ? OR c.participant_two_id = ?)`,
+    [uid, uid, uid]
+  );
+
+  return rows[0]?.total || 0;
+}
+
+/**
+ * Mark all messages in a conversation as read for a specific user.
+ */
+async function markConversationRead(conversationId, userId) {
+  await db.query(
+    `UPDATE dm_messages
+     SET is_read = 1
+     WHERE conversation_id = ? AND sender_id != ? AND is_read = 0`,
+    [conversationId, userId]
+  );
+}
+
+module.exports = {
+  getOrCreateConversation,
+  getInboxForUser,
+  isParticipant,
+  getMessages,
+  sendMessage,
+  getTotalUnreadCount,
+  markConversationRead,
+};

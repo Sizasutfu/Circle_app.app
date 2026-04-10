@@ -6,7 +6,7 @@
 // ============================================================
 
 const bcrypt       = require('bcrypt');
-const UserModel    = require('../models/UserModel');
+const UserModel    = require('../models/userModel');
 const { sendOk, sendError } = require('../middleware/response');
 
 // POST /api/users/register
@@ -119,4 +119,25 @@ async function updateProfile(req, res) {
   }
 }
 
-module.exports = { register, login, getProfile, updatePicture, updateProfile };
+// GET /api/users?search=<query>&limit=<n>
+// Used by the New Message modal to find people to DM.
+// Requires auth (x-user-id header) so the caller is excluded from results.
+async function searchUsers(req, res) {
+  const search = (req.query.search || '').trim();
+  const limit  = Math.min(parseInt(req.query.limit) || 10, 20);
+  const selfId = req.actorId; // set by requireAuth middleware
+
+  if (!search) {
+    return sendOk(res, 200, 'No query provided.', []);
+  }
+
+  try {
+    const users = await UserModel.searchUsers(search, selfId, limit);
+    return sendOk(res, 200, 'Users fetched.', users);
+  } catch (err) {
+    console.error('searchUsers error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
+
+module.exports = { register, login, getProfile, updatePicture, updateProfile, searchUsers };

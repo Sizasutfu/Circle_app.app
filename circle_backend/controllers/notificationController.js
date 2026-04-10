@@ -3,7 +3,7 @@
 //  Handles all request/response logic for notification routes.
 // ============================================================
 
-const NotificationModel     = require('../models/NotificationModel');
+const NotificationModel     = require('../models/notificationModel');
 const { sendOk, sendError } = require('../middleware/response');
 
 // GET /api/notifications/:userId
