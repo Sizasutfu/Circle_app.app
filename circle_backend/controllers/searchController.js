@@ -4,7 +4,7 @@
 // ============================================================
 
 const { db }                = require('../config/db');
-const FollowModel           = require('../models/FollowModel');
+const FollowModel           = require('../models/followModel');
 const PostModel             = require('../models/PostModel');
 const { sendOk, sendError } = require('../middleware/response');
 

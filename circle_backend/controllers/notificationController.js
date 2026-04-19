@@ -9,9 +9,13 @@ const { sendOk, sendError } = require('../middleware/response');
 // GET /api/notifications/:userId
 async function getNotifications(req, res) {
   const userId = parseInt(req.params.userId);
+  const limit  = Math.min(parseInt(req.query.limit) || 10, 50);
+  const page   = Math.max(parseInt(req.query.page)  || 1,  1);
+  const offset = (page - 1) * limit;
   try {
-    const notifications = await NotificationModel.getNotifications(userId);
-    return sendOk(res, 200, 'Notifications fetched.', notifications);
+    const notifications = await NotificationModel.getNotifications(userId, limit, offset);
+    const hasMore = notifications.length === limit;
+    return sendOk(res, 200, 'Notifications fetched.', { notifications, hasMore, page });
   } catch (err) {
     console.error('getNotifications error:', err);
     return sendError(res, 500, 'Server error.');

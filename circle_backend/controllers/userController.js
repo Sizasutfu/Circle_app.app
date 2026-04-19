@@ -5,13 +5,15 @@
 //  sends back a response. No SQL lives here.
 // ============================================================
 
-const bcrypt       = require('bcrypt');
-const UserModel    = require('../models/userModel');
+const bcrypt            = require('bcrypt');
+const UserModel         = require('../models/userModel');
+const FollowModel       = require('../models/followModel');
+const NotificationModel = require('../models/notificationModel');
 const { sendOk, sendError } = require('../middleware/response');
 
 // POST /api/users/register
 async function register(req, res) {
-  const { name, email, password } = req.body;
+  const { name, email, password, bio } = req.body;
   if (!name || !email || !password)
     return sendError(res, 400, 'Name, email, and password are required.');
 
@@ -83,6 +85,15 @@ async function updatePicture(req, res) {
     if (!user) return sendError(res, 404, 'User not found.');
 
     await UserModel.updatePicture(userId, picture || null);
+
+    // ── Notify all followers about the new profile picture ───
+    const followerIds = await FollowModel.getFollowerIds(userId);
+    await Promise.all(
+      followerIds.map(fId =>
+        NotificationModel.createNotification(fId, userId, 'profile_pic', null)
+      )
+    );
+
     return sendOk(res, 200, 'Picture updated.', { picture: picture || null });
   } catch (err) {
     console.error('updatePicture error:', err);
@@ -93,12 +104,15 @@ async function updatePicture(req, res) {
 // PUT /api/users/:id
 async function updateProfile(req, res) {
   const userId = parseInt(req.params.id);
-  const { name, email, password } = req.body;
+  const { name, email, password, bio } = req.body;
 
   if (req.actorId !== userId)
     return sendError(res, 403, 'Forbidden.');
   if (!name || !email)
     return sendError(res, 400, 'Name and email are required.');
+
+  // Cap bio at 160 chars and treat empty string as null
+  const cleanBio = bio ? String(bio).slice(0, 160).trim() || null : null;
 
   try {
     if (await UserModel.emailTakenByOther(email, userId))
@@ -106,9 +120,9 @@ async function updateProfile(req, res) {
 
     if (password && password.length >= 6) {
       const hash = await bcrypt.hash(password, 10);
-      await UserModel.updateUserWithPassword(userId, name, email, hash);
+      await UserModel.updateUserWithPassword(userId, name, email, hash, cleanBio);
     } else {
-      await UserModel.updateUser(userId, name, email);
+      await UserModel.updateUser(userId, name, email, cleanBio);
     }
 
     const updated = await UserModel.findById(userId);
@@ -140,4 +154,19 @@ async function searchUsers(req, res) {
   }
 }
 
-module.exports = { register, login, getProfile, updatePicture, updateProfile, searchUsers };
+// GET /api/users/new-members?limit=10
+// Returns users who joined in the last 7 days, excluding self and already-followed.
+async function getNewMembers(req, res) {
+  const limit    = Math.min(parseInt(req.query.limit) || 10, 20);
+  const viewerId = req.actorId || null;
+
+  try {
+    const users = await UserModel.getNewMembers(viewerId, limit);
+    return sendOk(res, 200, 'New members fetched.', users);
+  } catch (err) {
+    console.error('getNewMembers error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
+
+module.exports = { register, login, getProfile, updatePicture, updateProfile, searchUsers, getNewMembers };

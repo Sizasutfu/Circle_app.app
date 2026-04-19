@@ -24,9 +24,27 @@ function computeScore(post, viewerUserId, followingIds = []) {
   return recency + likeScore + commentScore + repostScore + ownBoost + followBoost + repostBoost;
 }
 
+// ── Nest flat comment rows into a parent → replies tree ───
+function nestComments(flatComments) {
+  const byId  = {};
+  const roots = [];
+
+  flatComments.forEach(c => {
+    byId[c.id] = { ...c, replies: [] };
+  });
+
+  flatComments.forEach(c => {
+    if (c.parentId && byId[c.parentId]) {
+      byId[c.parentId].replies.push(byId[c.id]);
+    } else {
+      roots.push(byId[c.id]);
+    }
+  });
+
+  return roots;
+}
+
 // ── Hydrate raw post rows with engagement data ─────────────
-// Fetches likes, reposts, comments, and embedded originalPost
-// in 3 parallel batch queries — never N×queries.
 async function hydratePosts(posts) {
   if (!posts.length) return posts;
 
@@ -38,6 +56,7 @@ async function hydratePosts(posts) {
     db.query(`SELECT user_id, original_post_id FROM reposts WHERE original_post_id IN (${ph})`, ids),
     db.query(
       `SELECT c.id, c.post_id, c.user_id AS userId,
+              c.parent_id AS parentId,
               u.name AS author, u.picture AS authorPicture,
               c.text, c.created_at AS createdAt
        FROM comments c
@@ -48,14 +67,13 @@ async function hydratePosts(posts) {
     ),
   ]);
 
-  // Build lookup maps keyed by post id
   const lMap = {}, rMap = {}, cMap = {};
   ids.forEach(id => { lMap[id] = []; rMap[id] = []; cMap[id] = []; });
   allLikes.forEach(l   => lMap[l.post_id]?.push(l.user_id));
   allReposts.forEach(r => rMap[r.original_post_id]?.push(r.user_id));
   allComments.forEach(c => cMap[c.post_id]?.push(c));
 
-  // Embed original posts for repost cards (one extra batch query)
+  // Embed original posts for repost cards
   const origIds = [
     ...new Set(
       posts.filter(p => p.isRepost && p.originalPostId).map(p => p.originalPostId)
@@ -65,7 +83,7 @@ async function hydratePosts(posts) {
   if (origIds.length) {
     const oph = origIds.map(() => '?').join(',');
     const [origRows] = await db.query(
-      `SELECT p.id, u.name AS author, u.picture AS authorPicture, p.text, p.image
+      `SELECT p.id, u.name AS author, u.picture AS authorPicture, p.text, p.image, p.video
        FROM posts p
        JOIN users u ON u.id = p.user_id
        WHERE p.id IN (${oph})`,
@@ -75,11 +93,12 @@ async function hydratePosts(posts) {
   }
 
   posts.forEach(p => {
-    p.likes        = lMap[p.id] || [];
-    p.reposts      = rMap[p.id] || [];
-    p.comments     = cMap[p.id] || [];
+    p.likes    = lMap[p.id] || [];
+    p.reposts  = rMap[p.id] || [];
+    p.comments = nestComments(cMap[p.id] || []);
     if (p.isRepost && p.originalPostId)
       p.originalPost = origMap[p.originalPostId] || null;
+    // image and video are now plain URLs — no base64 handling needed
   });
 
   return posts;
@@ -96,8 +115,6 @@ async function getFollowingIds(viewerUserId) {
 }
 
 // ── Fetch one page of posts ────────────────────────────────
-// feedMode: 'global' | 'following'
-// Returns { posts, hasMore }
 async function getPostsPage(viewerUserId, feedMode, page) {
   const LIMIT  = FEED_PAGE_SIZE;
   const OFFSET = (page - 1) * LIMIT;
@@ -114,7 +131,6 @@ async function getPostsPage(viewerUserId, feedMode, page) {
     whereParams = followingIds;
   }
 
-  // Fetch LIMIT+1 to cheaply know if a next page exists
   const [rawPosts] = await db.query(
     `SELECT
        p.id,
@@ -123,6 +139,7 @@ async function getPostsPage(viewerUserId, feedMode, page) {
        u.picture          AS authorPicture,
        p.text,
        p.image,
+       p.video,
        p.is_repost        AS isRepost,
        p.original_post_id AS originalPostId,
        p.created_at       AS createdAt
@@ -139,7 +156,6 @@ async function getPostsPage(viewerUserId, feedMode, page) {
 
   const posts = await hydratePosts(pagePosts);
 
-  // Score and sort within this page
   posts.forEach(p => { p._score = computeScore(p, viewerUserId, followingIds); });
   posts.sort((a, b) => b._score - a._score);
   posts.forEach(p => delete p._score);
@@ -147,11 +163,43 @@ async function getPostsPage(viewerUserId, feedMode, page) {
   return { posts, hasMore };
 }
 
+// ── Fetch all posts for a specific user profile ────────────
+async function getProfilePosts(profileUserId, page = 1) {
+  const LIMIT  = FEED_PAGE_SIZE;
+  const OFFSET = (page - 1) * LIMIT;
+
+  const [rawPosts] = await db.query(
+    `SELECT
+       p.id,
+       p.user_id          AS userId,
+       u.name             AS author,
+       u.picture          AS authorPicture,
+       p.text,
+       p.image,
+       p.video,
+       p.is_repost        AS isRepost,
+       p.original_post_id AS originalPostId,
+       p.created_at       AS createdAt
+     FROM posts p
+     JOIN users u ON u.id = p.user_id
+     WHERE p.user_id = ?
+     ORDER BY p.created_at DESC
+     LIMIT ? OFFSET ?`,
+    [profileUserId, LIMIT + 1, OFFSET]
+  );
+
+  const hasMore   = rawPosts.length > LIMIT;
+  const pagePosts = rawPosts.slice(0, LIMIT);
+  const posts     = await hydratePosts(pagePosts);
+
+  return { posts, hasMore };
+}
+
 // ── Create a post ──────────────────────────────────────────
-async function createPost(userId, text, image) {
+async function createPost(userId, text, image, video) {
   const [result] = await db.query(
-    'INSERT INTO posts (user_id, text, image) VALUES (?, ?, ?)',
-    [userId, text || null, image || null]
+    'INSERT INTO posts (user_id, text, image, video) VALUES (?, ?, ?, ?)',
+    [userId, text || null, image || null, video || null]
   );
   return result.insertId;
 }
@@ -192,11 +240,21 @@ async function getLikeCount(postId) {
   return total;
 }
 
-// ── Add a comment ──────────────────────────────────────────
-async function addComment(postId, userId, text) {
+// ── Add a comment or reply ─────────────────────────────────
+async function addComment(postId, userId, text, parentId = null) {
+  if (parentId) {
+    const [parentRows] = await db.query(
+      'SELECT id FROM comments WHERE id=? AND post_id=?',
+      [parentId, postId]
+    );
+    if (!parentRows.length) {
+      throw new Error('Parent comment not found on this post.');
+    }
+  }
+
   const [result] = await db.query(
-    'INSERT INTO comments (post_id, user_id, text) VALUES (?,?,?)',
-    [postId, userId, text]
+    'INSERT INTO comments (post_id, user_id, text, parent_id) VALUES (?,?,?,?)',
+    [postId, userId, text, parentId]
   );
   return result.insertId;
 }
@@ -225,11 +283,42 @@ async function createRepost(userId, text, originalPostId) {
 
 async function getOriginalPostEmbed(originalPostId) {
   const [rows] = await db.query(
-    `SELECT p.id, u.name AS author, u.picture AS authorPicture, p.text, p.image
+    `SELECT p.id, u.name AS author, u.picture AS authorPicture, p.text, p.image, p.video
      FROM posts p JOIN users u ON u.id=p.user_id WHERE p.id=?`,
     [originalPostId]
   );
   return rows[0] || null;
+}
+
+// ── Trending posts (last 24 hours, ranked by engagement) ──
+async function getTrendingPosts(limit = 20) {
+  const [rawPosts] = await db.query(
+    `SELECT
+       p.id,
+       p.user_id          AS userId,
+       u.name             AS author,
+       u.picture          AS authorPicture,
+       p.text,
+       p.image,
+       p.video,
+       p.is_repost        AS isRepost,
+       p.original_post_id AS originalPostId,
+       p.created_at       AS createdAt,
+       (
+         (SELECT COUNT(*) FROM likes    WHERE post_id = p.id) * 1 +
+         (SELECT COUNT(*) FROM comments WHERE post_id = p.id) * 2 +
+         (SELECT COUNT(*) FROM reposts  WHERE original_post_id = p.id) * 3
+       ) AS engagement_score
+     FROM posts p
+     JOIN users u ON u.id = p.user_id
+     WHERE p.created_at >= NOW() - INTERVAL 24 HOUR
+     ORDER BY engagement_score DESC, p.created_at DESC
+     LIMIT ?`,
+    [limit]
+  );
+
+  if (!rawPosts.length) return [];
+  return hydratePosts(rawPosts);
 }
 
 // ── Search posts ───────────────────────────────────────────
@@ -237,7 +326,7 @@ async function searchPosts(query) {
   const like = `%${query}%`;
   const [rows] = await db.query(
     `SELECT p.id, p.user_id AS userId, u.name AS author, u.picture AS authorPicture,
-            p.text, p.image, p.is_repost AS isRepost, p.created_at AS createdAt,
+            p.text, p.image, p.video, p.is_repost AS isRepost, p.created_at AS createdAt,
             (SELECT COUNT(*) FROM likes    WHERE post_id=p.id)           AS likeCount,
             (SELECT COUNT(*) FROM comments WHERE post_id=p.id)           AS commentCount,
             (SELECT COUNT(*) FROM reposts  WHERE original_post_id=p.id)  AS repostCount
@@ -253,8 +342,11 @@ async function searchPosts(query) {
 module.exports = {
   computeScore,
   hydratePosts,
+  nestComments,
   getFollowingIds,
   getPostsPage,
+  getProfilePosts,
+  getTrendingPosts,
   createPost,
   deletePost,
   findById,

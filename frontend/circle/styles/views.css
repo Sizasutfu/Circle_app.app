@@ -1,0 +1,13 @@
+/* ── Per-view styles live in components.css ── */
+
+/* ── Profile bio ── */
+
+      .profile-bio {
+        font-size: 13.5px;
+        color: var(--txt2);
+        margin-top: 8px;
+        line-height: 1.55;
+        max-width: 340px;
+      }
+
+      /* ═══════════════════ NEW MEMBERS CARD ══════════════════ */

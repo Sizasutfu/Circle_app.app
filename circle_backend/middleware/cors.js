@@ -18,7 +18,7 @@ function cors(req, res, next) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, Authorization');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
-  console.log('origin:', req.headers.origin);
+  //console.log('origin:', req.headers.origin);
 }
 
 

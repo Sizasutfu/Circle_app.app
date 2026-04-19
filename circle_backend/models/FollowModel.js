@@ -84,6 +84,16 @@ async function getFollowingSet(viewerId) {
   return new Set(rows.map(r => r.following_id));
 }
 
+// ── Returns a plain array of user IDs who follow the given userId ──
+// Used for fan-out notifications (new_post, profile_pic).
+async function getFollowerIds(userId) {
+  const [rows] = await db.query(
+    'SELECT follower_id FROM follows WHERE following_id = ?',
+    [userId]
+  );
+  return rows.map(r => r.follower_id);
+}
+
 module.exports = {
   getFollow,
   addFollow,
@@ -92,4 +102,5 @@ module.exports = {
   getFollowers,
   getFollowing,
   getFollowingSet,
+  getFollowerIds,
 };

@@ -29,8 +29,8 @@ async function createNotification(recipientId, actorId, type, postId = null) {
   }
 }
 
-// ── Fetch latest 50 notifications for a user ──────────────
-async function getNotifications(userId) {
+// ── Fetch paginated notifications for a user ──────────────
+async function getNotifications(userId, limit = 10, offset = 0) {
   const [rows] = await db.query(
     `SELECT
        n.id,
@@ -47,8 +47,8 @@ async function getNotifications(userId) {
      LEFT JOIN posts p ON p.id = n.post_id
      WHERE n.recipient_id = ?
      ORDER BY n.created_at DESC
-     LIMIT 50`,
-    [userId]
+     LIMIT ? OFFSET ?`,
+    [userId, limit, offset]
   );
   return rows;
 }

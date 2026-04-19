@@ -19,6 +19,10 @@ router.get( '/:id/profile',     userController.getProfile);
 // GET /api/users?search=alice&limit=8
 router.get('/', requireAuth, userController.searchUsers);
 
+// New members — joined in last 7 days
+// GET /api/users/new-members?limit=10
+router.get('/new-members', userController.getNewMembers);
+
 // Protected routes — must send X-User-Id header
 router.put('/:id/picture', requireAuth, userController.updatePicture);
 router.put('/:id',         requireAuth, userController.updateProfile);
