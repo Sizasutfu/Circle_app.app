@@ -246,4 +246,25 @@ async function repost(req, res) {
   }
 }
 
-module.exports = { getPosts, getPostById, createPost, deletePost, toggleLike, addComment, repost };
+// POST /api/posts/:id/view
+// Called by the frontend when a post enters the viewport.
+// Auth is optional — logged-in users are identified by userId,
+// guests by a client-generated fingerprint passed in the body.
+async function recordView(req, res) {
+  const postId = parseInt(req.params.id);
+  if (isNaN(postId)) return sendError(res, 400, 'Invalid post ID.');
+
+  // Prefer authenticated user id; fall back to anonymous fingerprint
+  const viewerId = req.actorId || req.body.fingerprint || req.ip;
+
+  try {
+    await PostModel.recordView(postId, viewerId);
+    const total = await PostModel.getViewCount(postId);
+    return sendOk(res, 200, 'View recorded.', { views: total });
+  } catch (err) {
+    console.error('recordView error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
+
+module.exports = { getPosts, getPostById, createPost, deletePost, toggleLike, addComment, repost, recordView };

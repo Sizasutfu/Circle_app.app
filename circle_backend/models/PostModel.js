@@ -51,7 +51,7 @@ async function hydratePosts(posts) {
   const ids = posts.map(p => p.id);
   const ph  = ids.map(() => '?').join(',');
 
-  const [[allLikes], [allReposts], [allComments]] = await Promise.all([
+  const [[allLikes], [allReposts], [allComments], [allViews]] = await Promise.all([
     db.query(`SELECT user_id, post_id FROM likes WHERE post_id IN (${ph})`, ids),
     db.query(`SELECT user_id, original_post_id FROM reposts WHERE original_post_id IN (${ph})`, ids),
     db.query(
@@ -65,13 +65,18 @@ async function hydratePosts(posts) {
        ORDER BY c.created_at ASC`,
       ids
     ),
+    db.query(
+      `SELECT post_id, COUNT(*) AS view_count FROM post_views WHERE post_id IN (${ph}) GROUP BY post_id`,
+      ids
+    ),
   ]);
 
-  const lMap = {}, rMap = {}, cMap = {};
-  ids.forEach(id => { lMap[id] = []; rMap[id] = []; cMap[id] = []; });
+  const lMap = {}, rMap = {}, cMap = {}, vMap = {};
+  ids.forEach(id => { lMap[id] = []; rMap[id] = []; cMap[id] = []; vMap[id] = 0; });
   allLikes.forEach(l   => lMap[l.post_id]?.push(l.user_id));
   allReposts.forEach(r => rMap[r.original_post_id]?.push(r.user_id));
   allComments.forEach(c => cMap[c.post_id]?.push(c));
+  allViews.forEach(v   => { if (vMap[v.post_id] !== undefined) vMap[v.post_id] = Number(v.view_count); });
 
   // Embed original posts for repost cards
   const origIds = [
@@ -96,6 +101,7 @@ async function hydratePosts(posts) {
     p.likes    = lMap[p.id] || [];
     p.reposts  = rMap[p.id] || [];
     p.comments = nestComments(cMap[p.id] || []);
+    p.views    = vMap[p.id] || 0;
     if (p.isRepost && p.originalPostId)
       p.originalPost = origMap[p.originalPostId] || null;
     // image and video are now plain URLs — no base64 handling needed
@@ -339,6 +345,25 @@ async function searchPosts(query) {
   return rows;
 }
 
+// ── View counts ────────────────────────────────────────────
+// Records one view per viewer (identified by userId or fingerprint).
+// Uses INSERT IGNORE so duplicate views in the same session are silently dropped.
+async function recordView(postId, viewerId) {
+  // viewerId can be a userId (int) or an anonymous fingerprint string
+  await db.query(
+    `INSERT IGNORE INTO post_views (post_id, viewer_key) VALUES (?, ?)`,
+    [postId, String(viewerId)]
+  );
+}
+
+async function getViewCount(postId) {
+  const [[{ total }]] = await db.query(
+    'SELECT COUNT(*) AS total FROM post_views WHERE post_id = ?',
+    [postId]
+  );
+  return Number(total);
+}
+
 module.exports = {
   computeScore,
   hydratePosts,
@@ -359,4 +384,6 @@ module.exports = {
   createRepost,
   getOriginalPostEmbed,
   searchPosts,
+  recordView,
+  getViewCount,
 };

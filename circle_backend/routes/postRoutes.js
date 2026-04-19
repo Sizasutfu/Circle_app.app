@@ -28,4 +28,7 @@ router.post('/:id/like',    requireAuth, postController.toggleLike);
 router.post('/:id/comment', requireAuth, postController.addComment);
 router.post('/:id/repost',  requireAuth, postController.repost);
 
+// View count — auth optional (guests tracked by fingerprint)
+router.post('/:id/view', postController.recordView);
+
 module.exports = router;

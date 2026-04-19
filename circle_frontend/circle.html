@@ -1418,6 +1418,23 @@
         height: 15px;
         transition: fill var(--tr);
       }
+      .act-views {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-left: auto;
+        padding: 6px 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--txt3);
+        pointer-events: none;
+        user-select: none;
+      }
+      .act-views svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+      }
       .comments-panel {
         border-top: 1px solid var(--border);
         padding: 14px 16px;
@@ -3775,19 +3792,41 @@
       }
       .dm-chat-head-status {
         font-size: 12px;
-        color: var(--green);
+        color: var(--txt2);
         margin-top: 1px;
         display: flex;
         align-items: center;
         gap: 5px;
+      }
+      .dm-chat-head-status.online {
+        color: var(--green);
       }
       .dm-chat-head-status::before {
         content: "";
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: var(--green);
+        background: var(--txt3);
         display: inline-block;
+        flex-shrink: 0;
+      }
+      .dm-chat-head-status.online::before {
+        background: var(--green);
+      }
+      /* "Seen" read receipt label under last sent message */
+      .dm-seen-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--txt3);
+        text-align: right;
+        margin-top: 3px;
+        margin-right: 2px;
+        letter-spacing: 0.01em;
+        animation: fadeInSeen 0.25s ease;
+      }
+      @keyframes fadeInSeen {
+        from { opacity: 0; transform: translateY(2px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
 
       .dm-messages {
@@ -6061,7 +6100,7 @@
                     <div class="av sm" id="dm-chat-av"></div>
                     <div class="dm-chat-head-info">
                       <div class="dm-chat-head-name" id="dm-chat-name"></div>
-                      <div class="dm-chat-head-status">Active now</div>
+                      <div class="dm-chat-head-status" id="dm-chat-status" style="display:none"></div>
                     </div>
                     <button
                       class="icon-btn"
@@ -9154,6 +9193,10 @@
         <span class="comment-count">${(function countAll(arr){return(arr||[]).reduce((n,c)=>n+1+countAll(c.replies||[]),0);})(post.comments) || ""}</span>
       </button>
       ${!post.isRepost ? `<button class="act-btn repost-btn${reposted ? " reposted" : ""}" onclick="openRepostModal(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg><span>${post.reposts ? post.reposts.length || "" : ""}</span></button>` : ""}
+      <span class="act-views" id="views-${post.id}" title="Views">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>${post.views ? fmtViews(post.views) : ""}</span>
+      </span>
     </div>
   </div>`;
       }
@@ -10540,6 +10583,97 @@
           day: "numeric",
         });
       }
+
+      // ── View count helpers ────────────────────────────────────────
+      function fmtViews(n) {
+        if (!n) return "";
+        if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+        if (n >= 1_000)     return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+        return String(n);
+      }
+
+      // Generate or retrieve a stable anonymous fingerprint for guests
+      function _getFingerprint() {
+        let fp = localStorage.getItem("circle_fp");
+        if (!fp) {
+          fp = "fp_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+          localStorage.setItem("circle_fp", fp);
+        }
+        return fp;
+      }
+
+      // Track which post IDs have already been counted this session
+      const _viewedPostIds = new Set();
+
+      // Fire POST /api/posts/:id/view when a card has been visible for ≥1s
+      function _recordView(postId) {
+        if (_viewedPostIds.has(postId)) return;
+        _viewedPostIds.add(postId);
+
+        const body = currentUser
+          ? {}
+          : { fingerprint: _getFingerprint() };
+
+        api("POST", `/api/posts/${postId}/view`, body)
+          .then(res => {
+            // Update the count in the DOM without re-rendering the whole card
+            const el = document.getElementById(`views-${postId}`);
+            if (el) {
+              const span = el.querySelector("span");
+              if (span) span.textContent = fmtViews(res?.data?.views || 0);
+            }
+            // Patch the in-memory post object too
+            const post = posts.find(p => p.id === postId);
+            if (post && res?.data?.views !== undefined) post.views = res.data.views;
+          })
+          .catch(() => { /* silent — view tracking is best-effort */ });
+      }
+
+      // IntersectionObserver: fires _recordView after the card has been
+      // visible for at least 1 second (avoids counting quick scrolls).
+      (function initViewTracker() {
+        const _timers = new Map(); // postId → setTimeout handle
+
+        const _io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            const card = entry.target;
+            const postId = parseInt(card.dataset.postId);
+            if (isNaN(postId)) return;
+
+            if (entry.isIntersecting) {
+              if (!_timers.has(postId)) {
+                const t = setTimeout(() => {
+                  _timers.delete(postId);
+                  _recordView(postId);
+                  _io.unobserve(card); // only count once per card lifetime
+                }, 1000);
+                _timers.set(postId, t);
+              }
+            } else {
+              // Card scrolled away before 1s — cancel the timer
+              const t = _timers.get(postId);
+              if (t !== undefined) {
+                clearTimeout(t);
+                _timers.delete(postId);
+              }
+            }
+          });
+        }, { threshold: 0.6 }); // at least 60% of card must be visible
+
+        // Observe newly added post cards via MutationObserver
+        const _mo = new MutationObserver(mutations => {
+          mutations.forEach(m => {
+            m.addedNodes.forEach(node => {
+              if (node.nodeType !== 1) return;
+              if (node.classList?.contains("post-card") && node.dataset.postId) {
+                _io.observe(node);
+              }
+              node.querySelectorAll?.(".post-card[data-post-id]").forEach(c => _io.observe(c));
+            });
+          });
+        });
+        _mo.observe(document.body, { childList: true, subtree: true });
+      })();
       function showAlert(el, msg, type) {
         el.textContent = msg;
         el.className = "alert " + type;
@@ -11584,6 +11718,17 @@
         let _polling      = null;
         let _sending      = false;
 
+        // Pagination state
+        let _cursor       = null;   // id of the oldest loaded message (for load-more)
+        let _hasMore      = false;  // whether older messages exist on the server
+        let _latestId     = null;   // id of the newest loaded message (for polling)
+        let _loadingMore  = false;  // guard against concurrent load-more calls
+
+        // Presence & heartbeat state
+        let _heartbeatTimer  = null;   // interval for POST /api/dm/heartbeat
+        let _presenceTimer   = null;   // interval for GET .../presence
+        let _peerOnline      = false;  // last known peer status
+
         // ── Time helpers ────────────────────────────────────────
         function _fmtTime(ts) {
           return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -11659,11 +11804,72 @@
           _polling = setInterval(async () => {
             if (!currentUser) return;
             await _loadInbox();
-            if (_activeConvId) await _fetchMessages(_activeConvId, false);
+            if (_activeConvId) {
+              await _pollNewMessages(_activeConvId);
+              await _fetchPresence(_activeConvId); // piggyback on 4s cycle for responsive status
+            }
           }, 4000);
         }
         function _stopPolling() {
           if (_polling) { clearInterval(_polling); _polling = null; }
+        }
+
+        // ── Heartbeat — keep current user's presence alive ───────
+        function _startHeartbeat() {
+          _stopHeartbeat();
+          // Fire immediately, then every 30 s
+          _sendHeartbeat();
+          _heartbeatTimer = setInterval(_sendHeartbeat, 30_000);
+        }
+        function _stopHeartbeat() {
+          if (_heartbeatTimer) { clearInterval(_heartbeatTimer); _heartbeatTimer = null; }
+        }
+        async function _sendHeartbeat() {
+          if (!currentUser) return;
+          try { await api("POST", "/api/dm/heartbeat"); } catch (_) {}
+        }
+
+        // ── Presence polling — update peer status in header ──────
+        function _startPresencePolling(convId) {
+          _stopPresencePolling();
+          _fetchPresence(convId); // immediate
+          _presenceTimer = setInterval(() => _fetchPresence(convId), 30_000);
+        }
+        function _stopPresencePolling() {
+          if (_presenceTimer) { clearInterval(_presenceTimer); _presenceTimer = null; }
+        }
+        async function _fetchPresence(convId) {
+          if (!currentUser || !convId) return;
+          try {
+            const res = await api("GET", `/api/dm/conversations/${convId}/presence`);
+            const { online, last_seen_at } = res.data;
+            _peerOnline = online;
+            _updateStatusEl(online, last_seen_at);
+          } catch (_) {}
+        }
+        function _updateStatusEl(online, lastSeenAt) {
+          const el = document.getElementById("dm-chat-status");
+          if (!el) return;
+          el.style.display = "flex";
+          if (online) {
+            el.textContent = "Active now";
+            el.className   = "dm-chat-head-status online";
+          } else if (lastSeenAt) {
+            const diff = Date.now() - new Date(lastSeenAt).getTime();
+            const mins = Math.floor(diff / 60_000);
+            const hrs  = Math.floor(diff / 3_600_000);
+            const days = Math.floor(diff / 86_400_000);
+            let label;
+            if (mins < 1)        label = "Active just now";
+            else if (mins < 60)  label = `Active ${mins}m ago`;
+            else if (hrs < 24)   label = `Active ${hrs}h ago`;
+            else                 label = `Active ${days}d ago`;
+            el.textContent = label;
+            el.className   = "dm-chat-head-status";
+          } else {
+            el.textContent = "Offline";
+            el.className   = "dm-chat-head-status";
+          }
         }
 
         // ── Render inbox list ───────────────────────────────────
@@ -11746,6 +11952,9 @@
             avEl.style.background = stringToColor(_activeOther.name);
           }
           document.getElementById("dm-chat-name").textContent = _activeOther.name;
+          // Reset status while we load presence
+          const statusEl = document.getElementById("dm-chat-status");
+          if (statusEl) { statusEl.style.display = "none"; statusEl.textContent = ""; }
           document.getElementById("dm-chat-empty").style.display  = "none";
           document.getElementById("dm-chat-active").style.display = "flex";
           document.getElementById("dm-messages").innerHTML =
@@ -11770,39 +11979,43 @@
             });
           }
 
+          // Reset pagination state for the new conversation
+          _messages    = [];
+          _cursor      = null;
+          _hasMore     = false;
+          _latestId    = null;
+          _loadingMore = false;
+
           await _fetchMessages(cid, true);
           _startPolling();
+          _fetchPresence(cid); // immediate fetch on open
         }
 
-        // ── Fetch messages ──────────────────────────────────────
-        // GET /api/dm/conversations/:id/messages
+        // ── Fetch messages (initial load or conversation switch) ──
+        // GET /api/dm/conversations/:id/messages?limit=10
         async function _fetchMessages(cid, markRead) {
           try {
-            const res  = await api("GET", `/api/dm/conversations/${cid}/messages`);
-            const msgs = Array.isArray(res.data) ? res.data : [];
+            const res  = await api("GET", `/api/dm/conversations/${cid}/messages?limit=10`);
+            const { messages: msgs, hasMore } = res.data;
 
             // Determine peer user id for decryption
             const otherUserId = _inbox.find(c => c.id == cid)?.other_id;
 
-            // Decrypt each message (skip if already has _plain or no e2e prefix)
             const decrypted = await Promise.all(msgs.map(async m => {
-              if (m._plain) return m;                            // already decoded
+              if (m._plain) return m;
               if (m.body && m.body.startsWith("e2e:") && otherUserId) {
                 return { ...m, _plain: await E2E.decrypt(otherUserId, m.body) };
               }
               return { ...m, _plain: m.body };
             }));
 
-            if (decrypted.length !== _messages.length || markRead) {
-              // Play tone only for new incoming messages (not on initial load or own sent messages)
-              if (!markRead && decrypted.length > _messages.length) {
-                const newMsgs = decrypted.slice(_messages.length);
-                const hasIncoming = newMsgs.some(m => m.sender_id !== currentUser.id);
-                if (hasIncoming) _msgTone.play();
-              }
-              _messages = decrypted;
-              _renderMessages(decrypted);
-            }
+            _messages  = decrypted;
+            _hasMore   = hasMore;
+            _cursor    = decrypted.length ? decrypted[0].id : null;
+            _latestId  = decrypted.length ? decrypted[decrypted.length - 1].id : null;
+
+            _renderMessages(decrypted);
+
             if (markRead) {
               const row = _inbox.find(c => c.id == cid);
               if (row) row.unread_count = 0;
@@ -11815,31 +12028,184 @@
           }
         }
 
+        // ── Load earlier messages (prepend) ──────────────────────
+        // GET /api/dm/conversations/:id/messages?limit=10&before_id=<cursor>
+        async function _loadMore() {
+          if (!_activeConvId || !_hasMore || _loadingMore || !_cursor) return;
+          _loadingMore = true;
+
+          const btn = document.getElementById("dm-load-more-btn");
+          if (btn) { btn.disabled = true; btn.textContent = "Loading…"; }
+
+          try {
+            const res  = await api("GET", `/api/dm/conversations/${_activeConvId}/messages?limit=10&before_id=${_cursor}`);
+            const { messages: msgs, hasMore } = res.data;
+
+            const otherUserId = _inbox.find(c => c.id == _activeConvId)?.other_id;
+            const decrypted = await Promise.all(msgs.map(async m => {
+              if (m._plain) return m;
+              if (m.body && m.body.startsWith("e2e:") && otherUserId) {
+                return { ...m, _plain: await E2E.decrypt(otherUserId, m.body) };
+              }
+              return { ...m, _plain: m.body };
+            }));
+
+            // Prepend older messages and update cursor
+            _messages = [...decrypted, ..._messages];
+            _hasMore  = hasMore;
+            _cursor   = decrypted.length ? decrypted[0].id : _cursor;
+
+            // Preserve scroll position after prepend
+            const el      = document.getElementById("dm-messages");
+            const prevH   = el.scrollHeight;
+            _renderMessages(_messages, false);
+            el.scrollTop += el.scrollHeight - prevH;
+          } catch (e) {
+            if (btn) { btn.disabled = false; btn.textContent = "↑ Load earlier messages"; }
+          } finally {
+            _loadingMore = false;
+          }
+        }
+
+        // ── Poll for new messages only (after _latestId) ─────────
+        // GET /api/dm/conversations/:id/messages/new?after_id=<latestId>
+        async function _pollNewMessages(cid) {
+          if (!_latestId) {
+            // No messages loaded yet — do a full fetch instead
+            await _fetchMessages(cid, false);
+            return;
+          }
+          try {
+            const res  = await api("GET", `/api/dm/conversations/${cid}/messages/new?after_id=${_latestId}`);
+            const msgs = Array.isArray(res.data) ? res.data : [];
+            if (!msgs.length) {
+              // No new messages — check if peer read ours
+              await _patchReadTicks();
+              return;
+            }
+
+            const otherUserId = _inbox.find(c => c.id == cid)?.other_id;
+            const decrypted = await Promise.all(msgs.map(async m => {
+              if (m._plain) return m;
+              if (m.body && m.body.startsWith("e2e:") && otherUserId) {
+                return { ...m, _plain: await E2E.decrypt(otherUserId, m.body) };
+              }
+              return { ...m, _plain: m.body };
+            }));
+
+            // Play tone for new incoming messages
+            const hasIncoming = decrypted.some(m => m.sender_id !== currentUser.id);
+            if (hasIncoming) _msgTone.play();
+
+            _messages = [..._messages, ...decrypted];
+            _latestId = decrypted[decrypted.length - 1].id;
+            _renderMessages(_messages);
+            await _patchReadTicks();
+          } catch (_) {}
+        }
+
+        // ── Patch "Seen" label without a full re-render ────────────
+        // Called every poll cycle. Asks the server which of our sent
+        // messages have actually been read — no guessing.
+        async function _patchReadTicks() {
+          // Collect IDs of our sent messages that are not yet marked read in local state
+          const unreadSentIds = _messages
+            .filter(m => m.sender_id === currentUser.id && !m.is_read && !String(m.id).startsWith("tmp_"))
+            .map(m => m.id);
+
+          if (!unreadSentIds.length) return;
+
+          try {
+            const res = await api("POST", "/api/dm/read-status", { ids: unreadSentIds });
+            const readIds = new Set(res.data?.readIds || []);
+            if (!readIds.size) return;
+
+            // Update local state
+            _messages = _messages.map(m =>
+              readIds.has(m.id) ? { ...m, is_read: 1 } : m
+            );
+
+            // Find the last sent message id (for placing the single "Seen" label)
+            let lastSentId = null;
+            for (let i = _messages.length - 1; i >= 0; i--) {
+              if (_messages[i].sender_id === currentUser.id && !String(_messages[i].id).startsWith("tmp_")) {
+                lastSentId = _messages[i].id;
+                break;
+              }
+            }
+
+            // Remove stale Seen labels
+            document.querySelectorAll(".dm-seen-label").forEach(el => el.remove());
+
+            // Only show "Seen" if the last sent message is read
+            if (!lastSentId) return;
+            const lastMsg = _messages.find(m => m.id === lastSentId);
+            if (!lastMsg?.is_read) return;
+
+            const msgEl = document.querySelector(`.dm-msg[data-msg-id="${lastSentId}"]`);
+            if (!msgEl) return;
+            const seen = document.createElement("div");
+            seen.className = "dm-seen-label";
+            seen.textContent = "Seen";
+            msgEl.appendChild(seen);
+          } catch (_) {}
+        }
+
         // ── Render message bubbles ──────────────────────────────
         // Backend fields: sender_id, body, created_at
-        function _renderMessages(msgs) {
+        // scrollToBottom=true on initial load; false when prepending older messages.
+        function _renderMessages(msgs, scrollToBottom = true) {
           const el = document.getElementById("dm-messages");
           if (!msgs.length) {
             el.innerHTML = `<div style="text-align:center;padding:40px 16px;color:var(--txt3);font-size:13.5px">Send a message to start the conversation ✨</div>`;
             return;
           }
           let lastDate = "";
-          el.innerHTML = msgs.map(msg => {
+          // Find the id of the last message sent by the current user (for "Seen" label)
+          let lastSentId = null;
+          for (let i = msgs.length - 1; i >= 0; i--) {
+            if (msgs[i].sender_id === currentUser.id && !String(msgs[i].id).startsWith("tmp_")) {
+              lastSentId = msgs[i].id;
+              break;
+            }
+          }
+          const bubbles = msgs.map(msg => {
             const mine    = msg.sender_id === currentUser.id;
             const dateStr = _fmtDate(msg.created_at);
             let divider   = "";
             if (dateStr !== lastDate) { lastDate = dateStr; divider = `<div class="dm-date-divider">${dateStr}</div>`; }
-            // Use decrypted _plain if available, otherwise fall back to raw body
             const displayText = msg._plain !== undefined ? msg._plain : msg.body;
             const isE2E = msg.body && msg.body.startsWith("e2e:");
-            return `${divider}<div class="dm-msg ${mine ? "mine" : "theirs"}">
+            // "Seen" label — only on the last sent message when it has been read
+            const isTmp = String(msg.id).startsWith("tmp_");
+            let seenLabel = "";
+            if (mine && !isTmp && msg.id === lastSentId && !!msg.is_read) {
+              seenLabel = `<div class="dm-seen-label">Seen</div>`;
+            }
+            return `${divider}<div class="dm-msg ${mine ? "mine" : "theirs"}" data-msg-id="${msg.id}">
               <div class="dm-bubble">
                 ${escHtml(displayText || "").replace(/\n/g, "<br>")}
                 <span class="dm-bubble-time">${_fmtTime(msg.created_at)}${isE2E ? ' <span title="End-to-end encrypted" style="opacity:0.7">🔒</span>' : ''}</span>
-              </div>
+              </div>${seenLabel}
             </div>`;
           }).join("");
-          el.scrollTop = el.scrollHeight;
+
+          // Prepend "Load earlier" button if more messages exist on the server
+          const loadMoreBtn = _hasMore
+            ? `<button id="dm-load-more-btn" onclick="DM.loadMore()" style="
+                display:block;margin:12px auto 6px;padding:7px 18px;
+                background:var(--accent-bg);color:var(--accent);
+                border:1px solid var(--accent);border-radius:20px;
+                font-size:12.5px;font-weight:600;cursor:pointer;
+                transition:background var(--tr),opacity var(--tr);"
+                onmouseover="this.style.background='var(--accent)';this.style.color='#fff';"
+                onmouseout="this.style.background='var(--accent-bg)';this.style.color='var(--accent)';">
+                ↑ Load earlier messages
+              </button>`
+            : "";
+
+          el.innerHTML = loadMoreBtn + bubbles;
+          if (scrollToBottom) el.scrollTop = el.scrollHeight;
         }
 
         // ── Send a message ──────────────────────────────────────
@@ -11870,7 +12236,12 @@
             const saved = res.data || res;
             _messages   = _messages.filter(m => m.id !== tempId);
             // Store plaintext on the saved message so we don't re-decrypt our own
-            if (saved && saved.id) { saved._plain = text; _messages.push(saved); }
+            if (saved && saved.id) {
+              saved._plain = text;
+              _messages.push(saved);
+              // Advance the polling cursor so we don't re-fetch this message
+              _latestId = saved.id;
+            }
             _renderMessages(_messages);
             await _loadInbox();
           } catch (e) {
@@ -11941,6 +12312,7 @@
           updateDMBadge,
           clearDMBadge,
           startConvWithUser,
+          loadMore: _loadMore,
           getActiveConvId: () => _activeConvId,
           _tonePlay: () => _msgTone.play(),
         };
