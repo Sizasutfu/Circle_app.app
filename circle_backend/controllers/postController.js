@@ -13,21 +13,32 @@ const FollowModel       = require('../models/followModel');
 const { db }            = require('../config/db');
 const { sendOk, sendError } = require('../middleware/response');
 
-// GET /api/posts?userId=<id>&feed=global|following&page=<n>
+// GET /api/posts?userId=<id>&feed=global|following&page=<n>&limit=<n>
 async function getPosts(req, res) {
   const profileUserId = req.query.userId ? parseInt(req.query.userId) : null;
   const feedMode      = req.query.feed === 'following' ? 'following' : 'global';
-  const page          = Math.max(1, parseInt(req.query.page) || 1);
+  const page          = Math.max(1, parseInt(req.query.page)  || 1);
+  const limit         = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
 
   try {
     if (profileUserId) {
-      const result = await PostModel.getProfilePosts(profileUserId, page);
-      return sendOk(res, 200, 'Posts fetched.', { ...result, page });
+      const result = await PostModel.getProfilePosts(profileUserId, page, limit);
+
+      // Normalise: guarantee posts array and hasMore flag are always present
+      // so the frontend can rely on them regardless of what PostModel returns.
+      const posts   = result.posts   ?? result ?? [];
+      const hasMore = result.hasMore ?? (posts.length === limit);
+
+      return sendOk(res, 200, 'Posts fetched.', { posts, hasMore, page, limit });
     }
 
     const viewerUserId = req.actorId || null;
-    const result = await PostModel.getPostsPage(viewerUserId, feedMode, page);
-    return sendOk(res, 200, 'Posts fetched.', { ...result, page });
+    const result = await PostModel.getPostsPage(viewerUserId, feedMode, page, limit);
+
+    const posts   = result.posts   ?? result ?? [];
+    const hasMore = result.hasMore ?? (posts.length === limit);
+
+    return sendOk(res, 200, 'Posts fetched.', { posts, hasMore, page, limit });
   } catch (err) {
     console.error('getPosts error:', err);
     return sendError(res, 500, 'Server error.');

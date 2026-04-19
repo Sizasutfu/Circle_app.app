@@ -121,8 +121,8 @@ async function getFollowingIds(viewerUserId) {
 }
 
 // ── Fetch one page of posts ────────────────────────────────
-async function getPostsPage(viewerUserId, feedMode, page) {
-  const LIMIT  = FEED_PAGE_SIZE;
+async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE) {
+  const LIMIT  = limit;
   const OFFSET = (page - 1) * LIMIT;
 
   const followingIds = await getFollowingIds(viewerUserId);
@@ -170,8 +170,8 @@ async function getPostsPage(viewerUserId, feedMode, page) {
 }
 
 // ── Fetch all posts for a specific user profile ────────────
-async function getProfilePosts(profileUserId, page = 1) {
-  const LIMIT  = FEED_PAGE_SIZE;
+async function getProfilePosts(profileUserId, page = 1, limit = FEED_PAGE_SIZE) {
+  const LIMIT  = limit;
   const OFFSET = (page - 1) * LIMIT;
 
   const [rawPosts] = await db.query(
@@ -328,8 +328,10 @@ async function getTrendingPosts(limit = 20) {
 }
 
 // ── Search posts ───────────────────────────────────────────
-async function searchPosts(query) {
-  const like = `%${query}%`;
+async function searchPosts(query, { limit = 20, offset = 0 } = {}) {
+  // Escape SQL LIKE wildcards so a query of "%" doesn't match every row
+  const escaped = query.replace(/[%_\\]/g, '\\$&');
+  const like = `%${escaped}%`;
   const [rows] = await db.query(
     `SELECT p.id, p.user_id AS userId, u.name AS author, u.picture AS authorPicture,
             p.text, p.image, p.video, p.is_repost AS isRepost, p.created_at AS createdAt,
@@ -339,8 +341,8 @@ async function searchPosts(query) {
      FROM posts p JOIN users u ON u.id=p.user_id
      WHERE p.text LIKE ? OR u.name LIKE ?
      ORDER BY likeCount DESC, p.created_at DESC
-     LIMIT 20`,
-    [like, like]
+     LIMIT ? OFFSET ?`,
+    [like, like, limit, offset]
   );
   return rows;
 }

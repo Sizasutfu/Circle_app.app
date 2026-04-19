@@ -397,12 +397,11 @@
       }
       #view-post-detail {
         display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 150;
-        background: var(--bg);
         flex-direction: column;
         overflow: hidden;
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
       }
       #view-post-detail.active {
         display: flex;
@@ -2106,6 +2105,11 @@
         display: none;
         flex-shrink: 0;
       }
+      .post-detail-reply-bar .comment-input-row {
+        max-width: 620px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
       .post-detail-reply-bar.visible {
         display: block;
       }
@@ -2123,12 +2127,6 @@
       .back-btn:hover {
         background: var(--accent-bg);
         color: var(--accent);
-     
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 14px;
-        margin-bottom: 14px;
       }
       .repost-preview-name {
         font-size: 13px;
@@ -6185,7 +6183,7 @@
                 <span id="reply-to-label">Replying to <strong></strong></span>
                 <button class="reply-cancel-btn" onclick="cancelReply()" title="Cancel reply">✕</button>
               </div>
-              <div class="comment-input-row" style="padding: 0 16px">
+              <div class="comment-input-row">
                 <input
                   class="comment-input"
                   id="post-detail-reply-input"
@@ -7483,14 +7481,21 @@
       /* END PostCache ════════════════════════════════════════════════ */
 
       /*  API  */
-      async function api(method, path, body = null) {
-        const opts = {
-          method,
-          headers: { "Content-Type": "application/json" },
-        };
-        // Attach auth header so protected routes (follow/unfollow) work
+      async function api(method, path, body = null, signal = undefined) {
+        const opts = { method, headers: {} };
+        // Send X-User-Id for all existing backend routes that still rely on it
         if (currentUser) opts.headers["X-User-Id"] = currentUser.id;
-        if (body) opts.body = JSON.stringify(body);
+        // Also send JWT Bearer token for routes that have been upgraded to use it
+        const token = localStorage.getItem("circle_token");
+        if (token) opts.headers["Authorization"] = `Bearer ${token}`;
+        if (body instanceof FormData) {
+          // Let the browser set Content-Type with the correct multipart boundary
+          opts.body = body;
+        } else if (body) {
+          opts.headers["Content-Type"] = "application/json";
+          opts.body = JSON.stringify(body);
+        }
+        if (signal) opts.signal = signal;
         const res = await fetch(API + path, opts);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Something went wrong.");
@@ -7698,6 +7703,8 @@
             email,
             password,
           });
+          // Store the JWT for authenticated requests
+          if (res.token) localStorage.setItem("circle_token", res.token);
           setCurrentUser(res.data);
           showToast("Welcome back, " + res.data.name.split(" ")[0] + "! 👋");
           setTimeout(() => goTo("feed"), 400);
@@ -7878,6 +7885,7 @@
       function logout() {
         currentUser = null;
         localStorage.removeItem("circle_user");
+        localStorage.removeItem("circle_token");
         // ── Cache: clear all cached data on logout ──────────────────
         PostCache.clear();
         posts = [];
@@ -8358,13 +8366,13 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span>';
         try {
-          const res = await api("POST", "/api/posts", {
-            text,
-            image: pendingImageDataUrl || null,
-            video: pendingVideoDataUrl || null,
-          });
+          const fd = new FormData();
+          fd.append("text", text);
+          if (pendingImageDataUrl instanceof File) fd.append("image", pendingImageDataUrl);
+          if (pendingVideoDataUrl instanceof File) fd.append("video", pendingVideoDataUrl);
+
+          const res = await api("POST", "/api/posts", fd);
           const newPost = res.data;
-          // ── Cache: store new post and invalidate stale feed pages ───
           PostCache.putPost(newPost);
           PostCache.invalidateFeed(currentFeedTab);
           posts.unshift(newPost);
@@ -8408,8 +8416,10 @@
           return;
         }
         // ── Optimistic update in cache and UI ───────────────────────
-        const post = posts.find((p) => p.id === postId);
+        // Check global feed array first, then PostCache (profile posts live there)
+        let post = posts.find((p) => p.id === postId) || PostCache.getPost(postId);
         if (post) {
+          if (!Array.isArray(post.likes)) post.likes = [];
           const i = post.likes.indexOf(currentUser.id);
           if (i === -1) post.likes.push(currentUser.id);
           else post.likes.splice(i, 1);
@@ -8423,6 +8433,7 @@
         } catch (e) {
           // Revert optimistic update on failure
           if (post) {
+            if (!Array.isArray(post.likes)) post.likes = [];
             const i = post.likes.indexOf(currentUser.id);
             if (i === -1) post.likes.push(currentUser.id);
             else post.likes.splice(i, 1);
@@ -8436,7 +8447,7 @@
       function refreshLikeBtn(postId) {
         const card = document.querySelector(`[data-post-id="${postId}"]`);
         if (!card) return;
-        const post = posts.find((p) => p.id === postId);
+        const post = posts.find((p) => p.id === postId) || PostCache.getPost(postId);
         if (!post) return;
         const liked = currentUser && post.likes && post.likes.includes(currentUser.id);
         const btn = card.querySelector(".like-btn");
@@ -8471,10 +8482,11 @@
             parentId: parentId || undefined,
           });
           const newComment = res.data;
-          const post = posts.find((p) => p.id === postId);
+          // Check global feed array first, then PostCache (covers profile tab posts)
+          const post = posts.find((p) => p.id === postId) || PostCache.getPost(postId);
           if (post) {
+            if (!Array.isArray(post.comments)) post.comments = [];
             if (newComment.parentId) {
-              // FIX: nest reply under the correct parent in local state
               const parent = post.comments.find(c => c.id === newComment.parentId);
               if (parent) {
                 if (!Array.isArray(parent.replies)) parent.replies = [];
@@ -8498,7 +8510,7 @@
       }
 
       function renderCommentList(postId) {
-        const post = posts.find((p) => p.id === postId);
+        const post = posts.find((p) => p.id === postId) || PostCache.getPost(postId);
         const panel = document.querySelector(
           `[data-post-id="${postId}"] .comments-panel`,
         );
@@ -8585,7 +8597,7 @@
 
       async function confirmRepost() {
         if (!currentUser || !repostTargetId) return;
-        const orig = posts.find((p) => p.id === repostTargetId);
+        const orig = posts.find((p) => p.id === repostTargetId) || PostCache.getPost(repostTargetId);
         if (!orig) return;
         const quote = document.getElementById("repost-quote").value.trim();
         try {
@@ -8594,8 +8606,9 @@
             text: quote || null,
           });
           const repost = res.data;
-          if (!orig.reposts) orig.reposts = [];
+          if (!Array.isArray(orig.reposts)) orig.reposts = [];
           orig.reposts.push(currentUser.id);
+          PostCache.putPost(orig);
           // Ensure originalPost has full data (server may omit video/image)
           if (repost.isRepost) {
             if (!repost.originalPost) repost.originalPost = {};
@@ -8620,9 +8633,10 @@
         if (!currentUser) return;
         try {
           await api("DELETE", `/api/posts/${postId}/repost`);
-          const orig = posts.find(p => p.id === postId);
+          const orig = posts.find(p => p.id === postId) || PostCache.getPost(postId);
           if (orig && orig.reposts) {
             orig.reposts = orig.reposts.filter(id => id !== currentUser.id);
+            PostCache.putPost(orig);
           }
           // Remove the repost card from the feed
           posts = posts.filter(p => !(p.isRepost && p.originalPost && p.originalPost.id === postId && p.userId === currentUser.id));
@@ -8652,10 +8666,10 @@
         const file = event.target.files[0];
         if (!file) return;
         if (file.size > 10 * 1024 * 1024) { showToast("Image must be under 10 MB."); event.target.value = ""; return; }
+        pendingImageDataUrl = file;   // store File object for FormData upload
+        pendingVideoDataUrl = null;
         const reader = new FileReader();
         reader.onload = (e) => {
-          pendingImageDataUrl = e.target.result;
-          pendingVideoDataUrl = null;
           document.getElementById("img-preview").src = e.target.result;
           document.getElementById("img-preview").style.display = "block";
           document.getElementById("video-preview").style.display = "none";
@@ -8667,14 +8681,11 @@
       function previewVideo(event) {
         const file = event.target.files[0];
         if (!file) return;
-        if (file.size > 100 * 1024 * 1024) {
-          showToast("Video must be under 100 MB.");
-          return;
-        }
+        if (file.size > 100 * 1024 * 1024) { showToast("Video must be under 100 MB."); return; }
+        pendingVideoDataUrl = file;   // store File object for FormData upload
+        pendingImageDataUrl = null;
         const reader = new FileReader();
         reader.onload = (e) => {
-          pendingVideoDataUrl = e.target.result;
-          pendingImageDataUrl = null;
           document.getElementById("video-preview").src = e.target.result;
           document.getElementById("video-preview").style.display = "block";
           document.getElementById("img-preview").style.display = "none";
@@ -9029,24 +9040,82 @@
         }
         const c = document.getElementById("profile-feed");
 
-        // Always fetch from API to show all posts including older ones
-        c.innerHTML = `<div style="text-align:center;padding:32px;color:var(--txt2)"><div class="spinner" style="margin:0 auto 12px"></div></div>`;
-        try {
-          const res = await api("GET", `/api/posts?userId=${targetId}&page=1`);
-          const userPosts = res.data?.posts || [];
-          // Hydrate into cache so engagement works
-          userPosts.forEach((p) => {
-            if (!Array.isArray(p.likes))    p.likes    = [];
-            if (!Array.isArray(p.reposts))  p.reposts  = [];
-            if (!Array.isArray(p.comments)) p.comments = [];
-            PostCache.putPost(p);
-          });
-          c.innerHTML = userPosts.length
-            ? userPosts.map((p) => buildPostCard(p, isOwnProfile)).join("")
-            : `<div class="empty"><div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>No posts yet</h3><p>${isOwnProfile ? "Share your first post!" : "Nothing posted yet."}</p></div>`;
-        } catch (e) {
-          c.innerHTML = `<div class="empty"><h3>Could not load posts</h3><p>${e.message}</p></div>`;
+        // Pagination state for this profile view
+        let _profilePage    = 1;
+        let _profileHasMore = false;
+        let _profileLoading = false;
+        let _profileUserId  = targetId;
+
+        async function loadProfilePosts(page, append = false) {
+          if (_profileLoading) return;
+          _profileLoading = true;
+
+          if (!append) {
+            c.innerHTML = `<div style="text-align:center;padding:32px;color:var(--txt2)"><div class="spinner" style="margin:0 auto 12px"></div></div>`;
+          } else {
+            // Show a small spinner below existing posts while loading next page
+            const skel = document.createElement("div");
+            skel.id = "profile-load-skel";
+            skel.style.cssText = "text-align:center;padding:20px;color:var(--txt2)";
+            skel.innerHTML = `<div class="spinner" style="margin:0 auto"></div>`;
+            c.appendChild(skel);
+          }
+
+          // Remove existing load-more button before fetch
+          document.getElementById("profile-load-more-btn")?.remove();
+
+          try {
+            const res = await api("GET", `/api/posts?userId=${_profileUserId}&page=${page}&limit=20`);
+            const userPosts = res.data?.posts || [];
+            const hasMore   = res.data?.hasMore ?? (userPosts.length === 20);
+
+            // Hydrate into cache so likes/comments/reposts work
+            userPosts.forEach((p) => {
+              if (!Array.isArray(p.likes))    p.likes    = [];
+              if (!Array.isArray(p.reposts))  p.reposts  = [];
+              if (!Array.isArray(p.comments)) p.comments = [];
+              PostCache.putPost(p);
+            });
+
+            document.getElementById("profile-load-skel")?.remove();
+
+            if (!append) {
+              c.innerHTML = userPosts.length
+                ? userPosts.map((p) => buildPostCard(p, isOwnProfile)).join("")
+                : `<div class="empty"><div class="empty-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>No posts yet</h3><p>${isOwnProfile ? "Share your first post!" : "Nothing posted yet."}</p></div>`;
+            } else {
+              const frag = document.createElement("div");
+              frag.innerHTML = userPosts.map((p) => buildPostCard(p, isOwnProfile)).join("");
+              c.appendChild(frag);
+            }
+
+            _profileHasMore = hasMore;
+
+            if (hasMore) {
+              const btn = document.createElement("button");
+              btn.id = "profile-load-more-btn";
+              btn.className = "btn btn-ghost";
+              btn.style.cssText = "width:100%;margin-top:16px;";
+              btn.textContent = "Load more posts";
+              btn.onclick = () => {
+                _profilePage++;
+                loadProfilePosts(_profilePage, true);
+              };
+              c.appendChild(btn);
+            }
+          } catch (e) {
+            document.getElementById("profile-load-skel")?.remove();
+            if (!append) {
+              c.innerHTML = `<div class="empty"><h3>Could not load posts</h3><p>${e.message}</p></div>`;
+            } else {
+              showToast("Could not load more posts: " + e.message);
+            }
+          } finally {
+            _profileLoading = false;
+          }
         }
+
+        loadProfilePosts(_profilePage);
       }
 
       function buildPostCard(post, showDelete = false) {
@@ -9380,24 +9449,43 @@
       }
 
       /* SEARCH */
-      let searchTab = "posts",
-        searchTimer = null;
+      // ── Search state ─────────────────────────────────────────────────────
+      let searchTab   = "posts";
+      let searchTimer = null;          // debounce timer handle
+      let _searchAbort = null;         // AbortController for in-flight request
+      let _searchPage  = 1;            // current pagination page
+      let _searchHasMore = false;      // whether more pages exist
+      let _searchLastQ = "";           // last executed query (for load-more)
+
+      // LRU-style cache: key = "q|type|page" → response data array
+      // Capped at 60 entries so it never grows unbounded.
+      const _searchCache = new Map();
+      const SEARCH_CACHE_MAX = 60;
+      function _cacheGet(key) { return _searchCache.get(key) ?? null; }
+      function _cacheSet(key, val) {
+        if (_searchCache.size >= SEARCH_CACHE_MAX) {
+          // Evict the oldest entry
+          _searchCache.delete(_searchCache.keys().next().value);
+        }
+        _searchCache.set(key, val);
+      }
 
       function switchSearchTab(tab) {
         searchTab = tab;
-        document
-          .getElementById("stab-posts")
-          .classList.toggle("active", tab === "posts");
-        document
-          .getElementById("stab-people")
-          .classList.toggle("active", tab === "people");
+        document.getElementById("stab-posts").classList.toggle("active", tab === "posts");
+        document.getElementById("stab-people").classList.toggle("active", tab === "people");
         const q = document.getElementById("search-input").value.trim();
+        _searchPage = 1;
         if (q.length >= 2) runSearch(q);
         else renderSearchHint();
       }
 
       function onSearchInput() {
+        // Cancel any pending debounce and abort in-flight request
         clearTimeout(searchTimer);
+        _searchAbort?.abort();
+        _searchAbort = null;
+
         const q = document.getElementById("search-input").value.trim();
         const stSection = document.getElementById("search-trending-section");
         if (q.length < 2) {
@@ -9406,7 +9494,11 @@
           return;
         }
         if (stSection) stSection.style.display = "none";
-        searchTimer = setTimeout(function() { runSearch(q); }, 400);
+        // Debounce: wait 300 ms after the user stops typing
+        searchTimer = setTimeout(function () {
+          _searchPage = 1;
+          runSearch(q);
+        }, 300);
       }
 
       function renderSearchHint() {
@@ -9414,14 +9506,8 @@
           `<div class="search-hint"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>Type to search ${searchTab === "posts" ? "posts" : "people"}</p></div>`;
       }
 
-      async function runSearch(q) {
-        if (!currentUser) {
-          showToast("Log in to search.");
-          goTo("login");
-          return;
-        }
-        const box = document.getElementById("search-results");
-        const skelPost = () => `<div class="search-skel-post">
+      function _skelPost() {
+        return `<div class="search-skel-post">
           <div class="search-skel-post-head">
             <div class="search-skel-av"></div>
             <div class="search-skel-meta">
@@ -9435,7 +9521,9 @@
             <div class="search-skel-line w-55"></div>
           </div>
         </div>`;
-        const skelPerson = () => `<div class="search-skel-person">
+      }
+      function _skelPerson() {
+        return `<div class="search-skel-person">
           <div class="search-skel-av" style="width:42px;height:42px"></div>
           <div class="search-skel-person-info">
             <div class="search-skel-line w-40"></div>
@@ -9443,31 +9531,123 @@
           </div>
           <div class="search-skel-btn"></div>
         </div>`;
-        box.innerHTML = searchTab === "posts"
-          ? [0,1,2,3].map(skelPost).join("")
-          : [0,1,2,3,4].map(skelPerson).join("");
+      }
+
+      async function runSearch(q, loadMore = false) {
+        if (!currentUser) {
+          showToast("Log in to search.");
+          goTo("login");
+          return;
+        }
+
+        const box = document.getElementById("search-results");
+        const page = loadMore ? _searchPage : 1;
+        const cacheKey = `${q}|${searchTab}|${page}`;
+
+        // ── Cache hit: paint instantly, no network needed ──
+        const cached = _cacheGet(cacheKey);
+        if (cached) {
+          if (loadMore) {
+            await _appendSearchResults(cached.data, q);
+          } else {
+            await renderSearchResults(cached.data, q);
+          }
+          _searchHasMore = cached.hasMore;
+          _searchLastQ   = q;
+          _renderLoadMore(q);
+          return;
+        }
+
+        // ── Show skeletons only on fresh (non-load-more) searches ──
+        if (!loadMore) {
+          box.innerHTML = searchTab === "posts"
+            ? [0,1,2,3].map(_skelPost).join("")
+            : [0,1,2,3,4].map(_skelPerson).join("");
+        } else {
+          // Append a mini skeleton strip below existing results
+          const strip = document.createElement("div");
+          strip.id = "search-load-more-skel";
+          strip.innerHTML = searchTab === "posts"
+            ? [0,1].map(_skelPost).join("")
+            : [0,1].map(_skelPerson).join("");
+          box.appendChild(strip);
+        }
+
+        // ── Abort any previous in-flight request ──
+        _searchAbort?.abort();
+        _searchAbort = new AbortController();
+
         try {
           const res = await api(
             "GET",
-            `/api/search?q=${encodeURIComponent(q)}&type=${searchTab}`,
+            `/api/search?q=${encodeURIComponent(q)}&type=${searchTab}&page=${page}&limit=20`,
+            null,
+            _searchAbort.signal,
           );
-          // If searching people, fetch follow status using same endpoint as profile tab
-          if (searchTab === "people" && currentUser && res.data.length) {
-            await Promise.all(
-              res.data.map(async (user) => {
-                try {
-                  const s = await api("GET", `/api/users/${user.id}/profile`);
-                  user.isFollowing = s.data?.isFollowing || false;
-                } catch (e) {
-                  user.isFollowing = false;
-                }
-              }),
-            );
+
+          // Remove load-more skeleton if present
+          document.getElementById("search-load-more-skel")?.remove();
+
+          const resultData = res.data ?? [];
+          const hasMore    = res.meta?.hasMore ?? (resultData.length === 20);
+
+          // For people results, hydrate follow status from the local _followingSet
+          // (same source the profile tab uses) — avoids N extra API calls
+          if (searchTab === "people" && currentUser && resultData.length) {
+            resultData.forEach(user => {
+              user.isFollowing = _followingSet.has(user.id);
+            });
           }
-          await renderSearchResults(res.data, q);
+
+          // Cache the result
+          _cacheSet(cacheKey, { data: resultData, hasMore });
+          _searchHasMore = hasMore;
+          _searchLastQ   = q;
+
+          if (loadMore) {
+            await _appendSearchResults(resultData, q);
+          } else {
+            await renderSearchResults(resultData, q);
+          }
+          _renderLoadMore(q);
         } catch (e) {
+          document.getElementById("search-load-more-skel")?.remove();
+          if (e.name === "AbortError") return; // request was superseded — do nothing
           box.innerHTML = `<div class="search-hint"><p style="color:var(--rose)">Error: ${escHtml(e.message)}</p></div>`;
         }
+      }
+
+      function _renderLoadMore(q) {
+        // Remove any existing load-more button
+        document.getElementById("search-load-more-btn")?.remove();
+        if (!_searchHasMore) return;
+        const box = document.getElementById("search-results");
+        const btn = document.createElement("button");
+        btn.id = "search-load-more-btn";
+        btn.className = "btn btn-ghost";
+        btn.style.cssText = "width:100%;margin-top:16px;";
+        btn.textContent = "Load more";
+        btn.onclick = () => {
+          _searchPage++;
+          btn.remove();
+          runSearch(q, true);
+        };
+        box.appendChild(btn);
+      }
+
+      async function _appendSearchResults(data, q) {
+        if (!data || !data.length) return;
+        const box = document.getElementById("search-results");
+        // Remove the load-more button before appending so new items go above it
+        document.getElementById("search-load-more-btn")?.remove();
+        const frag = document.createElement("div");
+        if (searchTab === "posts") {
+          await _hydratePostResults(data);
+          frag.innerHTML = data.map(post => buildPostCard(post, false)).join("");
+        } else {
+          frag.innerHTML = _buildPeopleCards(data, q);
+        }
+        box.appendChild(frag);
       }
 
       function highlight(text, q) {
@@ -9480,6 +9660,56 @@
         );
       }
 
+      async function _hydratePostResults(data) {
+        await Promise.all(data.map(async (post) => {
+          const cached = PostCache.getPost(post.id) || posts.find(p => p.id === post.id);
+          if (!cached) {
+            try {
+              const r = await api("GET", `/api/posts/${post.id}`);
+              const full = r.data || r;
+              full.likes    = Array.isArray(full.likes)    ? full.likes    : [];
+              full.reposts  = Array.isArray(full.reposts)  ? full.reposts  : [];
+              full.comments = Array.isArray(full.comments) ? full.comments : [];
+              PostCache.putPost(full);
+              posts.unshift(full);
+              Object.assign(post, full);
+            } catch (_) {}
+          } else {
+            post.likes    = cached.likes;
+            post.reposts  = cached.reposts;
+            post.comments = cached.comments;
+          }
+          post.likes    = Array.isArray(post.likes)    ? post.likes    : [];
+          post.reposts  = Array.isArray(post.reposts)  ? post.reposts  : [];
+          post.comments = Array.isArray(post.comments) ? post.comments : [];
+          PostCache.putPost(post);
+          if (!posts.find(p => p.id === post.id)) posts.unshift(post);
+        }));
+      }
+
+      function _buildPeopleCards(data, q) {
+        return data.map((user) => {
+          const color = stringToColor(user.name);
+          const avHtml = user.picture
+            ? `<img src="${user.picture}" alt="${escHtml(user.name.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+            : escHtml(user.name.charAt(0));
+          const isOwnProfile = currentUser && currentUser.id === user.id;
+          const followBtnHtml =
+            !isOwnProfile && currentUser
+              ? `<button class="btn ${user.isFollowing ? "btn-outline" : "btn-primary"}" style="font-size:13px;padding:8px 20px" data-following="${user.isFollowing ? "true" : "false"}" onclick="event.stopPropagation();searchFollow(${user.id},this)">${user.isFollowing ? "Following" : "Follow"}</button>`
+              : "";
+          return `<div class="people-card" onclick="viewProfile(${user.id})" style="cursor:pointer">
+      <div class="av" style="background:${user.picture ? "transparent" : color}">${avHtml}</div>
+      <div class="people-card-info">
+        <div class="people-card-name">${highlight(user.name, q)}</div>
+        <div class="people-card-email">${highlight(user.email, q)}</div>
+        <div class="people-card-posts">${user.postCount || 0} post${user.postCount === 1 ? "" : "s"} · ${user.followerCount || 0} followers</div>
+      </div>
+      ${followBtnHtml}
+    </div>`;
+        }).join("");
+      }
+
       async function renderSearchResults(data, q) {
         const box = document.getElementById("search-results");
         if (!data || !data.length) {
@@ -9487,77 +9717,43 @@
           return;
         }
         if (searchTab === "posts") {
-          // Fetch full post data for any results not already in cache/feed
-          await Promise.all(data.map(async (post) => {
-            const cached = PostCache.getPost(post.id) || posts.find(p => p.id === post.id);
-            if (!cached) {
-              try {
-                const r = await api("GET", `/api/posts/${post.id}`);
-                const full = r.data || r;
-                full.likes    = Array.isArray(full.likes)    ? full.likes    : [];
-                full.reposts  = Array.isArray(full.reposts)  ? full.reposts  : [];
-                full.comments = Array.isArray(full.comments) ? full.comments : [];
-                PostCache.putPost(full);
-                posts.unshift(full);
-                Object.assign(post, full);
-              } catch (_) {}
-            } else {
-              post.likes    = cached.likes;
-              post.reposts  = cached.reposts;
-              post.comments = cached.comments;
-            }
-            post.likes    = Array.isArray(post.likes)    ? post.likes    : [];
-            post.reposts  = Array.isArray(post.reposts)  ? post.reposts  : [];
-            post.comments = Array.isArray(post.comments) ? post.comments : [];
-            PostCache.putPost(post);
-            if (!posts.find(p => p.id === post.id)) posts.unshift(post);
-          }));
+          await _hydratePostResults(data);
           box.innerHTML = data.map((post) => buildPostCard(post, false)).join("");
         } else {
-          box.innerHTML = data
-            .map((user) => {
-              const color = stringToColor(user.name);
-              const avHtml = user.picture
-                ? `<img src="${user.picture}" alt="${escHtml(user.name.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
-                : escHtml(user.name.charAt(0));
-              const isOwnProfile = currentUser && currentUser.id === user.id;
-              const followBtnHtml =
-                !isOwnProfile && currentUser
-                  ? `<button class="follow-btn ${user.isFollowing ? "following" : "follow"}" data-following="${user.isFollowing ? "true" : "false"}" onclick="event.stopPropagation();searchFollow(${user.id},this)">${user.isFollowing ? "Following" : "Follow"}</button>`
-                  : "";
-              return `<div class="people-card" onclick="viewProfile(${user.id})" style="cursor:pointer">
-        <div class="av" style="background:${user.picture ? "transparent" : color}">${avHtml}</div>
-        <div class="people-card-info">
-          <div class="people-card-name">${highlight(user.name, q)}</div>
-          <div class="people-card-email">${highlight(user.email, q)}</div>
-          <div class="people-card-posts">${user.postCount || 0} post${user.postCount === 1 ? "" : "s"} · ${user.followerCount || 0} followers</div>
-        </div>
-        ${followBtnHtml}
-      </div>`;
-            })
-            .join("");
+          box.innerHTML = _buildPeopleCards(data, q);
         }
       }
 
       async function searchFollow(userId, btn) {
         if (!currentUser) { showToast("Log in to follow."); goTo("login"); return; }
         const isFollowing = btn.dataset.following === "true";
+        const orig = btn.textContent;
         btn.disabled = true;
+        btn.textContent = "…";
         try {
           if (isFollowing) {
             await api("DELETE", "/api/unfollow/" + userId);
+            _followingSet.delete(userId);
             btn.dataset.following = "false";
             btn.textContent = "Follow";
-            btn.classList.replace("following", "follow");
+            btn.classList.remove("btn-outline");
+            btn.classList.add("btn-primary");
             showToast("Unfollowed.");
           } else {
             await api("POST", "/api/follow/" + userId);
+            _followingSet.add(userId);
             btn.dataset.following = "true";
             btn.textContent = "Following";
-            btn.classList.replace("follow", "following");
+            btn.classList.remove("btn-primary");
+            btn.classList.add("btn-outline");
             showToast("Following! 🎉");
           }
+          // Invalidate cached people search results so re-searches reflect new status
+          for (const key of _searchCache.keys()) {
+            if (key.includes("|people|")) _searchCache.delete(key);
+          }
         } catch (e) {
+          btn.textContent = orig;
           showToast("Error: " + e.message);
         } finally {
           btn.disabled = false;
@@ -12522,8 +12718,11 @@
         try {
           const s = localStorage.getItem("circle_user");
           if (s) setCurrentUser(JSON.parse(s));
+          // If user object is gone, clear any stale token too
+          if (!s) localStorage.removeItem("circle_token");
         } catch (e) {
           localStorage.removeItem("circle_user");
+          localStorage.removeItem("circle_token");
         }
 
         // If arriving via reset link, show new-password view and skip loadPosts
@@ -13063,10 +13262,10 @@
         const file = event.target.files[0];
         if (!file) return;
         if (file.size > 10 * 1024 * 1024) { showToast("Image must be under 10 MB."); event.target.value = ""; return; }
+        _composeTabPendingImage = file;   // store File object for FormData upload
+        _composeTabPendingVideo = null;
         const reader = new FileReader();
         reader.onload = (e) => {
-          _composeTabPendingImage = e.target.result;
-          _composeTabPendingVideo = null;
           const img = document.getElementById("compose-tab-img-preview");
           const vid = document.getElementById("compose-tab-video-preview");
           img.src = e.target.result;
@@ -13082,10 +13281,10 @@
         const file = event.target.files[0];
         if (!file) return;
         if (file.size > 100 * 1024 * 1024) { showToast("Video must be under 100 MB."); return; }
+        _composeTabPendingVideo = file;   // store File object for FormData upload
+        _composeTabPendingImage = null;
         const reader = new FileReader();
         reader.onload = (e) => {
-          _composeTabPendingVideo = e.target.result;
-          _composeTabPendingImage = null;
           const vid = document.getElementById("compose-tab-video-preview");
           const img = document.getElementById("compose-tab-img-preview");
           vid.src = e.target.result;
@@ -13139,11 +13338,12 @@
         }, 300);
 
         try {
-          const res = await api("POST", "/api/posts", {
-            text,
-            image: _composeTabPendingImage || null,
-            video: _composeTabPendingVideo || null,
-          });
+          const fd = new FormData();
+          fd.append("text", text);
+          if (_composeTabPendingImage instanceof File) fd.append("image", _composeTabPendingImage);
+          if (_composeTabPendingVideo instanceof File) fd.append("video", _composeTabPendingVideo);
+
+          const res = await api("POST", "/api/posts", fd);
 
           clearInterval(progressInterval);
           // Jump to 100% then close
