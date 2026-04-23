@@ -1,10 +1,9 @@
-// ============================================================
+
 //  models/dmModel.js
 //  All database queries for Direct Messages
-// ============================================================
 
-const { db } = require('../config/db'); // adjust path to match your project
 
+const { db } = require('../config/db'); 
 // ─── Helpers ────────────────────────────────────────────────
 
 /**

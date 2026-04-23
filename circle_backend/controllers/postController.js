@@ -8,7 +8,7 @@
 
 const PostModel         = require('../models/PostModel');
 const UserModel         = require('../models/userModel');
-const NotificationModel = require('../models/notificationModel212');
+const NotificationModel = require('../models/notificationModel');
 const FollowModel       = require('../models/followModel');
 const { db }            = require('../config/db');
 const { sendOk, sendError } = require('../middleware/response');
