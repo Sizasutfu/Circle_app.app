@@ -90,26 +90,19 @@ async function createPost(req, res) {
   const imageFilename = req.compressedFiles?.image?.filename || null;
   const videoFilename = req.compressedFiles?.video?.filename || null;
 
-  // Save only the relative path in the DB — never a hardcoded host/IP.
-  // This way the URL always works regardless of whether the client reaches
-  // the server via localhost, 192.168.x.x, or a real domain name.
-  const imagePath = imageFilename ? `/uploads/${imageFilename}` : null;
-  const videoPath = videoFilename ? `/uploads/${videoFilename}` : null;
-
-  // Build the full URL for the response using the current request's host
+  // Build public URLs from the compressed filenames
   const baseUrl  = `${req.protocol}://${req.get('host')}`;
-  const imageUrl = imagePath ? `${baseUrl}${imagePath}` : null;
-  const videoUrl = videoPath ? `${baseUrl}${videoPath}` : null;
+  const imageUrl = imageFilename ? `${baseUrl}/uploads/${imageFilename}` : null;
+  const videoUrl = videoFilename ? `${baseUrl}/uploads/${videoFilename}` : null;
 
-  if (!text && !imagePath && !videoPath)
+  if (!text && !imageUrl && !videoUrl)
     return sendError(res, 400, 'A post must have text, an image, or a video.');
 
   try {
     const user = await UserModel.findById(userId);
     if (!user) return sendError(res, 404, 'User not found.');
 
-    // Save relative path so media loads from any host
-    const postId = await PostModel.createPost(userId, text, imagePath, videoPath);
+    const postId = await PostModel.createPost(userId, text, imageUrl, videoUrl);
 
     // ── Notify all followers about the new post ──────────────
     const followerIds = await FollowModel.getFollowerIds(userId);

@@ -71,20 +71,25 @@ async function getProfile(req, res) {
 }
 
 // PUT /api/users/:id/picture
+// Route must use: upload.fields([{ name: 'image', maxCount: 1 }]), compressUploads
 async function updatePicture(req, res) {
-  const userId  = parseInt(req.params.id);
-  const { picture } = req.body;
+  const userId = parseInt(req.params.id);
 
   if (req.actorId !== userId)
     return sendError(res, 403, 'Forbidden.');
-  if (picture && picture.length > 7_000_000)
-    return sendError(res, 413, 'Image too large (max 5 MB).');
 
   try {
     const user = await UserModel.findById(userId);
     if (!user) return sendError(res, 404, 'User not found.');
 
-    await UserModel.updatePicture(userId, picture || null);
+    // compressUploads middleware compresses the image to .webp and
+    // puts { filename, savedBytes } on req.compressedFiles.image
+    const compressed = req.compressedFiles?.image;
+    const pictureUrl = compressed
+      ? `/uploads/${compressed.filename}`
+      : null;
+
+    await UserModel.updatePicture(userId, pictureUrl);
 
     // ── Notify all followers about the new profile picture ───
     const followerIds = await FollowModel.getFollowerIds(userId);
@@ -94,7 +99,7 @@ async function updatePicture(req, res) {
       )
     );
 
-    return sendOk(res, 200, 'Picture updated.', { picture: picture || null });
+    return sendOk(res, 200, 'Picture updated.', { picture: pictureUrl });
   } catch (err) {
     console.error('updatePicture error:', err);
     return sendError(res, 500, 'Server error.');

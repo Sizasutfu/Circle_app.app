@@ -11,21 +11,6 @@ const {
   RECENCY_SCALE, RECENCY_SHIFT, FEED_PAGE_SIZE,
 } = require('../config/constants');
 
-// ── Normalise a stored media URL to a relative path ──────────
-// Old posts saved before the fix may have a full URL like
-// http://192.168.x.x:3000/uploads/foo.webp stored in the DB.
-// This strips the origin so only /uploads/foo.webp is returned,
-// keeping media accessible from any host the server runs on.
-function toRelativePath(url) {
-  if (!url) return url;
-  try {
-    const u = new URL(url);
-    // Only strip if it looks like a local/LAN upload URL
-    if (u.pathname.startsWith('/uploads/')) return u.pathname;
-  } catch {}
-  return url; // already relative or an external URL — leave it alone
-}
-
 // ── Score a single post ────────────────────────────────────
 function computeScore(post, viewerUserId, followingIds = []) {
   const hoursOld     = (Date.now() - new Date(post.createdAt).getTime()) / 3_600_000;
@@ -119,17 +104,7 @@ async function hydratePosts(posts) {
     p.views    = vMap[p.id] || 0;
     if (p.isRepost && p.originalPostId)
       p.originalPost = origMap[p.originalPostId] || null;
-
-    // Normalise any legacy full URLs (e.g. http://192.168.x.x/uploads/...)
-    // down to relative paths so media works from any host
-    p.image         = toRelativePath(p.image);
-    p.video         = toRelativePath(p.video);
-    p.authorPicture = toRelativePath(p.authorPicture);
-    if (p.originalPost) {
-      p.originalPost.image         = toRelativePath(p.originalPost.image);
-      p.originalPost.video         = toRelativePath(p.originalPost.video);
-      p.originalPost.authorPicture = toRelativePath(p.originalPost.authorPicture);
-    }
+    // image and video are now plain URLs — no base64 handling needed
   });
 
   return posts;

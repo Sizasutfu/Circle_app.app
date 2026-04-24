@@ -8,6 +8,8 @@ const router           = require('express').Router();
 const userController   = require('../controllers/userController');
 const { requireAuth }  = require('../middleware/auth');
 const { requestPasswordReset, confirmResetPassword } = require("../controllers/authController");
+const upload              = require('../middleware/upload');
+const { compressUploads } = require('../middleware/compress');
 
 
 // Public routes — no auth required
@@ -24,7 +26,7 @@ router.get('/', requireAuth, userController.searchUsers);
 router.get('/new-members', userController.getNewMembers);
 
 // Protected routes — must send X-User-Id header
-router.put('/:id/picture', requireAuth, userController.updatePicture);
+router.put('/:id/picture', requireAuth, upload.fields([{ name: 'image', maxCount: 1 }]), compressUploads, userController.updatePicture);
 router.put('/:id',         requireAuth, userController.updateProfile);
 
 router.post("/reset-password",         requestPasswordReset);
