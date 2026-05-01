@@ -473,6 +473,66 @@ async function getViewCount(postId) {
   return Number(total);
 }
 
+// ── Parse hashtags from post text ─────────────────────────
+function extractHashtags(text) {
+  if (!text) return [];
+  const matches = text.match(/#([a-zA-Z0-9_]+)/g) || [];
+  return [...new Set(matches.map(t => t.slice(1).toLowerCase()))];
+}
+
+// ── Save hashtags for a post ───────────────────────────────
+async function savePostTopics(postId, text) {
+  const tags = extractHashtags(text);
+  if (!tags.length) return;
+  const values = tags.map(tag => [postId, tag]);
+  await db.query(
+    'INSERT IGNORE INTO post_topics (post_id, topic) VALUES ?',
+    [values]
+  );
+}
+
+// ── Get trending topics ────────────────────────────────────
+async function getTopics(limit = 20) {
+  const [rows] = await db.query(
+    `SELECT topic, COUNT(*) AS post_count
+     FROM post_topics
+     GROUP BY topic
+     ORDER BY post_count DESC, topic ASC
+     LIMIT ?`,
+    [limit]
+  );
+  return rows;
+}
+
+// ── Get posts for a topic ──────────────────────────────────
+async function getPostsByTopic(topic, page = 1, limit = 20) {
+  const OFFSET = (page - 1) * limit;
+  const [rawPosts] = await db.query(
+    `SELECT
+       p.id,
+       p.user_id          AS userId,
+       u.name             AS author,
+       u.picture          AS authorPicture,
+       p.text,
+       p.image,
+       p.video,
+       p.is_repost        AS isRepost,
+       p.original_post_id AS originalPostId,
+       p.created_at       AS createdAt
+     FROM post_topics pt
+     JOIN posts p ON p.id = pt.post_id
+     JOIN users u ON u.id = p.user_id
+     WHERE pt.topic = ?
+     ORDER BY p.created_at DESC
+     LIMIT ? OFFSET ?`,
+    [topic.toLowerCase(), limit + 1, OFFSET]
+  );
+  const hasMore   = rawPosts.length > limit;
+  const pagePosts = rawPosts.slice(0, limit);
+  const posts     = await hydratePosts(pagePosts);
+  return { posts, hasMore };
+}
+
 module.exports = {
   computeScore,
   hydratePosts,
@@ -495,6 +555,9 @@ module.exports = {
   createRepost,
   getOriginalPostEmbed,
   searchPosts,
+  savePostTopics,
+  getTopics,
+  getPostsByTopic,
   recordView,
   getViewCount,
 };

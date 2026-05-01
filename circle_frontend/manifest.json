@@ -2,7 +2,7 @@
   "name": "Circle",
   "short_name": "Circle",
   "description": "Circle — where real connections happen. Share moments, join conversations, and grow your community.",
-  "start_url": "/circle (14).html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0a0a0d",
   "theme_color": "#7c6bff",

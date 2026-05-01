@@ -10,6 +10,8 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Circle" />
     <meta name="twitter:description" content="Where real connections happen." />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Circle</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icon.svg" />
@@ -727,32 +729,48 @@
         display: none;
       }
       .login-nudge {
-        background: var(--card);
-        border: 1px solid var(--border);
+        background: linear-gradient(135deg, var(--accent-bg) 0%, var(--card) 100%);
+        border: 1px solid var(--accent);
         border-radius: var(--radius);
-        padding: 18px 20px;
+        padding: 22px 20px;
         margin-bottom: 18px;
         display: flex;
         align-items: center;
-        gap: 13px;
+        gap: 16px;
         font-size: 14px;
-        color: var(--txt2);
+        color: var(--txt);
         transition: background 0.3s;
       }
       .login-nudge-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: var(--accent-bg);
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: var(--accent);
         display: grid;
         place-items: center;
         flex-shrink: 0;
-        color: var(--accent);
+        color: #fff;
       }
       .login-nudge-icon svg {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
       }
+      .login-nudge-body { flex: 1; }
+      .login-nudge-title { font-weight: 700; font-size: 15px; color: var(--txt); margin-bottom: 4px; }
+      .login-nudge-sub { font-size: 13px; color: var(--txt2); margin-bottom: 12px; }
+      .login-nudge-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      .login-nudge-btn-primary {
+        background: var(--accent); color: #fff; border: none; border-radius: 20px;
+        padding: 7px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+        font-family: inherit; transition: opacity 0.2s;
+      }
+      .login-nudge-btn-primary:hover { opacity: 0.85; }
+      .login-nudge-btn-secondary {
+        background: transparent; color: var(--accent); border: 1.5px solid var(--accent);
+        border-radius: 20px; padding: 7px 18px; font-size: 13px; font-weight: 700;
+        cursor: pointer; font-family: inherit; transition: background 0.2s;
+      }
+      .login-nudge-btn-secondary:hover { background: var(--accent-bg); }
       .link {
         color: var(--accent);
         font-weight: 700;
@@ -943,6 +961,56 @@
       @keyframes shimmer {
         0%, 100% { opacity: 0.35; }
         50% { opacity: 0.6; }
+      }
+      /* ── Hashtags & Topic Pills ─────────────────────────────────── */
+      .hashtag {
+        color: var(--accent);
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 0 2px;
+        transition: background var(--tr), color var(--tr);
+      }
+      .hashtag:hover {
+        background: var(--accent-bg);
+        text-decoration: underline;
+      }
+      .topic-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 4px 0;
+      }
+      .topic-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid var(--accent-glow);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background var(--tr), transform var(--tr-spring);
+        user-select: none;
+      }
+      .topic-pill:hover {
+        background: var(--accent);
+        color: #fff;
+        transform: translateY(-1px);
+      }
+      .topic-pill-count {
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .topic-pill:not(:hover) .topic-pill-count {
+        background: var(--border2);
+        color: var(--txt2);
       }
       .trending-footer {
         margin-top: 12px;
@@ -4570,6 +4638,46 @@
         border-color: var(--green);
         opacity: 0.7;
       }
+      .feed-new-bio {
+        font-size: 12px;
+        color: var(--txt2);
+        margin-top: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .feed-new-nav-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 8px 16px;
+        border-top: 1px solid rgba(34,212,143,0.15);
+        background: rgba(34,212,143,0.04);
+      }
+      .feed-new-nav {
+        background: none;
+        border: 1.5px solid var(--green);
+        color: var(--green);
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: background var(--tr);
+        line-height: 1;
+        padding: 0;
+      }
+      .feed-new-nav:hover { background: var(--green); color: #fff; }
+      .feed-new-nav-counter {
+        font-size: 12px;
+        color: var(--txt3);
+        font-weight: 600;
+        min-width: 60px;
+        text-align: center;
+      }
       /* Explore new members section */
       .explore-new-card {
         background: rgba(34, 212, 143, 0.06);
@@ -4776,7 +4884,7 @@
       }
 
       </style>
-  </head>
+      </head>
   <body>
     <div class="shell">
       <!-- SIDEBAR -->
@@ -5031,25 +5139,20 @@
             </div>
             <div class="login-nudge" id="login-nudge">
               <div class="login-nudge-icon">
-                <svg
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                   <circle cx="9" cy="7" r="4" />
                   <path d="M23 21v-2a4 4 0 00-3-3.87" />
                   <path d="M16 3.13a4 4 0 010 7.75" />
                 </svg>
               </div>
-              <div>
-                <button class="link" onclick="goTo('register')">
-                  Create an account
-                </button>
-                or
-                <button class="link" onclick="goTo('login')">log in</button> to
-                post and interact.
+              <div class="login-nudge-body">
+                <div class="login-nudge-title">Join the conversation 👋</div>
+                <div class="login-nudge-sub">Create an account to post, like, comment and follow people.</div>
+                <div class="login-nudge-actions">
+                  <button class="login-nudge-btn-primary" onclick="goTo('register')">Create account</button>
+                  <button class="login-nudge-btn-secondary" onclick="goTo('login')">Log in</button>
+                </div>
               </div>
             </div>
             <!-- SUGGESTED USERS (now rendered inline in feed) -->
@@ -5112,6 +5215,26 @@
                   <div class="explore-skel-card"></div>
                   <div class="explore-skel-card"></div>
                   <div class="explore-skel-card"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Topics -->
+            <div class="explore-section" id="explore-topics-section">
+              <div class="explore-section-title">
+                <span>🏷️</span> Topics
+                <button class="explore-refresh-btn" id="explore-topics-refresh" onclick="loadExploreTopics(true)">
+                  <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                  Refresh
+                </button>
+              </div>
+              <p style="font-size:12px;color:var(--txt2);margin:-6px 0 12px">Tap a topic to see all posts</p>
+              <div id="explore-topics-list">
+                <div class="explore-skeleton-row">
+                  <div class="explore-skel-card" style="height:44px;min-width:80px"></div>
+                  <div class="explore-skel-card" style="height:44px;min-width:80px"></div>
+                  <div class="explore-skel-card" style="height:44px;min-width:80px"></div>
+                  <div class="explore-skel-card" style="height:44px;min-width:80px"></div>
                 </div>
               </div>
             </div>
@@ -5182,6 +5305,22 @@
           </div>
 
           <!-- SEARCH -->
+          <!-- TOPIC FEED VIEW -->
+          <div class="view" id="view-topic">
+            <div class="page-header">
+              <button class="back-btn" onclick="goBack()">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <h1 id="topic-view-title">#topic</h1>
+              <p id="topic-view-subtitle">Posts tagged with this topic</p>
+            </div>
+            <div id="topic-feed-list"></div>
+            <div id="topic-feed-loader" style="text-align:center;padding:20px;display:none">
+              <div class="explore-post-skeleton"></div>
+              <div class="explore-post-skeleton"></div>
+            </div>
+          </div>
+
           <div class="view" id="view-search">
             <div class="page-header">
               <button class="back-btn" onclick="goBack()" id="back-btn-search">
@@ -7262,7 +7401,7 @@
       // Register service worker for PWA functionality
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('./sw.js')
             .then(registration => {
               console.log('Service Worker registered successfully:', registration.scope);
             })
@@ -9244,8 +9383,8 @@
       </div>
     </div>`}
     ${post.text ? (post.text.length > 280
-      ? `<div class="post-body truncated" id="pb-${post.id}">${escHtml(post.text)}</div><span class="post-see-more" onclick="event.stopPropagation();toggleSeeMore(${post.id},this)" id="sm-${post.id}">See more</span>`
-      : `<div class="post-body">${escHtml(post.text)}</div>`) : ""}
+      ? `<div class="post-body truncated" id="pb-${post.id}">${linkifyHashtags(escHtml(post.text))}</div><span class="post-see-more" onclick="event.stopPropagation();toggleSeeMore(${post.id},this)" id="sm-${post.id}">See more</span>`
+      : `<div class="post-body">${linkifyHashtags(escHtml(post.text))}</div>`) : ""}
     ${post.isRepost && post.originalPost && !post.text ? (() => {
       const op = post.originalPost;
       const opColor = stringToColor(op.author);
@@ -10374,9 +10513,119 @@
       function loadExplore() {
         // Guests can see trending too — only people-follow requires login
         loadExplorePeople();
+        loadExploreTopics();
         loadExploreTrending();
         if (currentUser) loadExploreNewMembers();
       }
+
+      /* ── Hashtag linkifier ───────────────────────────────────────── */
+      function linkifyHashtags(html) {
+        // html is already escHtml'd — replace #word with clickable spans
+        return html.replace(/(?<!&)#([a-zA-Z][a-zA-Z0-9_]*)/g, (match, tag) =>
+          `<span class="hashtag" onclick="event.stopPropagation();openTopicFeed('${tag.toLowerCase()}')">${match}</span>`
+        );
+      }
+
+      /* ── Topic explore section ───────────────────────────────────── */
+      async function loadExploreTopics(force = false) {
+        const list = document.getElementById('explore-topics-list');
+        const btn  = document.getElementById('explore-topics-refresh');
+        if (!list) return;
+
+        if (btn) { btn.classList.add('spinning'); btn.disabled = true; }
+        list.innerHTML = `<div class="explore-skeleton-row">${[1,2,3,4,5].map(() => '<div class="explore-skel-card" style="height:44px;min-width:80px"></div>').join('')}</div>`;
+
+        try {
+          const res    = await api('GET', '/api/topics?limit=20');
+          const topics = res.data || [];
+
+          if (!topics.length) {
+            list.innerHTML = `<div class="explore-trending-empty">No topics yet — start posting with #hashtags!</div>`;
+            return;
+          }
+
+          list.innerHTML = `<div class="topic-pills">${topics.map(t =>
+            `<span class="topic-pill" onclick="openTopicFeed('${escHtml(t.topic)}')">
+               #${escHtml(t.topic)}
+               <span class="topic-pill-count">${t.post_count}</span>
+             </span>`
+          ).join('')}</div>`;
+        } catch (e) {
+          list.innerHTML = `<div class="explore-trending-empty" style="color:var(--rose)">Could not load topics.</div>`;
+        } finally {
+          if (btn) { btn.classList.remove('spinning'); btn.disabled = false; }
+        }
+      }
+
+      /* ── Topic feed view ─────────────────────────────────────────── */
+      let _topicFeedCurrent = null;
+      let _topicFeedPage    = 1;
+      let _topicFeedMore    = true;
+      let _topicFeedLoading = false;
+
+      async function openTopicFeed(topic) {
+        _topicFeedCurrent = topic;
+        _topicFeedPage    = 1;
+        _topicFeedMore    = true;
+        _topicFeedLoading = false;
+
+        document.getElementById('topic-view-title').textContent    = `#${topic}`;
+        document.getElementById('topic-view-subtitle').textContent = `Posts tagged with #${topic}`;
+        document.getElementById('topic-feed-list').innerHTML       = '';
+
+        goTo('topic');
+        await _loadTopicFeedPage(true);
+      }
+
+      async function _loadTopicFeedPage(isFirst = false) {
+        if (_topicFeedLoading || !_topicFeedMore) return;
+        _topicFeedLoading = true;
+
+        const list   = document.getElementById('topic-feed-list');
+        const loader = document.getElementById('topic-feed-loader');
+        if (loader) loader.style.display = 'block';
+
+        if (isFirst) {
+          list.innerHTML = '<div class="explore-post-skeleton"></div><div class="explore-post-skeleton"></div><div class="explore-post-skeleton"></div>';
+        }
+
+        try {
+          const res  = await api('GET', `/api/topics/${_topicFeedCurrent}/posts?page=${_topicFeedPage}`);
+          const { posts: newPosts, hasMore } = res.data;
+
+          if (isFirst) list.innerHTML = '';
+
+          if (!newPosts.length && isFirst) {
+            list.innerHTML = `<div class="explore-trending-empty">No posts for #${escHtml(_topicFeedCurrent)} yet.</div>`;
+            return;
+          }
+
+          const frag = document.createDocumentFragment();
+          newPosts.forEach(p => {
+            const d = document.createElement('div');
+            d.innerHTML = buildPostCard(p);
+            frag.appendChild(d.firstElementChild);
+          });
+          list.appendChild(frag);
+
+          _topicFeedMore = hasMore;
+          _topicFeedPage++;
+        } catch (e) {
+          if (isFirst) list.innerHTML = `<div class="explore-trending-empty" style="color:var(--rose)">Could not load posts.</div>`;
+        } finally {
+          _topicFeedLoading = false;
+          if (loader) loader.style.display = 'none';
+        }
+      }
+
+      // Infinite scroll for topic feed
+      window.addEventListener('scroll', () => {
+        const v = document.getElementById('view-topic');
+        if (!v || !v.classList.contains('active')) return;
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+          _loadTopicFeedPage();
+        }
+      }, { passive: true });
 
       async function loadExplorePeople(force = false) {
         const list = document.getElementById("explore-people-list");
@@ -10563,10 +10812,11 @@
       /* ═══════════════════ END EXPLORE ════════════════════════ */
 
       /* ═══════════════════ NEW MEMBERS ═══════════════════════ */
+      const FEED_NEW_LIMIT  = 3; // max cards shown in feed
       let _newMembers       = [];
       let _newMembersLoaded = false;
-      let _feedNewDismissed = !!localStorage.getItem("circle_new_dismissed");
-      let _feedNewIndex     = 0; // which member is currently shown
+      // Track per-user dismissals so each card is independently dismissable
+      let _dismissedNewIds  = new Set(JSON.parse(localStorage.getItem("circle_new_dismissed_ids") || "[]"));
 
       function _joinedAgo(dateStr) {
         const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
@@ -10575,109 +10825,95 @@
         return `Joined ${diff} days ago`;
       }
 
+      function _saveDismissed() {
+        localStorage.setItem("circle_new_dismissed_ids", JSON.stringify([..._dismissedNewIds]));
+      }
+
       async function loadNewMembers(force = false) {
         if (!currentUser) return;
         if (_newMembersLoaded && !force) return;
         try {
           const res = await api("GET", "/api/users/new-members?limit=20");
-          // Only keep members who joined within the last 3 days
           _newMembers = (res.data || []).filter(u => {
             if (u.id === currentUser.id) return false;
             const days = Math.floor((Date.now() - new Date(u.createdAt).getTime()) / 86400000);
             return days <= 3;
           });
           _newMembersLoaded = true;
-          _feedNewIndex = 0;
-
-          // Inject into feed if rendered and not dismissed
-          if (!_feedNewDismissed && _newMembers.length) {
-            const feedList = document.getElementById("feed-list");
-            if (feedList && !document.getElementById("feed-new-inline")) {
-              const postCards = feedList.querySelectorAll(".post-card");
-              // Random injection between post 3 and 5
-              const injectAfter = Math.floor(Math.random() * 3) + 2; // 2,3,4 (0-indexed)
-              const target = postCards[Math.min(injectAfter, postCards.length - 1)];
-              if (target) {
-                const temp = document.createElement("div");
-                temp.innerHTML = buildFeedNewCard();
-                target.insertAdjacentElement("afterend", temp.firstElementChild);
-              }
-            }
-          }
-
-          // Update explore section
+          _injectFeedNewCards();
           loadExploreNewMembers();
         } catch (e) {
           showToast("Couldn't load new members.");
         }
       }
 
-      function buildFeedNewCard() {
-        if (!_newMembers.length) return "";
-        const u = _newMembers[_feedNewIndex];
-        if (!u) return "";
+      function _visibleNewMembers() {
+        // Members not yet dismissed, capped at limit
+        return _newMembers.filter(u => !_dismissedNewIds.has(u.id)).slice(0, FEED_NEW_LIMIT);
+      }
 
+      function _injectFeedNewCards() {
+        const feedList = document.getElementById("feed-list");
+        if (!feedList) return;
+        // Remove any existing new-member cards before re-injecting
+        feedList.querySelectorAll(".feed-new-card").forEach(el => el.remove());
+        const toShow = _visibleNewMembers();
+        if (!toShow.length) return;
+        const postCards = feedList.querySelectorAll(".post-card");
+        // Inject all cards after the 3rd post (or last post if fewer)
+        const anchor = postCards[Math.min(2, postCards.length - 1)];
+        if (!anchor) return;
+        // Insert in reverse so order is preserved after afterend insertions
+        [...toShow].reverse().forEach(u => {
+          const temp = document.createElement("div");
+          temp.innerHTML = buildFeedNewCard(u);
+          anchor.insertAdjacentElement("afterend", temp.firstElementChild);
+        });
+      }
+
+      function buildFeedNewCard(u) {
         const initial = (u.name || "?").charAt(0).toUpperCase();
         const color   = stringToColor(u.name || "");
         const avBg    = u.picture ? "transparent" : color;
         const avInner = u.picture
           ? `<img src="${escHtml(u.picture)}" alt="${initial}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
           : initial;
-        const counter = _newMembers.length > 1
-          ? `<span style="font-size:10px;color:var(--txt3);font-weight:600;margin-left:auto;padding-right:4px">${_feedNewIndex + 1} / ${_newMembers.length}</span>`
-          : "";
+        const bioHtml = u.bio ? `<div class="feed-new-bio">${escHtml(u.bio)}</div>` : "";
 
-        return `<div class="feed-new-card" id="feed-new-inline">
+        return `<div class="feed-new-card" id="feed-new-${u.id}" data-uid="${u.id}">
           <div class="feed-new-banner">
             <span class="feed-new-banner-label">
-              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
               New to Circle
             </span>
-            ${counter}
-            <span class="feed-new-dismiss" onclick="dismissFeedNew()">✕</span>
+            <span class="feed-new-dismiss" onclick="dismissFeedNew(${u.id})">✕</span>
           </div>
           <div class="feed-new-row" onclick="viewProfile(${u.id})">
-            <div class="av" style="background:${avBg};width:42px;height:42px;font-size:16px;flex-shrink:0">${avInner}</div>
+            <div class="av" style="background:${avBg};width:46px;height:46px;font-size:18px;flex-shrink:0">${avInner}</div>
             <div class="feed-new-info">
               <div class="feed-new-name">${escHtml(u.name || "New member")}</div>
               <div class="feed-new-joined">${_joinedAgo(u.createdAt)}</div>
+              ${bioHtml}
             </div>
-            <button class="feed-new-follow-btn" onclick="event.stopPropagation();feedNewFollow(${u.id},this)">Follow</button>
+            <button class="feed-new-follow-btn" onclick="event.stopPropagation();feedNewFollow(${u.id},this)">Follow 👋</button>
           </div>
         </div>`;
       }
 
-      function _refreshFeedNewCard() {
-        const el = document.getElementById("feed-new-inline");
-        if (!el) return;
-        if (_feedNewIndex >= _newMembers.length) {
-          // Exhausted all members — remove card permanently
-          _feedNewDismissed = true;
-          localStorage.setItem("circle_new_dismissed", "1");
-          el.style.transition = "opacity .25s";
-          el.style.opacity = "0";
-          setTimeout(() => el.remove(), 260);
-          return;
-        }
-        // Slide out old, render new
-        el.style.transition = "opacity .18s";
-        el.style.opacity = "0";
-        setTimeout(() => {
-          el.outerHTML = buildFeedNewCard();
-        }, 180);
-      }
-
-      function dismissFeedNew() {
-        _feedNewDismissed = true;
-        localStorage.setItem("circle_new_dismissed", "1");
-        const el = document.getElementById("feed-new-inline");
+      function dismissFeedNew(userId) {
+        _dismissedNewIds.add(userId);
+        _saveDismissed();
+        const el = document.getElementById("feed-new-" + userId);
         if (el) {
-          el.style.transition = "opacity .22s, max-height .28s";
+          el.style.transition = "opacity .22s, max-height .3s";
           el.style.opacity = "0";
-          el.style.maxHeight = "0";
-          el.style.overflow = "hidden";
-          el.style.marginBottom = "0";
-          setTimeout(() => el.remove(), 300);
+          el.style.maxHeight = el.offsetHeight + "px";
+          requestAnimationFrame(() => {
+            el.style.maxHeight = "0";
+            el.style.marginBottom = "0";
+            el.style.overflow = "hidden";
+          });
+          setTimeout(() => el.remove(), 320);
         }
       }
 
@@ -10689,10 +10925,8 @@
           btn.textContent = "Following ✓";
           btn.classList.add("following");
           showToast("You're now following them! 🎉");
-          // Remove this user from the queue and advance to next
-          _newMembers = _newMembers.filter(u => u.id !== userId);
-          // _feedNewIndex stays the same — next member slides into that index
-          setTimeout(() => _refreshFeedNewCard(), 600);
+          // Auto-dismiss card after a short delay
+          setTimeout(() => dismissFeedNew(userId), 800);
         } catch (e) {
           showToast("Error: " + e.message);
           btn.disabled = false;
@@ -10815,7 +11049,7 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
+          
       }
       function formatTime(date) {
         if (!date) return "";

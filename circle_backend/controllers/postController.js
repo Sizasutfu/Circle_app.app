@@ -32,7 +32,7 @@ async function getPosts(req, res) {
       return sendOk(res, 200, 'Posts fetched.', { posts, hasMore, page, limit });
     }
 
-    const viewerUserId = req.actorId || null;
+    const viewerUserId = req.actorId || (req.headers['x-user-id'] ? parseInt(req.headers['x-user-id']) : null);
     const result = await PostModel.getPostsPage(viewerUserId, feedMode, page, limit);
 
     const posts   = result.posts   ?? result ?? [];
@@ -110,6 +110,9 @@ async function createPost(req, res) {
 
     // Save relative path so media loads from any host
     const postId = await PostModel.createPost(userId, text, imagePath, videoPath);
+
+    // ── Extract and save hashtags ────────────────────────────
+    await PostModel.savePostTopics(postId, text);
 
     // ── Notify all followers about the new post ──────────────
     const followerIds = await FollowModel.getFollowerIds(userId);
@@ -285,4 +288,31 @@ async function recordView(req, res) {
   }
 }
 
-module.exports = { getPosts, getPostById, createPost, deletePost, toggleLike, addComment, repost, recordView };
+// GET /api/topics?limit=<n>
+async function getTopics(req, res) {
+  const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+  try {
+    const topics = await PostModel.getTopics(limit);
+    return sendOk(res, 200, 'Topics fetched.', topics);
+  } catch (err) {
+    console.error('getTopics error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
+
+// GET /api/topics/:topic/posts?page=<n>
+async function getPostsByTopic(req, res) {
+  const topic = req.params.topic?.toLowerCase();
+  if (!topic) return sendError(res, 400, 'Topic is required.');
+  const page  = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+  try {
+    const result = await PostModel.getPostsByTopic(topic, page, limit);
+    return sendOk(res, 200, 'Posts fetched.', result);
+  } catch (err) {
+    console.error('getPostsByTopic error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
+
+module.exports = { getPosts, getPostById, createPost, deletePost, toggleLike, addComment, repost, recordView, getTopics, getPostsByTopic };

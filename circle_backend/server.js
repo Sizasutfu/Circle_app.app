@@ -17,6 +17,7 @@ const searchRoutes       = require('./routes/searchRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const dmRoutes           = require('./routes/dm');
 const exploreRoutes      = require('./routes/exploreRoutes');
+const topicRoutes        = require('./routes/topicRoutes');
 
 // authRoutes is optional (Google OAuth) — only load if the file exists
 let authRoutes = null;
@@ -52,6 +53,7 @@ if (authRoutes) app.use('/api/auth', authRoutes);
 app.use('/api',               followRoutes);
 app.use('/api/dm',            dmRoutes);
 app.use('/api/explore',       exploreRoutes);
+app.use('/api/topics',        topicRoutes);
 
 // 404
 app.use((req, res) => sendError(res, 404, `Route '${req.originalUrl}' not found.`));
