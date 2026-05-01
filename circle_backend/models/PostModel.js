@@ -6,8 +6,9 @@
 
 const { db }          = require('../config/db');
 const {
-  WEIGHT_LIKE, WEIGHT_COMMENT, WEIGHT_REPOST,
+  WEIGHT_LIKE, WEIGHT_COMMENT, WEIGHT_REPOST, WEIGHT_VIEW,
   BOOST_OWN, BOOST_FOLLOW, BOOST_REPOST,
+  WEIGHT_ENGAGEMENT_LIKE, WEIGHT_ENGAGEMENT_COMMENT, WEIGHT_ENGAGEMENT_REPOST,
   RECENCY_SCALE, RECENCY_SHIFT, FEED_PAGE_SIZE,
 } = require('../config/constants');
 
@@ -27,16 +28,26 @@ function toRelativePath(url) {
 }
 
 // ── Score a single post ────────────────────────────────────
-function computeScore(post, viewerUserId, followingIds = []) {
+function computeScore(post, viewerUserId, followingIds = [], engagementMap = {}) {
   const hoursOld     = (Date.now() - new Date(post.createdAt).getTime()) / 3_600_000;
   const recency      = RECENCY_SCALE / (hoursOld + RECENCY_SHIFT);
   const likeScore    = (post.likes?.length    || 0) * WEIGHT_LIKE;
   const commentScore = (post.comments?.length || 0) * WEIGHT_COMMENT;
   const repostScore  = (post.reposts?.length  || 0) * WEIGHT_REPOST;
+  const viewScore    = (post.views            || 0) * WEIGHT_VIEW;
   const ownBoost     = post.userId === viewerUserId        ? BOOST_OWN    : 0;
   const followBoost  = followingIds.includes(post.userId)  ? BOOST_FOLLOW : 0;
   const repostBoost  = post.isRepost                       ? BOOST_REPOST : 0;
-  return recency + likeScore + commentScore + repostScore + ownBoost + followBoost + repostBoost;
+
+  // Personal engagement boost — how much this viewer has engaged with this author
+  const eng = engagementMap[post.userId] || {};
+  const engagementBoost =
+    (eng.likes    || 0) * WEIGHT_ENGAGEMENT_LIKE +
+    (eng.comments || 0) * WEIGHT_ENGAGEMENT_COMMENT +
+    (eng.reposts  || 0) * WEIGHT_ENGAGEMENT_REPOST;
+
+  return recency + likeScore + commentScore + repostScore + viewScore +
+         ownBoost + followBoost + repostBoost + engagementBoost;
 }
 
 // ── Nest flat comment rows into a parent → replies tree ───
@@ -145,6 +156,34 @@ async function getFollowingIds(viewerUserId) {
   return rows.map(r => r.following_id);
 }
 
+// ── Fetch viewer's personal engagement with each author ───
+async function getEngagementMap(viewerUserId) {
+  if (!viewerUserId) return {};
+  const [rows] = await db.query(
+    `SELECT
+       p.user_id                          AS authorId,
+       COUNT(DISTINCT l.id)               AS likes,
+       COUNT(DISTINCT c.id)               AS comments,
+       COUNT(DISTINCT r.id)               AS reposts
+     FROM posts p
+     LEFT JOIN likes    l ON l.post_id          = p.id AND l.user_id          = ?
+     LEFT JOIN comments c ON c.post_id          = p.id AND c.user_id          = ?
+     LEFT JOIN reposts  r ON r.original_post_id = p.id AND r.user_id          = ?
+     GROUP BY p.user_id
+     HAVING likes > 0 OR comments > 0 OR reposts > 0`,
+    [viewerUserId, viewerUserId, viewerUserId]
+  );
+  const map = {};
+  rows.forEach(r => {
+    map[r.authorId] = {
+      likes:    Number(r.likes),
+      comments: Number(r.comments),
+      reposts:  Number(r.reposts),
+    };
+  });
+  return map;
+}
+
 // ── Fetch one page of posts ────────────────────────────────
 async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE) {
   const LIMIT  = limit;
@@ -187,7 +226,8 @@ async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE
 
   const posts = await hydratePosts(pagePosts);
 
-  posts.forEach(p => { p._score = computeScore(p, viewerUserId, followingIds); });
+  const engagementMap = await getEngagementMap(viewerUserId);
+  posts.forEach(p => { p._score = computeScore(p, viewerUserId, followingIds, engagementMap); });
   posts.sort((a, b) => b._score - a._score);
   posts.forEach(p => delete p._score);
 
@@ -373,12 +413,11 @@ async function searchPosts(query, { limit = 20, offset = 0 } = {}) {
 }
 
 // ── View counts ────────────────────────────────────────────
-// Records one view per viewer (identified by userId or fingerprint).
-// Uses INSERT IGNORE so duplicate views in the same session are silently dropped.
+// Records a view each session — allows return visit recounts like Facebook/X.
 async function recordView(postId, viewerId) {
   // viewerId can be a userId (int) or an anonymous fingerprint string
   await db.query(
-    `INSERT IGNORE INTO post_views (post_id, viewer_key) VALUES (?, ?)`,
+    `INSERT INTO post_views (post_id, viewer_key) VALUES (?, ?)`,
     [postId, String(viewerId)]
   );
 }
@@ -396,6 +435,7 @@ module.exports = {
   hydratePosts,
   nestComments,
   getFollowingIds,
+  getEngagementMap,
   getPostsPage,
   getProfilePosts,
   getTrendingPosts,

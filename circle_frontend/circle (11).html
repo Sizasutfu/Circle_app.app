@@ -129,7 +129,7 @@
         min-height: 100vh;
       }
       .sidebar {
-        width: 72px;
+        width: 240px;
         flex-shrink: 0;
         background: var(--surface);
         border-right: 1px solid var(--border);
@@ -141,24 +141,8 @@
         top: 0;
         height: 100vh;
         overflow: hidden;
-        transition:
-          width var(--tr),
-          background 0.3s;
+        transition: background 0.3s;
         z-index: 100;
-      }
-      .sidebar:hover,
-      .sidebar.expanded {
-        width: 240px;
-      }
-      .sidebar:hover .nav-label,
-      .sidebar.expanded .nav-label,
-      .sidebar:hover .logo-text,
-      .sidebar.expanded .logo-text,
-      .sidebar:hover .user-info,
-      .sidebar.expanded .user-info {
-        opacity: 1;
-        width: auto;
-        pointer-events: auto;
       }
       .logo-wrap {
         display: flex;
@@ -190,10 +174,9 @@
         font-size: 20px;
         font-weight: 800;
         letter-spacing: -0.5px;
-        opacity: 0;
-        width: 0;
-        pointer-events: none;
-        transition: opacity var(--tr);
+        opacity: 1;
+        width: auto;
+        pointer-events: auto;
         white-space: nowrap;
       }
       .nav {
@@ -237,10 +220,9 @@
         flex-shrink: 0;
       }
       .nav-label {
-        opacity: 0;
-        width: 0;
-        pointer-events: none;
-        transition: opacity var(--tr);
+        opacity: 1;
+        width: auto;
+        pointer-events: auto;
       }
       .sidebar-bottom {
         width: 100%;
@@ -264,10 +246,9 @@
         background: var(--accent-bg);
       }
       .user-info {
-        opacity: 0;
-        width: 0;
-        pointer-events: none;
-        transition: opacity var(--tr);
+        opacity: 1;
+        width: auto;
+        pointer-events: auto;
         min-width: 0;
       }
       .user-info-name {
@@ -4894,13 +4875,10 @@
           id="sidebar-user-area"
           style="display: none"
         >
-          <div class="user-chip" onclick="goTo('profile')">
-            <div class="av" id="sb-avatar">?</div>
-            <div class="user-info">
-              <div class="user-info-name" id="sb-name">—</div>
-              <div class="user-info-sub" id="sb-email">—</div>
-            </div>
-          </div>
+          <button class="nav-item" onclick="logout()" style="width:100%;color:var(--rose)">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span class="nav-label">Log Out</span>
+          </button>
         </div>
       </aside>
 
@@ -5562,19 +5540,7 @@
                   </svg>
                   Edit Profile
                 </button>
-                <button class="logout-btn-sm" onclick="logout()">
-                  <svg
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                  </svg>
-                  Log Out
-                </button>
+
               </div>
             </div>
             <div class="section-label" id="profile-posts-label">Posts</div>
@@ -9236,9 +9202,9 @@
         const color = stringToColor(post.author);
         return `<div class="post-card" data-post-id="${post.id}" onclick="openPostDetail(event,${post.id})" style="cursor:pointer">
     ${post.isRepost ? `<div class="repost-strip"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>${escHtml(post.author)} reposted</div>` : ""}
-    <div class="post-head">
+    ${(post.isRepost && !post.text) ? "" : `<div class="post-head">
       <div class="av" style="background:${post.authorPicture ? "transparent" : color};cursor:pointer" onclick="viewProfile(${post.userId})" title="View profile">${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(post.author.charAt(0))}</div>
-      <div class="post-meta"><div class="post-name" onclick="viewProfile(${post.userId})" style="cursor:pointer" title="View profile">${escHtml(post.author)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
+      <div class="post-meta"><div class="post-name" onclick="event.stopPropagation();openPostDetail(event,${post.id})" style="cursor:pointer" title="View post">${escHtml(post.author)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
       <div class="post-menu-wrap" onclick="event.stopPropagation()">
         <button class="post-menu-btn" onclick="togglePostMenu(event,${post.id})" title="More options">⋯</button>
         <div class="post-dropdown" id="post-menu-${post.id}">
@@ -9265,11 +9231,21 @@
           </button>` : ""}
         </div>
       </div>
-    </div>
+    </div>`}
     ${post.text ? (post.text.length > 280
       ? `<div class="post-body truncated" id="pb-${post.id}">${escHtml(post.text)}</div><span class="post-see-more" onclick="event.stopPropagation();toggleSeeMore(${post.id},this)" id="sm-${post.id}">See more</span>`
       : `<div class="post-body">${escHtml(post.text)}</div>`) : ""}
-    ${post.isRepost && post.originalPost ? `<div class="repost-embed" style="cursor:pointer" onclick="event.stopPropagation();openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author)}"><div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}${post.originalPost.video ? `<div class="post-video-wrap repost-embed-video" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${post.originalPost.video}" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || "")}" title="Watch video" style="margin-top:8px"><video src="${post.originalPost.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : post.originalPost.image ? `<img class="repost-embed-img lb-thumb" src="${post.originalPost.image}" loading="lazy" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}</div>` : !post.isRepost && post.video ? `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${post.video}" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || '')}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || '')}" title="Watch video"><video src="${post.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : !post.isRepost && post.image ? `<img class="post-img lb-thumb" src="${post.image}" loading="lazy" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="openLightbox(this)" title="View full image"/>` : ""}
+    ${post.isRepost && post.originalPost && !post.text ? (() => {
+      const op = post.originalPost;
+      const opColor = stringToColor(op.author);
+      const opAvHtml = op.authorPicture ? `<img src="${op.authorPicture}" alt="${escHtml(op.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(op.author.charAt(0));
+      return `<div class="post-head" style="padding-top:10px">
+        <div class="av" style="background:${op.authorPicture ? "transparent" : opColor};cursor:pointer" onclick="event.stopPropagation();viewProfile(${op.userId})" title="View profile">${opAvHtml}</div>
+        <div class="post-meta"><div class="post-name" onclick="event.stopPropagation();openOriginalPost(${op.id})" style="cursor:pointer" title="View post">${escHtml(op.author)}</div><div class="post-time">${formatTime(op.createdAt)}</div></div>
+      </div>
+      ${op.text ? `<div class="post-body">${escHtml(op.text)}</div>` : ""}
+      ${op.video ? `<div class="post-video-wrap" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${op.video}" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" title="Watch video"><video src="${op.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : op.image ? `<img class="post-img lb-thumb" src="${op.image}" loading="lazy" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}`;
+    })() : post.isRepost && post.originalPost && post.text ? `<div class="repost-embed" style="cursor:pointer" onclick="event.stopPropagation();openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author)}"><div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}${post.originalPost.video ? `<div class="post-video-wrap repost-embed-video" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${post.originalPost.video}" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || "")}" title="Watch video" style="margin-top:8px"><video src="${post.originalPost.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : post.originalPost.image ? `<img class="repost-embed-img lb-thumb" src="${post.originalPost.image}" loading="lazy" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}</div>` : !post.isRepost && post.video ? `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${post.video}" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || '')}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || '')}" title="Watch video"><video src="${post.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : !post.isRepost && post.image ? `<img class="post-img lb-thumb" src="${post.image}" loading="lazy" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="openLightbox(this)" title="View full image"/>` : ""}
     <div class="post-actions">
       <button class="act-btn like-btn${liked ? " liked" : ""}" data-post-id="${post.id}" onclick="toggleLike(${post.id})">
         <svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
@@ -10831,15 +10807,26 @@
           .replace(/'/g, "&#039;");
       }
       function formatTime(date) {
-        const d = new Date(date),
-          now = new Date(),
-          diff = Math.floor((now - d) / 1000);
-        if (diff < 60) return "just now";
-        if (diff < 3600) return Math.floor(diff / 60) + "m ago";
-        if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
-        return d.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
+        if (!date) return "";
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return "";
+        const now  = new Date();
+        const diff = Math.floor((now - d) / 1000);
+        if (diff < 60)       return "just now";
+        if (diff < 3600)     return Math.floor(diff / 60) + "m ago";
+        if (diff < 86400)    return Math.floor(diff / 3600) + "h ago";
+        if (diff < 2592000)  return Math.floor(diff / 86400) + "d ago";
+        if (diff < 31536000) return Math.floor(diff / 2592000) + "mo ago";
+        return Math.floor(diff / 31536000) + "y ago";
+      }
+
+      function formatFullDate(date) {
+        if (!date) return "";
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return "";
+        return d.toLocaleString("en-US", {
+          month: "short", day: "numeric", year: "numeric",
+          hour: "numeric", minute: "2-digit", hour12: true,
         });
       }
 
@@ -12985,30 +12972,47 @@
         document.getElementById("post-detail-content").innerHTML = `
           <div class="post-detail-card">
             ${post.isRepost ? `<div class="repost-strip" style="margin-bottom:12px"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> ${escHtml(post.author)} reposted</div>` : ""}
-            <div class="post-detail-head">
+            ${!(post.isRepost && !post.text) ? `<div class="post-detail-head">
               <div class="av" style="background:${post.authorPicture ? "transparent" : color};cursor:pointer;flex-shrink:0" onclick="viewProfile(${post.userId})">${avHtml}</div>
               <div class="post-detail-author">
                 <span class="post-detail-name" onclick="viewProfile(${post.userId})">${escHtml(post.author)}</span>
                 <span class="post-detail-time">${dateStr}</span>
               </div>
               ${canDelete ? `<button class="post-del" style="margin-left:auto" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
-            </div>
+            </div>` : ""}
 
             ${post.text ? `<div class="post-detail-body">${escHtml(post.text)}</div>` : ""}
 
-            ${
-              post.isRepost && post.originalPost
-                ? `<div class="repost-embed" style="margin-bottom:14px;cursor:pointer" onclick="openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author)}">
+            ${(() => {
+              if (post.isRepost && post.originalPost && !post.text) {
+                const op = post.originalPost;
+                const opColor = stringToColor(op.author);
+                const opAvHtml = op.authorPicture
+                  ? `<img src="${op.authorPicture}" alt="${escHtml(op.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+                  : escHtml(op.author.charAt(0));
+                return `<div class="post-detail-head">
+                  <div class="av" style="background:${op.authorPicture ? "transparent" : opColor};cursor:pointer;flex-shrink:0" onclick="viewProfile(${op.userId})">${opAvHtml}</div>
+                  <div class="post-detail-author">
+                    <span class="post-detail-name" onclick="viewProfile(${op.userId})">${escHtml(op.author)}</span>
+                    <span class="post-detail-time">${formatFullDate(op.createdAt)}</span>
+                  </div>
+                </div>
+                ${op.text ? `<div class="post-detail-body">${escHtml(op.text)}</div>` : ""}
+                ${op.video ? `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${op.video}" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" title="Watch video"><video src="${op.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>`
+                  : op.image ? `<img class="post-detail-img lb-thumb" src="${op.image}" loading="lazy" onclick="openLightbox(this)" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}"/>` : ""}`;
+              } else if (post.isRepost && post.originalPost && post.text) {
+                return `<div class="repost-embed" style="margin-bottom:14px;cursor:pointer" onclick="openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author)}">
                   <div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>
                   ${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}
                   ${post.originalPost.video ? `<div class="post-video-wrap repost-embed-video" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${post.originalPost.video}" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || '')}" data-lb-user-id="${post.originalPost.userId || ''}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || '')}" title="Watch video" style="margin-top:8px"><video src="${post.originalPost.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : post.originalPost.image ? `<img class="post-detail-img repost-embed-img lb-thumb" src="${post.originalPost.image}" loading="lazy" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || '')}" data-lb-user-id="${post.originalPost.userId || ''}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || '')}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}
-                </div>`
-                : post.video
-                  ? `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${post.video}" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || '')}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || '')}" title="Watch video"><video src="${post.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>`
-                  : post.image
-                  ? `<img class="post-detail-img lb-thumb" src="${post.image}" loading="lazy" onclick="openLightbox(this)" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}"/>`
-                  : ""
-            }
+                </div>`;
+              } else if (post.video) {
+                return `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${post.video}" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || '')}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || '')}" title="Watch video"><video src="${post.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>`;
+              } else if (post.image) {
+                return `<img class="post-detail-img lb-thumb" src="${post.image}" loading="lazy" onclick="openLightbox(this)" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}"/>`;
+              }
+              return "";
+            })()}
 
             <div class="post-detail-actions">
               <button class="act-btn like-btn${liked ? " liked" : ""}" id="pd-like-btn" onclick="pdToggleLike(${post.id})">

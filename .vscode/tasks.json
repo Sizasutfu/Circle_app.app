@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"path": "circle_backend",
+			"problemMatcher": [],
+			"label": "npm: dev - circle_backend",
+			"detail": "nodemon server.js"
+		},
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "circle_backend",
+			"problemMatcher": [],
+			"label": "npm: start - circle_backend",
+			"detail": "node server.js",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}

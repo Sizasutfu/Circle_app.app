@@ -27,7 +27,7 @@ function fileFilter(_req, file, cb) {
 const upload = multer({
   storage: multer.memoryStorage(), // hold in RAM — compress middleware saves to disk
   fileFilter,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB ceiling (pre-compression)
+  limits: { fileSize: 200 * 1024 * 1024 }, // 100 MB ceiling (pre-compression)
 });
 
 module.exports = upload;
