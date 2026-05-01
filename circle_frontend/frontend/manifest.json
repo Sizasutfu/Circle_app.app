@@ -1,0 +1,22 @@
+{
+  "name": "Circle",
+  "short_name": "Circle",
+  "description": "Circle — where real connections happen. Share moments, join conversations, and grow your community.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0d",
+  "theme_color": "#7c6bff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "communication"],
+  "lang": "en",
+  "dir": "ltr"
+}
