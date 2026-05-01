@@ -29,4 +29,16 @@ module.exports = {
 
   // ── Pagination ──────────────────────────────────────────
   FEED_PAGE_SIZE: 15,  // posts returned per page (mobile-friendly)
+
+  // ── Feed freshness ──────────────────────────────────────
+  // How many times the page size to fetch as scoring candidates.
+  // e.g. page size 15 × 4 = 60 candidates pulled from DB,
+  // scored, sorted, then trimmed to 15 for the response.
+  // Higher = more variety but slightly more DB work.
+  FEED_CANDIDATE_MULTIPLIER: 4,
+
+  // Multiply a seen post's score by this factor instead of
+  // removing it entirely — keeps the feed from going empty
+  // for very active users or small apps.
+  SEEN_PENALTY: 0,
 };

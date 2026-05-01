@@ -11,7 +11,9 @@
     <meta name="twitter:title" content="Circle" />
     <meta name="twitter:description" content="Where real connections happen." />
     <title>Circle</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237c6bff'/><circle cx='16' cy='16' r='8' fill='none' stroke='white' stroke-width='3'/></svg>"/>
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="manifest" href="manifest.json" />
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap"
       rel="stylesheet"
@@ -7246,8 +7248,8 @@
       // Dynamically point to the server using whatever host the page loaded from.
       // Works on PC (localhost:5000), phone over LAN (192.168.x.x:5000),
       // or a real domain — no hardcoded IP needed.
-       const API = `${window.location.protocol}//${window.location.hostname}:5000`;
-    //const API = "http://localhost:5000";
+    //   const API = `${window.location.protocol}//${window.location.hostname}:5000`;
+   const API = "http://localhost:5000";
 
       let posts = [],
         currentUser = null,
@@ -7256,6 +7258,19 @@
         repostTargetId = null;
       let currentFeedTab = "global";
       const _followingSet = new Set(); // IDs of users the current user follows
+
+      // Register service worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('Service Worker registered successfully:', registration.scope);
+            })
+            .catch(error => {
+              console.log('Service Worker registration failed:', error);
+            });
+        });
+      }
 
       async function _loadFollowingSet() {
         if (!currentUser) { _followingSet.clear(); return; }

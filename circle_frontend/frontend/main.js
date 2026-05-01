@@ -7,13 +7,18 @@
       let currentFeedTab = "global";
       const _followingSet = new Set(); // IDs of users the current user follows
 
-      async function _loadFollowingSet() {
-        if (!currentUser) { _followingSet.clear(); return; }
-        try {
-          const res = await api("GET", `/api/users/${currentUser.id}/following`);
-          const list = res.data || res.following || res || [];
-          _followingSet.clear();
-          list.forEach(u => _followingSet.add(u.id || u));
+      // Register service worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('Service Worker registered successfully:', registration.scope);
+            })
+            .catch(error => {
+              console.log('Service Worker registration failed:', error);
+            });
+        });
+      }
         } catch (e) {
           // non-critical; silently ignore
         }

@@ -10,6 +10,7 @@ const {
   BOOST_OWN, BOOST_FOLLOW, BOOST_REPOST,
   WEIGHT_ENGAGEMENT_LIKE, WEIGHT_ENGAGEMENT_COMMENT, WEIGHT_ENGAGEMENT_REPOST,
   RECENCY_SCALE, RECENCY_SHIFT, FEED_PAGE_SIZE,
+  FEED_CANDIDATE_MULTIPLIER, SEEN_PENALTY,
 } = require('../config/constants');
 
 // ── Normalise a stored media URL to a relative path ──────────
@@ -184,10 +185,30 @@ async function getEngagementMap(viewerUserId) {
   return map;
 }
 
+// ── Fetch post IDs the viewer has already seen ────────────
+// Returns a Set of post IDs so lookups stay O(1).
+async function getSeenPostIds(viewerKey) {
+  if (!viewerKey) return new Set();
+  const [rows] = await db.query(
+    'SELECT DISTINCT post_id FROM post_views WHERE viewer_key = ?',
+    [String(viewerKey)]
+  );
+  return new Set(rows.map(r => r.post_id));
+}
+
 // ── Fetch one page of posts ────────────────────────────────
+// Strategy:
+//   1. Pull a large candidate pool (FEED_CANDIDATE_MULTIPLIER x limit)
+//      so the scorer has real variety to work with.
+//   2. Fetch which posts this viewer has already seen.
+//   3. Hydrate + score all candidates, applying SEEN_PENALTY to
+//      seen posts rather than dropping them — keeps the feed from
+//      going empty for active users or small apps.
+//   4. Sort by score descending, return the top `limit` posts.
 async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE) {
-  const LIMIT  = limit;
-  const OFFSET = (page - 1) * LIMIT;
+  const LIMIT     = limit;
+  const POOL_SIZE = LIMIT * FEED_CANDIDATE_MULTIPLIER;
+  const OFFSET    = (page - 1) * LIMIT;
 
   const followingIds = await getFollowingIds(viewerUserId);
 
@@ -201,6 +222,8 @@ async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE
     whereParams = followingIds;
   }
 
+  // Fetch POOL_SIZE + 1 so we can detect whether more posts exist
+  // beyond this pool without a separate COUNT query.
   const [rawPosts] = await db.query(
     `SELECT
        p.id,
@@ -218,20 +241,40 @@ async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE
      ${whereClause}
      ORDER BY p.created_at DESC
      LIMIT ? OFFSET ?`,
-    [...whereParams, LIMIT + 1, OFFSET]
+    [...whereParams, POOL_SIZE + 1, OFFSET]
   );
 
-  const hasMore   = rawPosts.length > LIMIT;
-  const pagePosts = rawPosts.slice(0, LIMIT);
+  const poolHasMore = rawPosts.length > POOL_SIZE;
+  const candidates  = rawPosts.slice(0, POOL_SIZE);
 
-  const posts = await hydratePosts(pagePosts);
+  if (!candidates.length) return { posts: [], hasMore: false };
 
-  const engagementMap = await getEngagementMap(viewerUserId);
-  posts.forEach(p => { p._score = computeScore(p, viewerUserId, followingIds, engagementMap); });
-  posts.sort((a, b) => b._score - a._score);
-  posts.forEach(p => delete p._score);
+  // Resolve the viewer key — same logic as recordView so the
+  // seen-post set is always consistent with what was recorded.
+  const viewerKey = viewerUserId ? String(viewerUserId) : null;
 
-  return { posts, hasMore };
+  // Run hydration, seen-ID lookup, and engagement map in parallel.
+  const [hydratedCandidates, seenIds, engagementMap] = await Promise.all([
+    hydratePosts(candidates),
+    getSeenPostIds(viewerKey),
+    getEngagementMap(viewerUserId),
+  ]);
+
+  // Score every candidate. Seen posts get SEEN_PENALTY applied so
+  // they sink to the bottom without vanishing entirely.
+  hydratedCandidates.forEach(p => {
+    const base = computeScore(p, viewerUserId, followingIds, engagementMap);
+    p._score   = seenIds.has(p.id) ? base * SEEN_PENALTY : base;
+  });
+
+  hydratedCandidates.sort((a, b) => b._score - a._score);
+
+  const pagePosts = hydratedCandidates.slice(0, LIMIT);
+  const hasMore   = hydratedCandidates.length > LIMIT || poolHasMore;
+
+  pagePosts.forEach(p => delete p._score);
+
+  return { posts: pagePosts, hasMore };
 }
 
 // ── Fetch all posts for a specific user profile ────────────
@@ -436,6 +479,7 @@ module.exports = {
   nestComments,
   getFollowingIds,
   getEngagementMap,
+  getSeenPostIds,
   getPostsPage,
   getProfilePosts,
   getTrendingPosts,
