@@ -380,6 +380,20 @@
       .view.active {
         display: block;
       }
+      #view-login,
+      #view-register,
+      #view-reset-password,
+      #view-new-password {
+        min-height: 100svh;
+        display: none;
+        flex-direction: column;
+      }
+      #view-login.active,
+      #view-register.active,
+      #view-reset-password.active,
+      #view-new-password.active {
+        display: flex;
+      }
       #view-post-detail {
         display: none;
         flex-direction: column;
@@ -502,7 +516,13 @@
       }
       .auth-wrap {
         max-width: 420px;
-        margin: 20px auto;
+        margin: 0 auto;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 24px 16px;
+        box-sizing: border-box;
       }
       .auth-card {
         background: var(--card);
@@ -511,7 +531,6 @@
         padding: 36px 32px;
         box-shadow: var(--shadow-lg);
         transition: background 0.3s;
-       
       }
       .auth-brand {
         display: flex;
@@ -808,7 +827,7 @@
         .content.feed-active { max-width: 940px; }
       }
 
-      /* ── Trending in your circles card ──────────────────────────── */
+      /* ── Trending on Circle card ──────────────────────────── */
       .trending-card {
         background: var(--card);
         border: 1px solid var(--border);
@@ -1012,6 +1031,59 @@
         background: var(--border2);
         color: var(--txt2);
       }
+      .feed-personalised-hint {
+        font-size: 12px;
+        color: var(--txt2);
+        padding: 2px 0 10px;
+        display: none;
+      }
+      /* ── Explore topics ranked list ─────────────────────────────── */
+      .topic-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .topic-list-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: background var(--tr);
+      }
+      .topic-list-row:hover { background: var(--card-hover); }
+      .topic-list-rank {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--txt3);
+        min-width: 18px;
+        text-align: right;
+      }
+      .topic-list-name {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--accent);
+      }
+      .topic-list-count {
+        font-size: 12px;
+        color: var(--txt2);
+        white-space: nowrap;
+      }
+      .topic-show-more {
+        background: none;
+        border: none;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 10px 2px;
+        text-align: left;
+        width: 100%;
+      }
+      .topic-show-more:hover { text-decoration: underline; }
+
       .trending-footer {
         margin-top: 12px;
         font-size: 11px;
@@ -1128,24 +1200,35 @@
       }
       .post-dropdown {
         display: none;
-        position: absolute;
-        top: calc(100% + 4px);
-        right: 0;
-        z-index: 200;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        z-index: 2000;
         background: var(--card);
         border: 1px solid var(--border2);
-        border-radius: 12px;
-        padding: 5px;
-        min-width: 168px;
-        box-shadow: var(--shadow-lg);
-        animation: dropIn 0.18s cubic-bezier(0.34,1.4,0.64,1) both;
+        border-radius: 16px;
+        padding: 6px;
+        min-width: 200px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.28), 0 2px 12px rgba(0,0,0,0.14);
+        animation: dropIn 0.18s cubic-bezier(0.34,1.4,0.64,1) forwards;
       }
       .post-dropdown.open {
         display: block;
       }
+      /* dim backdrop behind centered dropdown */
+      .post-dropdown.open::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: -1;
+        backdrop-filter: blur(2px);
+        animation: fadeIn 0.15s ease;
+      }
       @keyframes dropIn {
-        from { opacity: 0; transform: translateY(-8px) scale(0.95); }
-        to   { opacity: 1; transform: translateY(0)   scale(1); }
+        from { opacity: 0; transform: translate(-50%, -50%) scale(0.90); }
+        to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
       }
       .post-dropdown-item {
         display: flex;
@@ -1854,7 +1937,7 @@
         inset: 0;
         background: rgba(0, 0, 0, 0.7);
         backdrop-filter: blur(8px);
-        z-index: 1000;
+        z-index: 3000;
         display: none;
         place-items: center;
         animation: fadeIn 0.18s ease;
@@ -1910,7 +1993,7 @@
         border-radius: var(--radius);
         padding: 20px 16px 12px;
         margin-bottom: 2px;
-        overflow: hidden;
+        overflow: visible;
         max-width: 100%;
         box-sizing: border-box;
       }
@@ -1973,15 +2056,24 @@
       }
       .post-detail-actions {
         display: flex;
-        gap: 8px;
-        padding: 8px 0;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 0 2px;
         border-bottom: 1px solid var(--border);
       }
       .post-detail-actions .act-btn {
         flex: 1;
         justify-content: center;
-        padding: 10px;
+        padding: 10px 8px;
         border-radius: var(--radius-sm);
+        font-size: 13.5px;
+      }
+      .post-detail-actions .post-menu-wrap {
+        flex: 1;
+        display: flex;
+      }
+      .post-detail-actions .post-menu-wrap .act-btn {
+        width: 100%;
       }
       .post-detail-comments-section {
         background: var(--card);
@@ -2033,6 +2125,48 @@
         color: var(--txt3);
         font-size: 14px;
       }
+      /* ── Comment skeleton loaders ───────────────────────────── */
+      .comment-skel-item {
+        display: flex;
+        gap: 10px;
+        padding: 12px 0;
+        border-top: 1px solid var(--border);
+      }
+      .comment-skel-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--border);
+        flex-shrink: 0;
+        animation: skel-pulse 1.4s ease-in-out infinite;
+      }
+      .comment-skel-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        justify-content: center;
+      }
+      .comment-skel-name {
+        height: 11px;
+        width: 30%;
+        border-radius: 6px;
+        background: var(--border);
+        animation: skel-pulse 1.4s ease-in-out infinite;
+      }
+      .comment-skel-line {
+        height: 11px;
+        border-radius: 6px;
+        background: var(--border);
+        animation: skel-pulse 1.4s ease-in-out infinite;
+      }
+      .comment-skel-line.long  { width: 85%; animation-delay: 0.1s; }
+      .comment-skel-line.short { width: 55%; animation-delay: 0.2s; }
+      @keyframes skel-pulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.4; }
+      }
+
       /* ── Reply feature styles ─────────────────────────────── */
       /* Feed card comment reply nesting */
       .comment-replies {
@@ -2226,6 +2360,9 @@
         border-radius: 7px;
         margin-top: 8px;
       }
+      /* ── Repost popover (Twitter-style) ─────────────────── */
+      /* repost dropdown — reuses .post-menu-wrap / .post-dropdown pattern */
+      .rp-undo { color: var(--green) !important; }
       .modal textarea {
         width: 100%;
         background: var(--bg);
@@ -2822,6 +2959,53 @@
         opacity: 1;
         transform: scale(1.15);
       }
+      /* Other-profile: view-photo mode — eye icon, no upload badge */
+      .av-upload-wrap.av-view-mode .av-upload-badge { display: none; }
+      .av-upload-wrap.av-view-mode { cursor: zoom-in; }
+      /* Other-profile: no picture — not interactive */
+      .av-upload-wrap.av-disabled-mode { cursor: default; }
+      .av-upload-wrap.av-disabled-mode:hover .av-upload-overlay,
+      .av-upload-wrap.av-disabled-mode:hover .av-upload-badge { opacity: 0; }
+      /* ── Avatar action menu (own profile) — fixed so it floats above all layout ── */
+      .av-action-menu {
+        position: fixed;
+        z-index: 9999;
+        background: var(--card);
+        border: 1px solid var(--border2);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-lg);
+        min-width: 180px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.92);
+        transform-origin: top left;
+        transition: opacity 0.15s ease, transform 0.18s cubic-bezier(0.34,1.4,0.64,1);
+      }
+      .av-action-menu.open {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+      .av-action-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 12px 16px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--txt);
+        cursor: pointer;
+        transition: background var(--tr), color var(--tr);
+        border: none;
+        background: none;
+        font-family: inherit;
+        width: 100%;
+        text-align: left;
+      }
+      .av-action-item:hover { background: var(--accent-bg); color: var(--accent); }
+      .av-action-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+      .av-action-item + .av-action-item { border-top: 1px solid var(--border); }
       .av img,
       .av.lg img {
         width: 100%;
@@ -3380,7 +3564,8 @@
           font-size: 22px;
         }
         .auth-wrap {
-          margin: 8px auto;
+          margin: 0 auto;
+          padding: 16px 12px;
         }
         .auth-card {
           padding: 24px 18px;
@@ -4547,19 +4732,25 @@
       /* ═══════════════════ NEW MEMBERS CARD ══════════════════ */
       .feed-new-card {
         background: var(--card);
-        border: 1.5px solid var(--green);
+        border: 1.5px solid var(--border);
         border-radius: var(--radius);
         margin-bottom: 12px;
         overflow: hidden;
-        transition: background 0.3s;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: background 0.3s, opacity 0.35s ease, transform 0.35s ease;
+      }
+      .feed-new-card.visible {
+        opacity: 1;
+        transform: translateY(0);
       }
       .feed-new-banner {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 8px 14px;
-        background: rgba(34, 212, 143, 0.1);
-        border-bottom: 1px solid rgba(34, 212, 143, 0.2);
+        background: var(--accent-bg);
+        border-bottom: 1px solid var(--border);
       }
       .feed-new-banner-label {
         display: flex;
@@ -4567,7 +4758,7 @@
         gap: 6px;
         font-size: 11px;
         font-weight: 800;
-        color: var(--green);
+        color: var(--accent);
         text-transform: uppercase;
         letter-spacing: 0.07em;
       }
@@ -4585,8 +4776,8 @@
         font-weight: 600;
       }
       .feed-new-dismiss:hover {
-        background: var(--green-bg);
-        color: var(--green);
+        background: var(--accent-bg);
+        color: var(--accent);
       }
       .feed-new-row {
         display: flex;
@@ -4611,7 +4802,7 @@
       }
       .feed-new-joined {
         font-size: 12px;
-        color: var(--green);
+        color: var(--accent);
         font-weight: 600;
         margin-top: 2px;
       }
@@ -4620,22 +4811,22 @@
         font-weight: 700;
         padding: 7px 18px;
         border-radius: 20px;
-        border: 1.5px solid var(--green);
+        border: 1.5px solid var(--accent);
         background: none;
-        color: var(--green);
+        color: var(--accent);
         cursor: pointer;
         transition: all var(--tr);
         white-space: nowrap;
         flex-shrink: 0;
       }
       .feed-new-follow-btn:hover {
-        background: var(--green);
+        background: var(--accent);
         color: #fff;
       }
       .feed-new-follow-btn.following {
-        background: var(--green-bg);
-        color: var(--green);
-        border-color: var(--green);
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
         opacity: 0.7;
       }
       .feed-new-bio {
@@ -4645,38 +4836,6 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-      .feed-new-nav-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        padding: 8px 16px;
-        border-top: 1px solid rgba(34,212,143,0.15);
-        background: rgba(34,212,143,0.04);
-      }
-      .feed-new-nav {
-        background: none;
-        border: 1.5px solid var(--green);
-        color: var(--green);
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        font-size: 16px;
-        cursor: pointer;
-        display: grid;
-        place-items: center;
-        transition: background var(--tr);
-        line-height: 1;
-        padding: 0;
-      }
-      .feed-new-nav:hover { background: var(--green); color: #fff; }
-      .feed-new-nav-counter {
-        font-size: 12px;
-        color: var(--txt3);
-        font-weight: 600;
-        min-width: 60px;
-        text-align: center;
       }
       /* Explore new members section */
       .explore-new-card {
@@ -5078,6 +5237,7 @@
                 👥 Following
               </button>
             </div>
+            <p class="feed-personalised-hint" id="feed-personalised-hint">✨ Ranked for you based on your interests</p>
             <div class="compose" id="compose-box" style="display: none">
               <div class="compose-row">
                 <div class="av" id="compose-av">?</div>
@@ -5167,7 +5327,7 @@
             <aside class="feed-aside">
               <div class="trending-card" id="trending-card">
                 <div class="trending-title">
-                  <span>🔥</span> Trending in your circles
+                  <span>🔥</span> Trending on Circle
                   <button class="trending-refresh" onclick="loadTrending(true)" title="Refresh">↻ Refresh</button>
                 </div>
                 <div id="trending-filter-bar" style="display:none" class="trending-filter-active">
@@ -5186,6 +5346,7 @@
                 </div>
                 <div class="trending-footer" id="trending-footer"></div>
               </div>
+
             </aside>
             </div><!-- /.feed-layout -->
           </div><!-- /#view-feed -->
@@ -5228,7 +5389,7 @@
                   Refresh
                 </button>
               </div>
-              <p style="font-size:12px;color:var(--txt2);margin:-6px 0 12px">Tap a topic to see all posts</p>
+              <p style="font-size:12px;color:var(--txt2);margin:-6px 0 12px">Tap a topic to see all posts · your feed learns from what you open</p>
               <div id="explore-topics-list">
                 <div class="explore-skeleton-row">
                   <div class="explore-skel-card" style="height:44px;min-width:80px"></div>
@@ -5369,7 +5530,7 @@
             <div id="search-trending-section" style="margin-bottom:4px">
               <div class="trending-card">
                 <div class="trending-title">
-                  <span>🔥</span> Trending in your circles
+                  <span>🔥</span> Trending on Circle
                   <button class="trending-refresh" onclick="loadTrending(true)" title="Refresh">↻ Refresh</button>
                 </div>
                 <div id="search-trending-body">
@@ -5627,12 +5788,12 @@
             </div>
             <div class="profile-hero">
               <div class="profile-hero-top">
-                <label class="av-upload-wrap" for="profile-pic-input" title="Change profile picture">
+                <div class="av-upload-wrap" id="profile-av-wrap" title="Change profile picture">
                   <div class="av lg" id="profile-av">?</div>
-                  <div class="av-upload-overlay"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+                  <div class="av-upload-overlay" id="profile-av-overlay"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
                   <div class="av-upload-badge"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
                   <input type="file" id="profile-pic-input" accept="image/*" onchange="handleProfilePicUpload(event)" style="display:none"/>
-                </label>
+                </div>
                 <div class="profile-info">
                   <div class="profile-name" id="profile-name">—</div>
                   <div class="profile-email" id="profile-email">—</div>
@@ -5897,7 +6058,7 @@
                   ></label>
                 </div>
               </div>
-              <div class="settings-row">
+              <div class="settings-row" id="push-notif-row">
                 <div class="settings-row-icon purple">
                   <svg
                     fill="none"
@@ -5911,16 +6072,17 @@
                 </div>
                 <div class="settings-row-body">
                   <div class="settings-row-title">Push Notifications</div>
-                  <div class="settings-row-sub">
+                  <div class="settings-row-sub" id="push-notif-sub">
                     Receive browser push notifications
                   </div>
                 </div>
                 <div class="settings-row-end">
-                  <label class="toggle"
-                    ><input type="checkbox" id="notif-push" />
+                  <label class="toggle" id="push-notif-toggle-label">
+                    <input type="checkbox" id="notif-push" onchange="handlePushToggle(this.checked)" />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div
-                  ></label>
+                    <div class="toggle-thumb"></div>
+                  </label>
+                  <span id="push-notif-denied-badge" style="display:none;font-size:11px;font-weight:700;color:var(--rose);background:var(--rose-bg);padding:3px 8px;border-radius:6px;white-space:nowrap;">Blocked</span>
                 </div>
               </div>
               <div class="settings-row">
@@ -6506,25 +6668,18 @@
       </div>
     </div>
 
-    <!-- REPOST MODAL -->
+    <!-- QUOTE MODAL -->
     <div
       class="modal-backdrop"
-      id="repost-modal"
-      onclick="closeRepostModal(event)"
+      id="quote-modal"
+      onclick="closeQuoteModal(event)"
     >
       <div class="modal">
         <div class="modal-title">
-          <svg
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            viewBox="0 0 24 24"
-          >
-            <polyline points="17 1 21 5 17 9" />
-            <path d="M3 11V9a4 4 0 014-4h14" />
-            <polyline points="7 23 3 19 7 15" />
-            <path d="M21 13v2a4 4 0 01-4 4H3" /></svg
-          >Repost to your feed
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Quote post
         </div>
         <div class="repost-preview">
           <div class="repost-preview-name" id="modal-orig-author">—</div>
@@ -6547,26 +6702,19 @@
           ></video>
         </div>
         <textarea
-          id="repost-quote"
-          placeholder="Add your own comment… (optional)"
-          rows="2"
+          id="quote-text"
+          placeholder="Add your comment…"
+          rows="3"
         ></textarea>
         <div class="modal-actions">
-          <button class="modal-cancel" onclick="closeRepostModal()">
+          <button class="modal-cancel" onclick="closeQuoteModal()">
             Cancel
           </button>
-          <button class="modal-confirm" onclick="confirmRepost()">
-            <svg
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              viewBox="0 0 24 24"
-              width="14"
-              height="14"
-            >
-              <polyline points="17 1 21 5 17 9" />
-              <path d="M3 11V9a4 4 0 014-4h14" /></svg
-            >Repost
+          <button class="modal-confirm" onclick="confirmQuote()">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            Quote
           </button>
         </div>
       </div>
@@ -7202,33 +7350,36 @@
 
         <!-- Repost -->
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-          <button
-            id="lb-repost-btn"
-            onclick="lbOpenRepost()"
-            title="Repost"
-            style="
-              width: 52px;
-              height: 52px;
-              border-radius: 50%;
-              background: rgba(255,255,255,0.1);
-              border: 1px solid rgba(255,255,255,0.15);
-              color: #fff;
-              display: grid;
-              place-items: center;
-              backdrop-filter: blur(8px);
-              transition: background 0.2s, transform 0.2s;
-              cursor: pointer;
-            "
-            onmouseover="this.style.background='rgba(34,212,143,0.25)';this.style.transform='scale(1.1)';"
-            onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)';"
-          >
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="22" height="22">
-              <polyline points="17 1 21 5 17 9"/>
-              <path d="M3 11V9a4 4 0 014-4h14"/>
-              <polyline points="7 23 3 19 7 15"/>
-              <path d="M21 13v2a4 4 0 01-4 4H3"/>
-            </svg>
-          </button>
+          <div style="position:relative" onclick="event.stopPropagation()">
+            <button
+              id="lb-repost-btn"
+              onclick="lbToggleRepost()"
+              title="Repost"
+              style="
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.15);
+                color: #fff;
+                display: grid;
+                place-items: center;
+                backdrop-filter: blur(8px);
+                transition: background 0.2s, transform 0.2s;
+                cursor: pointer;
+              "
+              onmouseover="this.style.background='rgba(34,212,143,0.25)';this.style.transform='scale(1.1)';"
+              onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)';"
+            >
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="22" height="22"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+            </button>
+            <div class="post-dropdown" id="lb-repost-menu">
+              <button class="post-dropdown-item" id="lb-rp-do-btn" onclick="lbCloseRepost();confirmRepost()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Repost</button>
+              <button class="post-dropdown-item rp-undo" id="lb-rp-undo-btn" onclick="lbCloseRepost();undoRepost(_lbPostId)" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Undo repost</button>
+              <div class="post-dropdown-divider"></div>
+              <button class="post-dropdown-item" onclick="lbCloseRepost();openQuoteModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quote</button>
+            </div>
+          </div>
           <span id="lb-repost-count" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);font-family:var(--font-body)">0</span>
         </div>
 
@@ -7387,8 +7538,7 @@
       // Dynamically point to the server using whatever host the page loaded from.
       // Works on PC (localhost:5000), phone over LAN (192.168.x.x:5000),
       // or a real domain — no hardcoded IP needed.
-    //   const API = `${window.location.protocol}//${window.location.hostname}:5000`;
-   const API = "http://localhost:5000";
+    const API = 'http://localhost:5000';
 
       let posts = [],
         currentUser = null,
@@ -7398,16 +7548,25 @@
       let currentFeedTab = "global";
       const _followingSet = new Set(); // IDs of users the current user follows
 
-      // Register service worker for PWA functionality
+      // Register service worker for PWA + push notification functionality
+      let _swRegistration = null;
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
             .then(registration => {
-              console.log('Service Worker registered successfully:', registration.scope);
+              _swRegistration = registration;
+              // Listen for messages from SW (e.g. notification clicks)
+              navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'NOTIFICATION_CLICK') {
+                  const url = event.data.url || '';
+                  if (url.includes('view=notifications')) goTo('notifications');
+                  else goTo('feed');
+                }
+              });
+              // Sync push toggle once SW is ready
+              _syncPushToggle();
             })
-            .catch(error => {
-              console.log('Service Worker registration failed:', error);
-            });
+            .catch(() => { /* SW registration failed silently */ });
         });
       }
 
@@ -7450,25 +7609,29 @@
         const _profiles = {}; // userId → { ids[], ts }
 
         // ── Persistence ─────────────────────────────────────────────
+        let _saveTimer = null;
         function _save() {
-          try {
-            // Only persist the most recent posts to stay under 5MB quota
-            const recent = [..._byId.values()]
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .slice(0, MAX_STORED);
-            const payload = {
-              posts: recent,
-              feeds: _feeds,
-              profiles: _profiles,
-              savedAt: Date.now(),
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-          } catch (e) {
-            // Storage quota exceeded — clear and retry once
+          // Debounce: batch rapid consecutive saves (e.g. rendering 20 posts)
+          // into a single write 200ms after the last call.
+          if (_saveTimer) return;
+          _saveTimer = setTimeout(() => {
+            _saveTimer = null;
             try {
-              localStorage.removeItem(STORAGE_KEY);
-            } catch (_) {}
-          }
+              const recent = [..._byId.values()]
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, MAX_STORED);
+              const payload = {
+                posts: recent,
+                feeds: _feeds,
+                profiles: _profiles,
+                savedAt: Date.now(),
+              };
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } catch (e) {
+              // Storage quota exceeded — clear and retry once
+              try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+            }
+          }, 200);
         }
 
         function _load() {
@@ -7596,6 +7759,8 @@
             _byId.clear();
             Object.keys(_feeds).forEach((k) => delete _feeds[k]);
             Object.keys(_profiles).forEach((k) => delete _profiles[k]);
+            // Cancel any pending debounced save so stale data isn't written after logout
+            if (_saveTimer) { clearTimeout(_saveTimer); _saveTimer = null; }
             try {
               localStorage.removeItem(STORAGE_KEY);
             } catch (_) {}
@@ -7630,7 +7795,17 @@
         }
         if (signal) opts.signal = signal;
         const res = await fetch(API + path, opts);
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch (_) { data = {}; }
+        if (res.status === 401) {
+          // Token expired or invalid — clear session and redirect to login
+          localStorage.removeItem("circle_token");
+          localStorage.removeItem("circle_user");
+          PostCache.clear();
+          // Redirect without calling logout() to avoid re-entering api()
+          setTimeout(() => goTo("login"), 0);
+          throw new Error("Session expired. Please log in again.");
+        }
         if (!res.ok) throw new Error(data.message || "Something went wrong.");
         return data;
       }
@@ -7693,7 +7868,7 @@
         });
       }
 
-      function goTo(view, _opts = {}) {
+      window.goTo = function goTo(view, _opts = {}) {
         document
           .querySelectorAll(".view")
           .forEach((v) => v.classList.remove("active"));
@@ -7839,7 +8014,7 @@
           // Store the JWT for authenticated requests
           if (res.token) localStorage.setItem("circle_token", res.token);
           setCurrentUser(res.data);
-          showToast("Welcome back, " + res.data.name.split(" ")[0] + "! 👋");
+          showToast("Welcome back, " + ((res.data?.name ?? "there").split(" ")[0]) + "! 👋");
           setTimeout(() => goTo("feed"), 400);
         } catch (e) {
           showAlert(el, e.message, "error");
@@ -7918,7 +8093,7 @@
           const res = await api("POST", "/api/auth/phone/verify-otp", { phone, code });
           _clearOtpTimer();
           setCurrentUser(res.data);
-          showToast("Welcome back, " + res.data.name.split(" ")[0] + "! 👋");
+          showToast("Welcome back, " + ((res.data?.name ?? "there").split(" ")[0]) + "! 👋");
           setTimeout(() => goTo("feed"), 400);
         } catch (e) {
           showAlert(el, e.message || "Invalid code. Please try again.", "error");
@@ -8030,6 +8205,9 @@
         document.getElementById("compose-box").style.display = "none";
         document.getElementById("login-nudge").style.display = "flex";
         document.getElementById("feed-tabs").style.display = "none";
+        const hint = document.getElementById("feed-personalised-hint");
+        if (hint) hint.style.display = "none";
+
         const ta = document.getElementById("topbar-avatar");
         if (ta) {
           ta.style.background = "var(--border2)";
@@ -8063,18 +8241,18 @@
         localStorage.setItem("circle_user", JSON.stringify(user));
         if (!user) return;
         if (user) _loadFollowingSet();
-        const initial = user.name.charAt(0).toUpperCase(),
-          color = stringToColor(user.name);
+        const initial = (user.name || "?").charAt(0).toUpperCase(),
+          color = stringToColor(user.name || "");
         const pic = resolveMediaUrl(user.picture) || null;
 
         function applyAv(el) {
           if (!el) return;
           if (pic) {
             el.style.background = "transparent";
-            el.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block"/>`;
+            el.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block" onerror="this.parentElement.innerHTML=defaultAvatar();this.parentElement.style.background='${color}'"/>`;
           } else {
-            el.innerHTML = initial;
             el.style.background = color;
+            el.innerHTML = defaultAvatar();
           }
         }
 
@@ -8086,15 +8264,17 @@
           ta.style.display = "grid";
           if (pic) {
             ta.style.background = "transparent";
-          ta.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`;
+            ta.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block" onerror="this.parentElement.innerHTML=defaultAvatar();this.parentElement.style.background='${color}'"/>`;
           } else {
-            ta.innerHTML = initial;
             ta.style.background = color;
+            ta.innerHTML = defaultAvatar();
           }
         }
         document.getElementById("compose-box").style.display = "block";
         document.getElementById("login-nudge").style.display = "none";
         document.getElementById("feed-tabs").style.display = "flex";
+        const hint = document.getElementById("feed-personalised-hint");
+        if (hint) hint.style.display = "block";
         startNotifPolling();
         loadSuggestions();
         // Generate / load E2E key-pair and publish public key to server
@@ -8163,14 +8343,14 @@
         const sav = document.getElementById("settings-av");
         if (sav) {
           const pic = resolveMediaUrl(currentUser.picture) || null,
-            initial = currentUser.name.charAt(0).toUpperCase(),
-            color = stringToColor(currentUser.name);
+            initial = (currentUser.name || "?").charAt(0).toUpperCase(),
+            color = stringToColor(currentUser.name || "");
           if (pic) {
             sav.style.background = "transparent";
-            sav.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block"/>`;
+            sav.innerHTML = `<img src="${pic}" alt="${initial}" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block" onerror="this.parentElement.innerHTML=defaultAvatar();this.parentElement.style.background='${color}'"/>`;
           } else {
-            sav.innerHTML = initial;
             sav.style.background = color;
+            sav.innerHTML = defaultAvatar();
           }
         }
         const p = JSON.parse(
@@ -8322,7 +8502,7 @@
             ? `?feed=${feedTab}&page=1`
             : `?feed=global&page=1`;
           const res = await api("GET", `/api/posts${qs}`);
-          const { posts: fresh, hasMore } = res.data;
+          const { posts: fresh, hasMore } = res.data ?? res;
           PostCache.storeFeedPage(currentFeedTab, 1, fresh, hasMore);
           // Only re-render if content actually changed
           const currentIds = posts
@@ -8419,13 +8599,13 @@
             ? `?feed=${feedTab}&page=${feedPage}`
             : `?feed=global&page=${feedPage}`;
           const res = await api("GET", `/api/posts${qs}`);
-          let { posts: newPosts, hasMore } = res.data;
+          let { posts: newPosts, hasMore } = res.data ?? res;
 
           // ── New user with no interactions: fall back to all global posts ──
           if (isFirstPage && currentFeedTab === "global" && !newPosts.length) {
             const fallback = await api("GET", `/api/posts?feed=global&page=1`);
-            newPosts = fallback.data?.posts  || [];
-            hasMore  = fallback.data?.hasMore || false;
+            newPosts = fallback.data?.posts  || fallback.posts  || [];
+            hasMore  = fallback.data?.hasMore ?? fallback.hasMore ?? false;
           }
 
           // Remove skeleton cards before inserting real posts
@@ -8509,6 +8689,7 @@
           removeMedia();
           renderFeed();
           showToast("Posted! ✨");
+          loadTrending(true);
         } catch (e) {
           showToast("Error: " + e.message);
         } finally {
@@ -8574,14 +8755,17 @@
       }
 
       function refreshLikeBtn(postId) {
-        const card = document.querySelector(`[data-post-id="${postId}"]`);
-        if (!card) return;
         const post = posts.find((p) => p.id === postId) || PostCache.getPost(postId);
         if (!post) return;
         const liked = currentUser && post.likes && post.likes.includes(currentUser.id);
-        const btn = card.querySelector(".like-btn");
-        btn.className = "act-btn like-btn" + (liked ? " liked" : "");
-        btn.innerHTML = `<svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><span>${(post.likes && post.likes.length) || ""}</span>`;
+        const btnHtml = `<svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><span>${(post.likes && post.likes.length) || ""}</span>`;
+        // Update every rendered instance of this post (feed card + detail modal)
+        document.querySelectorAll(`[data-post-id="${postId}"]`).forEach(card => {
+          const btn = card.querySelector(".like-btn");
+          if (!btn) return;
+          btn.className = "act-btn like-btn" + (liked ? " liked" : "");
+          btn.innerHTML = btnHtml;
+        });
       }
 
       /* COMMENTS  */
@@ -8674,81 +8858,89 @@
         return comments.map(c => renderOne(c, false)).join('');
       }
 
-      /* REPOSTS */
-      function openRepostModal(postId) {
-        if (!currentUser) {
-          showToast("Log in to repost.");
-          goTo("login");
-          return;
-        }
-        const post = posts.find((p) => p.id === postId);
-        if (!post) return;
-        if (post.reposts && post.reposts.includes(currentUser.id)) {
-          undoRepost(postId);
-          return;
-        }
-        repostTargetId = postId;
-        document.getElementById("modal-orig-author").textContent = post.author;
-        document.getElementById("modal-orig-text").textContent =
-          post.text || "";
-        document.getElementById("repost-quote").value = "";
-        const img = document.getElementById("modal-orig-img");
-        const vid = document.getElementById("modal-orig-video");
-        if (post.video) {
-          vid.src = resolveMediaUrl(post.video);
-          vid.style.display = "block";
-          img.src = "";
-          img.style.display = "none";
-        } else if (post.image) {
-          img.src = resolveMediaUrl(post.image);
-          img.style.display = "block";
-          vid.src = "";
-          vid.style.display = "none";
-        } else {
-          img.src = "";
-          img.style.display = "none";
-          vid.src = "";
-          vid.style.display = "none";
-        }
-        document.getElementById("repost-modal").classList.add("open");
-        setTimeout(() => document.getElementById("repost-quote").focus(), 120);
+      /* ── REPOSTS (inline dropdown — same pattern as post menu) ── */
+
+      function _resolveRepostTarget(postId) {
+        const card = posts.find(p => p.id === postId);
+        const targetId = (card?.isRepost && card.originalPost?.id) ? card.originalPost.id : postId;
+        const orig = posts.find(p => p.id === targetId) || PostCache.getPost(targetId) || card?.originalPost || card;
+        return { targetId, orig };
       }
 
-      function closeRepostModal(e) {
-        if (e && e.target !== document.getElementById("repost-modal")) return;
-        const _rm = document.getElementById("repost-modal");
-        _rm.classList.remove("open");
-        _rm.style.zIndex = "";
-        repostTargetId = null;
-        const _rvid = document.getElementById("modal-orig-video");
-        if (_rvid) { _rvid.pause(); _rvid.src = ""; _rvid.style.display = "none"; }
+      function toggleRepostMenu(e, postId) {
+        e.stopPropagation();
+        if (!currentUser) { showToast("Log in to repost."); goTo("login"); return; }
+        const menu = document.getElementById("repost-menu-" + postId);
+        if (!menu) return;
+        const isOpen = menu.classList.contains("open");
+        // Close all open repost menus
+        document.querySelectorAll(".post-dropdown.open").forEach(m => {
+          m.classList.remove("open");
+        });
+        _rpBackdropRemove();
+        if (!isOpen) {
+          const { targetId, orig } = _resolveRepostTarget(postId);
+          if (!orig) return;
+          repostTargetId = targetId;
+          const already = Array.isArray(orig.reposts) && orig.reposts.includes(currentUser.id);
+          const doBtn   = document.getElementById("repost-menu-do-"   + postId);
+          const undoBtn = document.getElementById("repost-menu-undo-" + postId);
+          if (doBtn)   doBtn.style.display   = already ? "none" : "flex";
+          if (undoBtn) undoBtn.style.display = already ? "flex" : "none";
+          menu.classList.add("open");
+          // close on backdrop click
+          setTimeout(() => document.addEventListener("click", _rpBackdropClose, { once: true }), 0);
+        }
       }
 
-      async function confirmRepost() {
+      function _rpBackdropClose(e) {
+        // close any open dropdown that doesn't contain the click target
+        document.querySelectorAll(".post-dropdown.open").forEach(m => {
+          if (!m.contains(e.target)) m.classList.remove("open");
+        });
+        lbCloseRepost();
+      }
+      function _rpBackdropRemove() {
+        document.removeEventListener("click", _rpBackdropClose);
+      }
+
+      function closeRepostMenu(postId) {
+        const menu = document.getElementById("repost-menu-" + postId);
+        if (menu) menu.classList.remove("open");
+        _rpBackdropRemove();
+      }
+
+      // Legacy alias so confirmRepost / undoRepost / openQuoteModal can still call it
+      function closeRepostPopover() {
+        document.querySelectorAll("[id^='repost-menu-'].open").forEach(m => {
+          m.classList.remove("open");
+        });
+        _rpBackdropRemove();
+        lbCloseRepost();
+      }
+
+      async function confirmRepost(postId) {
+        if (postId) repostTargetId = _resolveRepostTarget(postId).targetId;
+        closeRepostPopover();
         if (!currentUser || !repostTargetId) return;
-        const orig = posts.find((p) => p.id === repostTargetId) || PostCache.getPost(repostTargetId);
+        const orig = posts.find(p => p.id === repostTargetId) || PostCache.getPost(repostTargetId);
         if (!orig) return;
-        const quote = document.getElementById("repost-quote").value.trim();
         try {
           const res = await api("POST", `/api/posts/${repostTargetId}/repost`, {
             userId: currentUser.id,
-            text: quote || null,
+            text: null,
           });
           const repost = res.data;
+          // Mark button as reposted immediately
           if (!Array.isArray(orig.reposts)) orig.reposts = [];
           orig.reposts.push(currentUser.id);
           PostCache.putPost(orig);
-          // Ensure originalPost has full data (server may omit video/image)
+          // Merge in full original data the server may have omitted
           if (repost.isRepost) {
             if (!repost.originalPost) repost.originalPost = {};
             repost.originalPost = Object.assign({}, orig, repost.originalPost);
           }
           posts.unshift(repost);
-          const _rModal = document.getElementById("repost-modal");
-          _rModal.classList.remove("open");
-          _rModal.style.zIndex = "";
-          const _rvid2 = document.getElementById("modal-orig-video");
-          if (_rvid2) { _rvid2.pause(); _rvid2.src = ""; _rvid2.style.display = "none"; }
           repostTargetId = null;
           renderFeed();
           if (typeof _lbUpdateActions === "function") _lbUpdateActions();
@@ -8759,6 +8951,7 @@
       }
 
       async function undoRepost(postId) {
+        closeRepostPopover();
         if (!currentUser) return;
         try {
           await api("DELETE", `/api/posts/${postId}/repost`);
@@ -8767,8 +8960,9 @@
             orig.reposts = orig.reposts.filter(id => id !== currentUser.id);
             PostCache.putPost(orig);
           }
-          // Remove the repost card from the feed
-          posts = posts.filter(p => !(p.isRepost && p.originalPost && p.originalPost.id === postId && p.userId === currentUser.id));
+          // Remove the simple repost card from the local feed
+          posts = posts.filter(p => !(p.isRepost && !p.text && p.originalPost && p.originalPost.id === postId && p.userId === currentUser.id));
+          repostTargetId = null;
           renderFeed();
           if (typeof _lbUpdateActions === "function") _lbUpdateActions();
           showToast("Repost removed.");
@@ -8777,11 +8971,81 @@
         }
       }
 
+      /* ── Quote modal ── */
+      function openQuoteModal(postId) {
+        if (postId) repostTargetId = _resolveRepostTarget(postId).targetId;
+        closeRepostPopover();
+        if (!repostTargetId) return;
+        const orig = posts.find(p => p.id === repostTargetId) || PostCache.getPost(repostTargetId);
+        if (!orig) return;
+        document.getElementById("modal-orig-author").textContent = orig.author || "";
+        document.getElementById("modal-orig-text").textContent   = orig.text  || "";
+        document.getElementById("quote-text").value = "";
+        const img = document.getElementById("modal-orig-img");
+        const vid = document.getElementById("modal-orig-video");
+        if (orig.video) {
+          vid.src = resolveMediaUrl(orig.video);
+          vid.style.display = "block";
+          img.src = ""; img.style.display = "none";
+        } else if (orig.image) {
+          img.src = resolveMediaUrl(orig.image);
+          img.style.display = "block";
+          vid.src = ""; vid.style.display = "none";
+        } else {
+          img.src = ""; img.style.display = "none";
+          vid.src = ""; vid.style.display = "none";
+        }
+        document.getElementById("quote-modal").classList.add("open");
+        setTimeout(() => document.getElementById("quote-text").focus(), 120);
+      }
+
+      function closeQuoteModal(e) {
+        if (e && e.target !== document.getElementById("quote-modal")) return;
+        const modal = document.getElementById("quote-modal");
+        modal.classList.remove("open");
+        modal.style.zIndex = "";
+        repostTargetId = null;
+        const vid = document.getElementById("modal-orig-video");
+        if (vid) { vid.pause(); vid.src = ""; vid.style.display = "none"; }
+      }
+
+      async function confirmQuote() {
+        const text = document.getElementById("quote-text").value.trim();
+        if (!text) { showToast("Add a comment to quote."); return; }
+        if (!currentUser || !repostTargetId) return;
+        const orig = posts.find(p => p.id === repostTargetId) || PostCache.getPost(repostTargetId);
+        if (!orig) return;
+        try {
+          const res = await api("POST", `/api/posts/${repostTargetId}/repost`, {
+            userId: currentUser.id,
+            text,
+          });
+          const repost = res.data;
+          // Quote posts don't toggle the repost button — they are their own posts
+          if (repost.isRepost) {
+            if (!repost.originalPost) repost.originalPost = {};
+            repost.originalPost = Object.assign({}, orig, repost.originalPost);
+          }
+          posts.unshift(repost);
+          const modal = document.getElementById("quote-modal");
+          modal.classList.remove("open");
+          modal.style.zIndex = "";
+          const vid = document.getElementById("modal-orig-video");
+          if (vid) { vid.pause(); vid.src = ""; vid.style.display = "none"; }
+          repostTargetId = null;
+          renderFeed();
+          if (typeof _lbUpdateActions === "function") _lbUpdateActions();
+          showToast("Quoted! 💬");
+        } catch (e) {
+          showToast("Error: " + e.message);
+        }
+      }
+
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
-          const _escRm = document.getElementById("repost-modal");
-          _escRm.classList.remove("open");
-          _escRm.style.zIndex = "";
+          closeRepostPopover();
+          const qm = document.getElementById("quote-modal");
+          if (qm) { qm.classList.remove("open"); qm.style.zIndex = ""; }
           repostTargetId = null;
           closeNotifPanel();
           const rm = document.getElementById("report-modal");
@@ -8863,8 +9127,11 @@
         }
         // Inject new member card at a random position between 3–5 if not dismissed
         if (!_feedNewDismissed && currentUser && _newMembers.length) {
-          const injectAt = Math.floor(Math.random() * 3) + 3; // positions 3,4,5
-          parts.splice(Math.min(injectAt, parts.length), 0, buildFeedNewCard());
+          const member = _newMembers[_feedNewIndex % _newMembers.length];
+          if (member) {
+            const injectAt = Math.floor(Math.random() * 3) + 3; // positions 3,4,5
+            parts.splice(Math.min(injectAt, parts.length), 0, buildFeedNewCard(member));
+          }
         }
         c.innerHTML = parts.join("");
       }
@@ -8903,15 +9170,8 @@
       }
 
       async function loadTrending(force = false) {
-        if (!currentUser) {
-          const guestHtml = `<div class="trending-guest"><a onclick="goTo('login')">Log in</a> to see what's trending among people you follow.</div>`;
-          _setTrendingContent("trending-body", "trending-footer", guestHtml, "");
-          _setTrendingContent("search-trending-body", "search-trending-footer", guestHtml, "");
-          return;
-        }
         if (_trendingLoading) return;
         if (_trendingLoaded && !force) {
-          // Already loaded — just paint into search container if it's empty
           renderTrending("search-trending-body", "search-trending-footer");
           return;
         }
@@ -8924,9 +9184,58 @@
         }
 
         try {
-          const res = await api("GET", "/api/posts?feed=following&page=1");
-          const followingPosts = (res.data || res.posts || res || []);
-          _trendingWords = extractTrending(Array.isArray(followingPosts) ? followingPosts : []);
+          // Fetch both topics (hashtag-based) and recent posts (plain-word counting)
+          // so "Circle is amazing" and "#Circle is amazing" both count the word.
+          const [topicsRes, postsRes] = await Promise.allSettled([
+            api("GET", "/api/topics?limit=20"),
+            api("GET", "/api/posts?feed=global&page=1")
+          ]);
+
+          // Build a score map from the hashtag topics API
+          const scoreMap = {};
+          const risingMap = {};
+          if (topicsRes.status === "fulfilled") {
+            (topicsRes.value.data || []).forEach(t => {
+              const key = t.topic.toLowerCase();
+              scoreMap[key] = (scoreMap[key] || 0) + (t.post_count || 0) * 2; // weight hashtags higher
+            });
+          }
+
+          // Merge in plain-word counts from posts (strips # so both forms unify)
+          if (postsRes.status === "fulfilled") {
+            const allPosts = postsRes.value.data || postsRes.value.posts || postsRes.value || [];
+            const now = Date.now();
+            (Array.isArray(allPosts) ? allPosts : []).forEach(post => {
+              if (!post.text) return;
+              const isRecent = post.createdAt && (now - new Date(post.createdAt).getTime()) < 86400000;
+              const weight = isRecent ? 2 : 1;
+              // Strip # so #Circle and Circle both become "circle"
+              const words = post.text
+                .toLowerCase()
+                .replace(/#/g, "")           // remove hash signs first
+                .replace(/[^a-z0-9\s]/g, " ")
+                .split(/\s+/)
+                .filter(w => w.length >= 3 && !STOPWORDS.has(w) && !/^\d+$/.test(w));
+              const seen = new Set();
+              words.forEach(w => {
+                scoreMap[w] = (scoreMap[w] || 0) + weight;
+                if (isRecent && !seen.has(w)) {
+                  risingMap[w] = (risingMap[w] || 0) + 1;
+                  seen.add(w);
+                }
+              });
+            });
+          }
+
+          _trendingWords = Object.entries(scoreMap)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10)
+            .map(([word, score]) => ({
+              word,
+              score,
+              postCount: Math.ceil(score / 2),
+              rising: (risingMap[word] || 0) >= 2
+            }));
           _trendingLoaded = true;
           const now = new Date();
           const timeStr = `Updated ${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}`;
@@ -8988,20 +9297,19 @@
         if (!body) return;
         if (!_trendingWords.length) {
           body.innerHTML = `<div class="trending-empty">
-            No trends yet.<br>Follow more people to see<br>what they're talking about.
+            No topics yet.<br>Start posting with #hashtags to see<br>what's trending on Circle.
           </div>`;
           return;
         }
 
         const pills = _trendingWords.map((item, i) => {
-          const isActive = _activeFilter === item.word;
           const signal = item.rising
             ? `<span class="trending-pill-signal rising">&#8593; rising</span>`
             : `<span class="trending-pill-signal stable">&#9679; active</span>`;
-          return `<button class="trending-pill ${isActive ? "active" : ""}"
-            onclick="applyTrendingFilter('${escHtml(item.word)}')" title="Filter feed by '${escHtml(item.word)}'">
+          return `<button class="trending-pill"
+            onclick="openTopicFeed('${escHtml(item.word)}')" title="See all posts tagged #${escHtml(item.word)}">
             <span class="trending-pill-rank">${i + 1}</span>
-            <span class="trending-pill-word">#${escHtml(item.word)}</span>
+            <span class="trending-pill-word">${item.word.includes(" ") ? escHtml(item.word) : "#" + escHtml(item.word)}</span>
             ${signal}
             <span class="trending-pill-badge">${item.postCount}</span>
           </button>`;
@@ -9056,8 +9364,11 @@
         const parts = posts.map(p => buildPostCard(p));
         if (!_feedSugDismissed && currentUser && parts.length >= 5) parts.splice(5, 0, buildFeedSugCard());
         if (!_feedNewDismissed && currentUser && _newMembers.length) {
-          const injectAt = Math.floor(Math.random() * 3) + 3;
-          parts.splice(Math.min(injectAt, parts.length), 0, buildFeedNewCard());
+          const member = _newMembers[_feedNewIndex % _newMembers.length];
+          if (member) {
+            const injectAt = Math.floor(Math.random() * 3) + 3;
+            parts.splice(Math.min(injectAt, parts.length), 0, buildFeedNewCard(member));
+          }
         }
         c.innerHTML = parts.join("");
       }
@@ -9129,6 +9440,38 @@
         } else {
           av.innerHTML = initial;
           av.style.background = color;
+        }
+
+        // Configure avatar wrapper click behaviour
+        const avWrap = document.getElementById("profile-av-wrap");
+        const avOverlay = document.getElementById("profile-av-overlay");
+        // Reset mode classes
+        avWrap.classList.remove("av-view-mode", "av-disabled-mode");
+        avWrap.onclick = null;
+        if (isOwnProfile) {
+          // Own profile: clicking opens the avatar action menu (View / Change)
+          avWrap.title = pic ? "View or change profile picture" : "Add profile picture";
+          // Camera icon in overlay
+          avOverlay.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+          // Show/hide "View Photo" option depending on whether they have a pic
+          const viewBtn = document.getElementById("profile-av-view-btn");
+          if (viewBtn) viewBtn.style.display = pic ? "flex" : "none";
+          // Store current pic on wrap for the menu functions to read
+          avWrap.dataset.currentPic = pic || "";
+          avWrap.dataset.currentName = name;
+          avWrap.onclick = (e) => { e.stopPropagation(); toggleAvatarMenu(); };
+        } else if (pic) {
+          // Other profile with picture: clicking shows full-size photo in lightbox
+          avWrap.classList.add("av-view-mode");
+          avWrap.title = `View ${name}'s photo`;
+          // Eye icon in overlay
+          avOverlay.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+          avWrap.onclick = () => openProfilePicLightbox(pic, name);
+        } else {
+          // Other profile with no picture: not interactive
+          avWrap.classList.add("av-disabled-mode");
+          avWrap.title = "";
+          avWrap.onclick = null;
         }
         document.getElementById("profile-name").textContent = name;
         document.getElementById("profile-email").textContent = isOwnProfile ? email : "";
@@ -9250,39 +9593,39 @@
       function buildPostCard(post, showDelete = false) {
         // ── Profile photo update activity card ──────────────────────────
         if (post.type === 'profile_pic') {
-          const color = stringToColor(post.author);
+          const color = stringToColor(post.author || '');
           return `<div class="post-card activity-card" data-post-id="${post.id}" onclick="viewProfile(${post.userId})" style="cursor:pointer">
   <div class="post-head">
     <div class="av" style="background:${post.authorPicture ? 'transparent' : color};cursor:pointer">
-      ${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(post.author.charAt(0))}
+      ${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml((post.author||'?').charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml((post.author||'?').charAt(0))}
     </div>
     <div class="post-meta">
-      <div class="post-name">${escHtml(post.author)}</div>
+      <div class="post-name">${escHtml(post.author||'')}</div>
       <div class="post-time">${formatTime(post.createdAt)}</div>
     </div>
   </div>
   <div class="activity-body">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="15" height="15" style="flex-shrink:0;color:var(--accent)"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>${escHtml(post.author)} updated their profile photo</span>
+    <span>${escHtml(post.author||'')} updated their profile photo</span>
   </div>
   ${post.image ? `<div class="activity-photo-wrap"><img src="${escHtml(post.image)}" alt="New profile photo" loading="lazy" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--accent)"/></div>` : ''}
 </div>`;
         }
         if (post.type === 'profile_update') {
-          const color = stringToColor(post.author);
+          const color = stringToColor(post.author || '');
           return `<div class="post-card activity-card" data-post-id="${post.id}" onclick="viewProfile(${post.userId})" style="cursor:pointer">
   <div class="post-head">
     <div class="av" style="background:${post.authorPicture ? 'transparent' : color};cursor:pointer">
-      ${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(post.author.charAt(0))}
+      ${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml((post.author||'?').charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml((post.author||'?').charAt(0))}
     </div>
     <div class="post-meta">
-      <div class="post-name">${escHtml(post.author)}</div>
+      <div class="post-name">${escHtml(post.author||'')}</div>
       <div class="post-time">${formatTime(post.createdAt)}</div>
     </div>
   </div>
   <div class="activity-body">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="15" height="15" style="flex-shrink:0;color:var(--accent)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    <span>${escHtml(post.author)} updated their profile</span>
+    <span>${escHtml(post.author||'')} updated their profile</span>
   </div>
   ${post.text ? `<div class="activity-body" style="padding-top:0;font-style:italic;color:var(--txt3)">"${escHtml(post.text)}"</div>` : ''}
 </div>`;
@@ -9297,6 +9640,13 @@
             if (!post.originalPost.video && _cached.video) post.originalPost.video = _cached.video;
             if (!post.originalPost.image && _cached.image) post.originalPost.image = _cached.image;
             if (!post.originalPost.authorPicture && _cached.authorPicture) post.originalPost.authorPicture = _cached.authorPicture;
+            if (!post.originalPost.createdAt && _cached.createdAt) post.originalPost.createdAt = _cached.createdAt;
+            if (!post.originalPost.text && _cached.text) post.originalPost.text = _cached.text;
+            if (!post.originalPost.author && _cached.author) post.originalPost.author = _cached.author;
+            if (!post.originalPost.likes && _cached.likes) post.originalPost.likes = _cached.likes;
+            if (!post.originalPost.comments && _cached.comments) post.originalPost.comments = _cached.comments;
+            if (!post.originalPost.reposts && _cached.reposts) post.originalPost.reposts = _cached.reposts;
+            if (!post.originalPost.views && _cached.views) post.originalPost.views = _cached.views;
           }
           // Check PostCache store
           if (!post.originalPost.video && !post.originalPost.image) {
@@ -9305,10 +9655,17 @@
               if (!post.originalPost.video && _stored.video) post.originalPost.video = _stored.video;
               if (!post.originalPost.image && _stored.image) post.originalPost.image = _stored.image;
               if (!post.originalPost.authorPicture && _stored.authorPicture) post.originalPost.authorPicture = _stored.authorPicture;
+              if (!post.originalPost.createdAt && _stored.createdAt) post.originalPost.createdAt = _stored.createdAt;
+              if (!post.originalPost.text && _stored.text) post.originalPost.text = _stored.text;
+              if (!post.originalPost.author && _stored.author) post.originalPost.author = _stored.author;
+              if (!post.originalPost.likes && _stored.likes) post.originalPost.likes = _stored.likes;
+              if (!post.originalPost.comments && _stored.comments) post.originalPost.comments = _stored.comments;
+              if (!post.originalPost.reposts && _stored.reposts) post.originalPost.reposts = _stored.reposts;
+              if (!post.originalPost.views && _stored.views) post.originalPost.views = _stored.views;
             }
           }
-          // If still missing media, fetch from API in background and re-render that card
-          if (!post.originalPost.video && !post.originalPost.image) {
+          // If still missing media or timestamp, fetch from API in background and re-render that card
+          if ((!post.originalPost.video && !post.originalPost.image) || !post.originalPost.createdAt) {
             if (!window._repostMediaFetchQueue) window._repostMediaFetchQueue = new Set();
             if (!window._repostMediaFetchQueue.has(_oid)) {
               window._repostMediaFetchQueue.add(_oid);
@@ -9319,9 +9676,16 @@
                 // Patch all repost cards in current posts array that reference this original
                 posts.forEach(p => {
                   if (p.isRepost && p.originalPost && p.originalPost.id === _oid) {
-                    if (orig.video)        p.originalPost.video        = orig.video;
-                    if (orig.image)        p.originalPost.image        = orig.image;
+                    if (orig.video)         p.originalPost.video         = orig.video;
+                    if (orig.image)         p.originalPost.image         = orig.image;
                     if (orig.authorPicture) p.originalPost.authorPicture = orig.authorPicture;
+                    if (orig.createdAt)     p.originalPost.createdAt     = orig.createdAt;
+                    if (orig.text)          p.originalPost.text          = orig.text;
+                    if (orig.author)        p.originalPost.author        = orig.author;
+                    if (orig.likes)         p.originalPost.likes         = orig.likes;
+                    if (orig.comments)      p.originalPost.comments      = orig.comments;
+                    if (orig.reposts)       p.originalPost.reposts       = orig.reposts;
+                    if (orig.views)         p.originalPost.views         = orig.views;
                   }
                 });
                 // Re-render just the affected card(s) in the DOM
@@ -9349,12 +9713,20 @@
         if (!Array.isArray(post.likes))    post.likes    = [];
         if (!Array.isArray(post.reposts))  post.reposts  = [];
         if (!Array.isArray(post.comments)) post.comments = [];
-        const color = stringToColor(post.author);
-        return `<div class="post-card" data-post-id="${post.id}" onclick="openPostDetail(event,${post.id})" style="cursor:pointer">
-    ${post.isRepost ? `<div class="repost-strip"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>${escHtml(post.author)} reposted</div>` : ""}
+        const color = stringToColor(post.author || '');
+        // For no-quote reposts every engagement action targets the original post,
+        // so data-post-id must match the original's ID — that's what toggleLike,
+        // refreshLikeBtn, renderCommentList etc. all query against.
+        // We keep the repost's own ID in data-repost-id so undoRepost can find it.
+        const _isNoQuoteRepost = post.isRepost && post.originalPost && !post.text;
+        const _cardPostId      = _isNoQuoteRepost ? post.originalPost.id : post.id;
+        const _cardClickId     = _isNoQuoteRepost ? post.originalPost.id : post.id;
+        const _repostIdAttr    = _isNoQuoteRepost ? ` data-repost-id="${post.id}"` : '';
+        return `<div class="post-card" data-post-id="${_cardPostId}"${_repostIdAttr} onclick="openPostDetail(event,${_cardClickId})" style="cursor:pointer">
+    ${post.isRepost ? `<div class="repost-strip"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>${escHtml(post.author||'')} reposted</div>` : ""}
     ${(post.isRepost && !post.text) ? "" : `<div class="post-head">
-      <div class="av" style="background:${post.authorPicture ? "transparent" : color};cursor:pointer" onclick="viewProfile(${post.userId})" title="View profile">${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(post.author.charAt(0))}</div>
-      <div class="post-meta"><div class="post-name" onclick="event.stopPropagation();openPostDetail(event,${post.id})" style="cursor:pointer" title="View post">${escHtml(post.author)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
+      <div class="av" style="background:${post.authorPicture ? "transparent" : color};cursor:pointer" onclick="viewProfile(${post.userId})" title="View profile">${post.authorPicture ? `<img src="${post.authorPicture}" alt="${escHtml((post.author||'?').charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml((post.author||'?').charAt(0))}</div>
+      <div class="post-meta"><div class="post-name" onclick="event.stopPropagation();openPostDetail(event,${post.id})" style="cursor:pointer" title="View post">${escHtml(post.author||'')}</div><div class="post-time">${formatTime(post.createdAt)}</div></div>
       <div class="post-menu-wrap" onclick="event.stopPropagation()">
         <button class="post-menu-btn" onclick="togglePostMenu(event,${post.id})" title="More options">⋯</button>
         <div class="post-dropdown" id="post-menu-${post.id}">
@@ -9387,30 +9759,48 @@
       : `<div class="post-body">${linkifyHashtags(escHtml(post.text))}</div>`) : ""}
     ${post.isRepost && post.originalPost && !post.text ? (() => {
       const op = post.originalPost;
-      const opColor = stringToColor(op.author);
-      const opAvHtml = op.authorPicture ? `<img src="${op.authorPicture}" alt="${escHtml(op.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml(op.author.charAt(0));
+      const opColor = stringToColor(op.author || '');
+      const opAvHtml = op.authorPicture ? `<img src="${op.authorPicture}" alt="${escHtml((op.author||'?').charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>` : escHtml((op.author||'?').charAt(0));
       return `<div class="post-head" style="padding-top:10px">
         <div class="av" style="background:${op.authorPicture ? "transparent" : opColor};cursor:pointer" onclick="event.stopPropagation();viewProfile(${op.userId})" title="View profile">${opAvHtml}</div>
-        <div class="post-meta"><div class="post-name" onclick="event.stopPropagation();openOriginalPost(${op.id})" style="cursor:pointer" title="View post">${escHtml(op.author)}</div><div class="post-time">${formatTime(op.createdAt)}</div></div>
+        <div class="post-meta"><div class="post-name" onclick="event.stopPropagation();openOriginalPost(${op.id})" style="cursor:pointer" title="View post">${escHtml(op.author||'')}</div><div class="post-time">${formatTime(op.createdAt)}</div></div>
       </div>
       ${op.text ? `<div class="post-body">${escHtml(op.text)}</div>` : ""}
-      ${op.video ? `<div class="post-video-wrap" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${op.video}" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" title="Watch video"><video src="${op.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : op.image ? `<img class="post-img lb-thumb" src="${op.image}" loading="lazy" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}`;
-    })() : post.isRepost && post.originalPost && post.text ? `<div class="repost-embed" style="cursor:pointer" onclick="event.stopPropagation();openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author)}"><div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}${post.originalPost.video ? `<div class="post-video-wrap repost-embed-video" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${post.originalPost.video}" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || "")}" title="Watch video" style="margin-top:8px"><video src="${post.originalPost.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : post.originalPost.image ? `<img class="repost-embed-img lb-thumb" src="${post.originalPost.image}" loading="lazy" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}</div>` : !post.isRepost && post.video ? `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${post.video}" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || '')}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || '')}" title="Watch video"><video src="${post.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : !post.isRepost && post.image ? `<img class="post-img lb-thumb" src="${post.image}" loading="lazy" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="openLightbox(this)" title="View full image"/>` : ""}
-    <div class="post-actions">
-      <button class="act-btn like-btn${liked ? " liked" : ""}" data-post-id="${post.id}" onclick="toggleLike(${post.id})">
-        <svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        <span>${(post.likes && post.likes.length) || ""}</span>
+      ${op.video ? `<div class="post-video-wrap" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${op.video}" data-lb-name="${escHtml(op.author||'')}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" title="Watch video"><video src="${op.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : op.image ? `<img class="post-img lb-thumb" src="${op.image}" loading="lazy" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}`;
+    })() : post.isRepost && post.originalPost && post.text ? `<div class="repost-embed" style="cursor:pointer" onclick="event.stopPropagation();openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author||'')}"><div class="repost-embed-name">${escHtml(post.originalPost.author||'')} </div>${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}${post.originalPost.video ? `<div class="post-video-wrap repost-embed-video" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${post.originalPost.video}" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || "")}" title="Watch video" style="margin-top:8px"><video src="${post.originalPost.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : post.originalPost.image ? `<img class="repost-embed-img lb-thumb" src="${post.originalPost.image}" loading="lazy" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || "")}" data-lb-user-id="${post.originalPost.userId || ""}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}</div>` : !post.isRepost && post.video ? `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${post.video}" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || '')}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || '')}" title="Watch video"><video src="${post.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : !post.isRepost && post.image ? `<img class="post-img lb-thumb" src="${post.image}" loading="lazy" data-lb-name="${escHtml(post.author)}" data-lb-picture="${escHtml(post.authorPicture || "")}" data-lb-user-id="${post.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.text || "")}" onclick="openLightbox(this)" title="View full image"/>` : ""}
+    ${(() => {
+      // For a no-quote repost, all actions should target the original post
+      const isNoQuoteRepost = post.isRepost && post.originalPost && !post.text;
+      const targetId    = isNoQuoteRepost ? post.originalPost.id   : post.id;
+      const targetLikes = isNoQuoteRepost ? (post.originalPost.likes    || []) : (post.likes    || []);
+      const targetComments = isNoQuoteRepost ? (post.originalPost.comments || []) : (post.comments || []);
+      const targetReposts  = isNoQuoteRepost ? (post.originalPost.reposts  || []) : (post.reposts  || []);
+      const targetLiked    = currentUser && targetLikes.includes(currentUser.id);
+      const targetReposted = currentUser && targetReposts.some(r => (r.userId || r) === currentUser.id);
+      return `<div class="post-actions">
+      <button class="act-btn like-btn${targetLiked ? " liked" : ""}" data-post-id="${targetId}" onclick="event.stopPropagation();toggleLike(${targetId})">
+        <svg fill="${targetLiked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <span>${targetLikes.length || ""}</span>
       </button>
-      <button class="act-btn" onclick="event.stopPropagation();goToPostDetail(${post.id},true)">
+      <button class="act-btn" onclick="event.stopPropagation();goToPostDetail(${targetId},true)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        <span class="comment-count">${(function countAll(arr){return(arr||[]).reduce((n,c)=>n+1+countAll(c.replies||[]),0);})(post.comments) || ""}</span>
+        <span class="comment-count">${(function countAll(arr){return(arr||[]).reduce((n,c)=>n+1+countAll(c.replies||[]),0);})(targetComments) || ""}</span>
       </button>
-      ${!post.isRepost ? `<button class="act-btn repost-btn${reposted ? " reposted" : ""}" onclick="openRepostModal(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg><span>${post.reposts ? post.reposts.length || "" : ""}</span></button>` : ""}
-      <span class="act-views" id="views-${post.id}" title="Views">
+      <div class="post-menu-wrap" onclick="event.stopPropagation()">
+        <button class="act-btn repost-btn${targetReposted ? " reposted" : ""}" onclick="toggleRepostMenu(event,${targetId})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg><span>${targetReposts.length || ""}</span></button>
+        <div class="post-dropdown" id="repost-menu-${targetId}">
+          <button class="post-dropdown-item" id="repost-menu-do-${targetId}" onclick="closeRepostMenu(${targetId});confirmRepost(${targetId})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Repost</button>
+          <button class="post-dropdown-item rp-undo" id="repost-menu-undo-${targetId}" onclick="closeRepostMenu(${targetId});undoRepost(${targetId})" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Undo repost</button>
+          <div class="post-dropdown-divider"></div>
+          <button class="post-dropdown-item" onclick="closeRepostMenu(${targetId});openQuoteModal(${targetId})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quote</button>
+        </div>
+      </div>
+      <span class="act-views" id="views-${targetId}" title="Views">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        <span>${post.views ? fmtViews(post.views) : ""}</span>
+        <span>${(isNoQuoteRepost ? post.originalPost.views : post.views) ? fmtViews(isNoQuoteRepost ? post.originalPost.views : post.views) : ""}</span>
       </span>
-    </div>
+    </div>`;
+    })()}
   </div>`;
       }
 
@@ -9456,6 +9846,109 @@
         } catch (e) {
           showToast("Upload failed: " + e.message);
         }
+      }
+
+      /* ── Avatar action menu (own profile) ── */
+      function toggleAvatarMenu() {
+        const menu = document.getElementById('profile-av-menu');
+        if (!menu) return;
+        const isOpen = menu.classList.contains('open');
+        if (isOpen) {
+          closeAvatarMenu();
+        } else {
+          // Position the menu below the avatar using fixed coords
+          const wrap = document.getElementById('profile-av-wrap');
+          if (wrap) {
+            const r = wrap.getBoundingClientRect();
+            const menuW = 180;
+            let left = r.left + r.width / 2 - menuW / 2;
+            // Clamp to viewport
+            left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
+            menu.style.top  = (r.bottom + 10) + 'px';
+            menu.style.left = left + 'px';
+            menu.style.transformOrigin = 'top center';
+          }
+          menu.classList.add('open');
+          // Close on next outside click
+          setTimeout(() => {
+            document.addEventListener('click', closeAvatarMenu, { once: true });
+          }, 0);
+        }
+      }
+      function closeAvatarMenu() {
+        const menu = document.getElementById('profile-av-menu');
+        if (menu) menu.classList.remove('open');
+      }
+      function profileAvViewPhoto() {
+        closeAvatarMenu();
+        const wrap = document.getElementById('profile-av-wrap');
+        const pic  = wrap?.dataset.currentPic;
+        const name = wrap?.dataset.currentName || 'Your';
+        if (pic) openProfilePicLightbox(pic, name);
+      }
+      function profileAvChangePhoto() {
+        closeAvatarMenu();
+        document.getElementById('profile-pic-input').click();
+      }
+
+      /* PROFILE PICTURE LIGHTBOX (other users) */
+      function openProfilePicLightbox(picUrl, userName) {
+        // Reuse the existing lightbox overlay in a minimal "profile pic" mode:
+        // no carousel controls, no post actions — just the photo + a name chip.
+        const lb     = document.getElementById("lightbox");
+        const lbImg  = document.getElementById("lb-img");
+        const lbVid  = document.getElementById("lb-video");
+        const lbActs = document.getElementById("lb-actions");
+        const lbHint = document.getElementById("lb-hint");
+        const lbPrev = document.getElementById("lb-prev");
+        const lbNext = document.getElementById("lb-next");
+        const lbCtr  = document.getElementById("lb-counter");
+        const lbProf = document.getElementById("lb-profile");
+        const lbCommPanel = document.getElementById("lb-comments-panel");
+        const lbRepPanel  = document.getElementById("lb-report-panel");
+
+        // Hide everything that doesn't apply to a standalone avatar view
+        if (lbVid)  { lbVid.pause && lbVid.pause(); lbVid.style.display = "none"; lbVid.src = ""; }
+        if (lbActs) lbActs.style.display = "none";
+        if (lbHint) lbHint.style.opacity = "0";
+        if (lbPrev) lbPrev.style.display = "none";
+        if (lbNext) lbNext.style.display = "none";
+        if (lbCtr)  lbCtr.style.display  = "none";
+        if (lbCommPanel) { lbCommPanel.style.display = "none"; }
+        if (lbRepPanel)  { lbRepPanel.style.display  = "none"; }
+
+        // Show the profile chip with just the user's name (no nav to their profile
+        // since we're already on it)
+        if (lbProf) {
+          lbProf.style.display = "flex";
+          lbProf.onclick = null;
+          lbProf.style.cursor = "default";
+          lbProf.onmouseover = null;
+          lbProf.onmouseout  = null;
+          lbProf.innerHTML   = `<span style="font-size:14px;font-weight:700;color:#fff;letter-spacing:-0.2px">${escHtml(userName)}'s photo</span>`;
+        }
+
+        // Display the avatar full-size
+        lbImg.style.display = "";
+        lbImg.style.transition = "none";
+        lbImg.style.transform  = "scale(0.88)";
+        lbImg.style.opacity    = "0";
+        lbImg.src = picUrl;
+
+        lb.style.display    = "flex";
+        lb.style.opacity    = "0";
+        lb.style.transition = "opacity 0.18s ease";
+        document.body.style.overflow = "hidden";
+
+        // Mark the lightbox so closeLightbox() knows to restore lb-actions
+        lb.dataset.profilePicMode = "1";
+
+        requestAnimationFrame(() => {
+          lb.style.opacity = "1";
+          lbImg.style.transition = "transform 0.32s cubic-bezier(0.34,1.2,0.64,1), opacity 0.2s ease";
+          lbImg.style.transform  = "scale(1)";
+          lbImg.style.opacity    = "1";
+        });
       }
 
       /* FOLLOW / UNFOLLOW  */
@@ -9738,7 +10231,14 @@
           // (same source the profile tab uses) — avoids N extra API calls
           if (searchTab === "people" && currentUser && resultData.length) {
             resultData.forEach(user => {
-              user.isFollowing = _followingSet.has(user.id);
+              // Prefer server-returned isFollowing if present, otherwise use local set
+              if (typeof user.isFollowing !== "boolean") {
+                user.isFollowing = _followingSet.has(user.id);
+              } else {
+                // Sync local set to match server truth
+                if (user.isFollowing) _followingSet.add(user.id);
+                else _followingSet.delete(user.id);
+              }
             });
           }
 
@@ -9832,10 +10332,11 @@
 
       function _buildPeopleCards(data, q) {
         return data.map((user) => {
-          const color = stringToColor(user.name);
+          const color = stringToColor(user.name || "");
+          const nameInitial = (user.name || "?").charAt(0);
           const avHtml = user.picture
-            ? `<img src="${user.picture}" alt="${escHtml(user.name.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
-            : escHtml(user.name.charAt(0));
+            ? `<img src="${user.picture}" alt="${escHtml(nameInitial)}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+            : escHtml(nameInitial);
           const isOwnProfile = currentUser && currentUser.id === user.id;
           const followBtnHtml =
             !isOwnProfile && currentUser
@@ -10231,17 +10732,12 @@
         const menu = document.getElementById("post-menu-" + postId);
         if (!menu) return;
         const isOpen = menu.classList.contains("open");
-        // Close all other open menus and reset their card z-index
+        // Close all other open menus
         document.querySelectorAll(".post-dropdown.open").forEach(m => {
           m.classList.remove("open");
-          const card = m.closest(".post-card");
-          if (card) card.style.zIndex = "";
         });
         if (!isOpen) {
           menu.classList.add("open");
-          // Elevate this card above sibling cards so the dropdown isn't hidden
-          const card = menu.closest(".post-card");
-          if (card) card.style.zIndex = "10";
 
           // Dynamically update Follow/Unfollow button — same API the profile tab uses
           if (currentUser) {
@@ -10269,19 +10765,13 @@
 
       function closePostMenu(postId) {
         const menu = document.getElementById("post-menu-" + postId);
-        if (menu) {
-          menu.classList.remove("open");
-          const card = menu.closest(".post-card");
-          if (card) card.style.zIndex = "";
-        }
+        if (menu) menu.classList.remove("open");
       }
 
-      // Close menus on outside click
+      // Close all dropdowns (post menus + repost menus) on outside click
       document.addEventListener("click", () => {
         document.querySelectorAll(".post-dropdown.open").forEach(m => {
           m.classList.remove("open");
-          const card = m.closest(".post-card");
-          if (card) card.style.zIndex = "";
         });
       });
 
@@ -10533,7 +11023,7 @@
         if (!list) return;
 
         if (btn) { btn.classList.add('spinning'); btn.disabled = true; }
-        list.innerHTML = `<div class="explore-skeleton-row">${[1,2,3,4,5].map(() => '<div class="explore-skel-card" style="height:44px;min-width:80px"></div>').join('')}</div>`;
+        list.innerHTML = `<div class="explore-skeleton-row">${[1,2,3,4,5].map(() => '<div class="explore-skel-card" style="height:36px;width:100%"></div>').join('')}</div>`;
 
         try {
           const res    = await api('GET', '/api/topics?limit=20');
@@ -10544,17 +11034,56 @@
             return;
           }
 
-          list.innerHTML = `<div class="topic-pills">${topics.map(t =>
-            `<span class="topic-pill" onclick="openTopicFeed('${escHtml(t.topic)}')">
-               #${escHtml(t.topic)}
-               <span class="topic-pill-count">${t.post_count}</span>
-             </span>`
-          ).join('')}</div>`;
+          const VISIBLE = 10;
+          const renderRows = (items) => items.map((t, i) => {
+            const count = t.post_count >= 1000
+              ? (t.post_count / 1000).toFixed(1) + 'k'
+              : t.post_count;
+            return `<div class="topic-list-row" onclick="openTopicFeed('${escHtml(t.topic)}')">
+              <span class="topic-list-rank">${i + 1}</span>
+              <span class="topic-list-name">#${escHtml(t.topic)}</span>
+              <span class="topic-list-count">${count} posts</span>
+            </div>`;
+          }).join('');
+
+          if (topics.length <= VISIBLE) {
+            list.innerHTML = `<div class="topic-list">${renderRows(topics)}</div>`;
+          } else {
+            list.innerHTML = `
+              <div class="topic-list" id="topic-list-inner">
+                ${renderRows(topics.slice(0, VISIBLE))}
+              </div>
+              <button class="topic-show-more" id="topic-show-more-btn"
+                onclick="expandTopicList(${JSON.stringify(topics.slice(VISIBLE))})">
+                Show ${topics.length - VISIBLE} more topics ↓
+              </button>`;
+          }
         } catch (e) {
           list.innerHTML = `<div class="explore-trending-empty" style="color:var(--rose)">Could not load topics.</div>`;
         } finally {
           if (btn) { btn.classList.remove('spinning'); btn.disabled = false; }
         }
+      }
+
+      function expandTopicList(remaining) {
+        const inner = document.getElementById('topic-list-inner');
+        const btn   = document.getElementById('topic-show-more-btn');
+        if (!inner || !remaining.length) return;
+        const offset = inner.querySelectorAll('.topic-list-row').length;
+        remaining.forEach((t, i) => {
+          const count = t.post_count >= 1000
+            ? (t.post_count / 1000).toFixed(1) + 'k'
+            : t.post_count;
+          const row = document.createElement('div');
+          row.className = 'topic-list-row';
+          row.onclick = () => openTopicFeed(t.topic);
+          row.innerHTML = `
+            <span class="topic-list-rank">${offset + i + 1}</span>
+            <span class="topic-list-name">#${escHtml(t.topic)}</span>
+            <span class="topic-list-count">${count} posts</span>`;
+          inner.appendChild(row);
+        });
+        if (btn) btn.remove();
       }
 
       /* ── Topic feed view ─────────────────────────────────────────── */
@@ -10568,6 +11097,11 @@
         _topicFeedPage    = 1;
         _topicFeedMore    = true;
         _topicFeedLoading = false;
+
+        // Passively register interest — silent, score uses GREATEST so won't overwrite higher
+        if (currentUser) {
+          api('POST', `/api/topics/${encodeURIComponent(topic)}/follow`).catch(() => {});
+        }
 
         document.getElementById('topic-view-title').textContent    = `#${topic}`;
         document.getElementById('topic-view-subtitle').textContent = `Posts tagged with #${topic}`;
@@ -10815,6 +11349,8 @@
       const FEED_NEW_LIMIT  = 3; // max cards shown in feed
       let _newMembers       = [];
       let _newMembersLoaded = false;
+      let _feedNewDismissed = !!localStorage.getItem("circle_new_dismissed");
+      let _feedNewIndex     = 0;
       // Track per-user dismissals so each card is independently dismissable
       let _dismissedNewIds  = new Set(JSON.parse(localStorage.getItem("circle_new_dismissed_ids") || "[]"));
 
@@ -10864,10 +11400,15 @@
         const anchor = postCards[Math.min(2, postCards.length - 1)];
         if (!anchor) return;
         // Insert in reverse so order is preserved after afterend insertions
+        // Then stagger the fade-in so cards appear one by one
         [...toShow].reverse().forEach(u => {
           const temp = document.createElement("div");
           temp.innerHTML = buildFeedNewCard(u);
           anchor.insertAdjacentElement("afterend", temp.firstElementChild);
+        });
+        // Stagger visibility: each card fades in 150ms after the previous
+        document.querySelectorAll(".feed-new-card").forEach((el, i) => {
+          setTimeout(() => el.classList.add("visible"), 120 + i * 180);
         });
       }
 
@@ -10970,7 +11511,7 @@
             return `<div class="explore-person-card" onclick="viewProfile(${u.id})" style="border-color:var(--green);position:relative">
               <span style="position:absolute;top:-7px;right:-7px;background:var(--green);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:20px;text-transform:uppercase">NEW</span>
               <div class="explore-person-av" style="background:${avBg}">${avInner}</div>
-              <div class="explore-person-name" title="${escHtml(u.name)}">${escHtml(u.name)}</div>
+              <div class="explore-person-name" title="${escHtml(u.name || '')}">${escHtml(u.name || '')}</div>
               <div class="explore-person-meta" style="color:var(--green)">${_joinedAgo(u.createdAt)}</div>
               <button class="explore-person-follow" onclick="event.stopPropagation();exploreNewFollow(${u.id},this)" style="background:var(--green);border-color:var(--green)">Follow</button>
             </div>`;
@@ -11009,11 +11550,14 @@
         if (url.startsWith('/')) return API + url;
         try {
           const u = new URL(url);
-          // Full URL with a private/LAN IP or wrong port — rewrite to API server
-          if (
-            /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(u.hostname) ||
-            u.host !== new URL(API).host
-          ) {
+          const apiHost = new URL(API).host; // e.g. "127.0.0.1:5000"
+          // Already pointing at the right place — leave it alone
+          if (u.host === apiHost) return url;
+          // Rewrite localhost/127.0.0.1 on any port (catches Live Server at :5500, etc.)
+          const isLocal = /^(localhost|127\.0\.0\.1)$/.test(u.hostname);
+          // Rewrite private/LAN IPs too
+          const isLAN = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(u.hostname);
+          if (isLocal || isLAN) {
             return API + u.pathname + u.search;
           }
         } catch {}
@@ -11049,7 +11593,7 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
-          
+          .replace(/'/g, "&#39;");
       }
       function formatTime(date) {
         if (!date) return "";
@@ -11095,9 +11639,13 @@
 
       // Fire POST /api/posts/:id/view when a card has been visible for ≥1s
       function _recordView(postId) {
-        const body = currentUser
+       /* const body = currentUser
           ? {}
-          : { fingerprint: _getFingerprint() };
+          : { fingerprint: _getFingerprint() };*/
+          
+          const body = currentUser
+          ? {dwellMs:window._lastDwellMs || null}
+          : {fingerprint: _getFingerprint() };
 
         api("POST", `/api/posts/${postId}/view`, body)
           .then(res => {
@@ -11127,23 +11675,40 @@
 
             if (entry.isIntersecting) {
               if (!_timers.has(postId)) {
-                const t = setTimeout(() => {
+                
+                /*const t = setTimeout(() => {
                   _timers.delete(postId);
                   _recordView(postId);
                   _io.unobserve(card); // only count once per card lifetime
+                }, 1000);*/
+                const enteredAt = Date.now();
+                const t = setTimeout(() => {
+                  _timers.delete(postId);
+                  window._lastDwellMs = Date.now() - enteredAt;
+                  _recordView(postId);
+                  window._lastDwellMs = null;
+                  _io.observe(card)
                 }, 1000);
                 _timers.set(postId, t);
               }
+              
             } else {
-              // Card scrolled away before 1s — cancel the timer
               const t = _timers.get(postId);
               if (t !== undefined) {
                 clearTimeout(t);
                 _timers.delete(postId);
+
+                //fast scroll = skip signal
+
+                if (currentUser) {
+                  api('POST', `/api/posts/${postId}/skip`, {}).catch(() => {});
+                }
               }
             }
-          });
+      });
         }, { threshold: 0.6 }); // at least 60% of card must be visible
+
+
 
         // Observe newly added post cards via MutationObserver
         const _mo = new MutationObserver(mutations => {
@@ -11171,6 +11736,14 @@
         clearTimeout(_tt);
         _tt = setTimeout(() => t.classList.remove("show"), 2800);
       }
+      // Default avatar SVG — shown when user has no profile picture or image fails to load
+      function defaultAvatar() {
+        return `<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:60%;height:60%;opacity:0.9">
+          <circle cx="18" cy="13" r="7" fill="white" fill-opacity="0.9"/>
+          <path d="M4 32c0-7.732 6.268-14 14-14s14 6.268 14 14" fill="white" fill-opacity="0.9"/>
+        </svg>`;
+      }
+
       function stringToColor(s) {
         const c = [
           "#7c6bff",
@@ -11366,10 +11939,10 @@
         if (composeAv && currentUser) {
           if (currentUser.picture) {
             composeAv.style.background = 'transparent';
-            composeAv.innerHTML = `<img src="${currentUser.picture}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block" alt="${currentUser.name.charAt(0)}"/>`;
+            composeAv.innerHTML = `<img src="${currentUser.picture}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block" alt="${(currentUser.name || "?").charAt(0)}"/>`;
           } else {
-            composeAv.innerHTML = currentUser.name.charAt(0).toUpperCase();
-            composeAv.style.background = stringToColor(currentUser.name);
+            composeAv.innerHTML = (currentUser.name || "?").charAt(0).toUpperCase();
+            composeAv.style.background = stringToColor(currentUser.name || "");
           }
         } else if (composeAv) {
           composeAv.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
@@ -11667,13 +12240,39 @@
         }
       }
 
-      /* ── Lightbox open repost modal ── */
-      function lbOpenRepost() {
-        if (!_lbPostId) return;
-        openRepostModal(_lbPostId);
-        // Ensure the repost modal appears above the lightbox (z-index 2000)
-        const modal = document.getElementById("repost-modal");
-        if (modal) modal.style.zIndex = "2100";
+      /* ── Lightbox repost dropdown ── */
+      function lbToggleRepost() {
+        if (!_lbPostId || !currentUser) {
+          if (!currentUser) { showToast("Log in to repost."); }
+          return;
+        }
+        const menu = document.getElementById("lb-repost-menu");
+        if (!menu) return;
+        if (menu.classList.contains("open")) {
+          menu.classList.remove("open");
+          return;
+        }
+        const { targetId, orig } = _resolveRepostTarget(_lbPostId);
+        if (!orig) return;
+        repostTargetId = targetId;
+        const already = Array.isArray(orig.reposts) && orig.reposts.includes(currentUser.id);
+        const doBtn   = document.getElementById("lb-rp-do-btn");
+        const undoBtn = document.getElementById("lb-rp-undo-btn");
+        if (doBtn)   doBtn.style.display   = already ? "none" : "flex";
+        if (undoBtn) undoBtn.style.display = already ? "flex" : "none";
+        menu.classList.add("open");
+        setTimeout(() => document.addEventListener("click", _lbCloseRepostOutside, { once: true }), 0);
+      }
+
+      function _lbCloseRepostOutside(e) {
+        const menu = document.getElementById("lb-repost-menu");
+        if (menu && !menu.contains(e.target)) menu.classList.remove("open");
+      }
+
+      function lbCloseRepost() {
+        const menu = document.getElementById("lb-repost-menu");
+        if (menu) menu.classList.remove("open");
+        document.removeEventListener("click", _lbCloseRepostOutside);
       }
 
       /* ── Open (image) ── */
@@ -11760,6 +12359,13 @@
         _lbOrigin = imgEl.getBoundingClientRect();
 
         const lb = document.getElementById('lightbox');
+
+        // Clear any leftover profile-pic mode state so the username chip and
+        // action buttons render correctly for this post's lightbox.
+        if (lb.dataset.profilePicMode) delete lb.dataset.profilePicMode;
+        const lbActsReset = document.getElementById('lb-actions');
+        if (lbActsReset) lbActsReset.style.display = 'none'; // _lbRenderProfile will show if needed
+
         const lbImg = document.getElementById('lb-img');
         const lbVid = document.getElementById('lb-video');
         lbVid.pause && lbVid.pause(); lbVid.style.display = 'none'; lbVid.src = '';
@@ -11810,6 +12416,13 @@
         _lbScale = 1; _lbTranslateX = 0; _lbTranslateY = 0;
 
         const lb = document.getElementById('lightbox');
+
+        // Clear any leftover profile-pic mode state so the username chip and
+        // action buttons render correctly for this post's lightbox.
+        if (lb.dataset.profilePicMode) delete lb.dataset.profilePicMode;
+        const lbActsReset2 = document.getElementById('lb-actions');
+        if (lbActsReset2) lbActsReset2.style.display = 'none'; // _lbRenderProfile will show if needed
+
         lb.style.display = 'flex';
         lb.style.opacity = '0';
         lb.style.transition = 'opacity 0.18s ease';
@@ -11885,6 +12498,8 @@
       function lbGoToVideo(newIdx) { lbGoTo(newIdx); }
 
       function closeLightbox() {
+        // Close repost menu if open
+        lbCloseRepost();
         // Also close comment panel and report panel if open
         const panel = document.getElementById('lb-comments-panel');
         if (panel) { panel.style.display = 'none'; panel.style.transform = ''; panel.style.opacity = ''; }
@@ -11894,6 +12509,30 @@
         if (actions) actions.style.right = '20px';
 
         const lb = document.getElementById("lightbox");
+
+        // If we were in profile-pic mode, clean up the mode flag and restore
+        // the profile chip's hover handlers for the next regular lightbox open.
+        if (lb.dataset.profilePicMode) {
+          delete lb.dataset.profilePicMode;
+          const lbProf = document.getElementById('lb-profile');
+          if (lbProf) {
+            // Restore the chip's child structure that openProfilePicLightbox replaced
+            // with plain text, so _lbRenderProfile can write to lb-profile-av / lb-profile-name.
+            lbProf.innerHTML = `<div id="lb-profile-av" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;background:var(--accent);display:grid;place-items:center;font-family:var(--font-head);font-size:13px;font-weight:800;color:#fff;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,0.18)"></div><div><div id="lb-profile-name" style="font-family:var(--font-head);font-size:13px;font-weight:800;color:#fff;line-height:1.2;white-space:nowrap"></div><div style="font-size:11px;color:rgba(255,255,255,0.5)">View profile</div></div>`;
+            lbProf.style.display  = 'none';
+            lbProf.style.cursor   = '';
+            lbProf.onclick        = null;
+            lbProf.onmouseover = function() {
+              this.style.background = 'rgba(255,255,255,0.12)';
+              this.style.transform  = 'scale(1.03)';
+            };
+            lbProf.onmouseout = function() {
+              this.style.background = 'rgba(0,0,0,0.55)';
+              this.style.transform  = 'scale(1)';
+            };
+          }
+        }
+
         lb.style.transition = "opacity 0.18s ease";
         lb.style.opacity = "0";
         setTimeout(() => {
@@ -13074,6 +13713,7 @@
           if (ftFollowing) ftFollowing.style.opacity = "0.5";
         }
         loadPosts();
+        loadTrending();
       })();
 
       /* ── POST DETAIL ──────────────────────────────────────────── */
@@ -13188,11 +13828,11 @@
         const reposted =
           currentUser && post.reposts && post.reposts.includes(currentUser.id);
         const canDelete = currentUser && currentUser.id === post.userId;
-        const color = stringToColor(post.author);
+        const color = stringToColor(post.author || '');
 
         const avHtml = post.authorPicture
-          ? `<img src="${post.authorPicture}" alt="${escHtml(post.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
-          : escHtml(post.author.charAt(0));
+          ? `<img src="${post.authorPicture}" alt="${escHtml((post.author||'?').charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+          : escHtml((post.author||'?').charAt(0));
 
         const detailDate = new Date(
           post.createdAt.includes("T")
@@ -13210,14 +13850,17 @@
 
         document.getElementById("post-detail-content").innerHTML = `
           <div class="post-detail-card">
-            ${post.isRepost ? `<div class="repost-strip" style="margin-bottom:12px"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> ${escHtml(post.author)} reposted</div>` : ""}
+            ${post.isRepost ? `<div class="repost-strip" style="margin-bottom:12px"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> ${escHtml(post.author||'')} reposted</div>` : ""}
             ${!(post.isRepost && !post.text) ? `<div class="post-detail-head">
               <div class="av" style="background:${post.authorPicture ? "transparent" : color};cursor:pointer;flex-shrink:0" onclick="viewProfile(${post.userId})">${avHtml}</div>
               <div class="post-detail-author">
-                <span class="post-detail-name" onclick="viewProfile(${post.userId})">${escHtml(post.author)}</span>
+                <span class="post-detail-name" onclick="viewProfile(${post.userId})">${escHtml(post.author||'')}</span>
                 <span class="post-detail-time">${dateStr}</span>
               </div>
-              ${canDelete ? `<button class="post-del" style="margin-left:auto" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
+              <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                ${canDelete ? `<button class="post-del" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
+                ${(currentUser && currentUser.id !== post.userId) ? (() => { const isFollowing = _followingSet.has(post.userId); return `<button class="btn ${isFollowing ? "btn-outline" : "btn-primary"}" id="pd-follow-btn" style="font-size:12px;padding:6px 16px;border-radius:20px" data-following="${isFollowing}" onclick="toggleFollow(${post.userId}, this)">${isFollowing ? "Following" : "Follow"}</button>`; })() : ""}
+              </div>
             </div>` : ""}
 
             ${post.text ? `<div class="post-detail-body">${escHtml(post.text)}</div>` : ""}
@@ -13225,14 +13868,14 @@
             ${(() => {
               if (post.isRepost && post.originalPost && !post.text) {
                 const op = post.originalPost;
-                const opColor = stringToColor(op.author);
+                const opColor = stringToColor(op.author || '');
                 const opAvHtml = op.authorPicture
-                  ? `<img src="${op.authorPicture}" alt="${escHtml(op.author.charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
-                  : escHtml(op.author.charAt(0));
+                  ? `<img src="${op.authorPicture}" alt="${escHtml((op.author||'?').charAt(0))}" loading="lazy" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block"/>`
+                  : escHtml((op.author||'?').charAt(0));
                 return `<div class="post-detail-head">
                   <div class="av" style="background:${op.authorPicture ? "transparent" : opColor};cursor:pointer;flex-shrink:0" onclick="viewProfile(${op.userId})">${opAvHtml}</div>
                   <div class="post-detail-author">
-                    <span class="post-detail-name" onclick="viewProfile(${op.userId})">${escHtml(op.author)}</span>
+                    <span class="post-detail-name" onclick="viewProfile(${op.userId})">${escHtml(op.author||'')}</span>
                     <span class="post-detail-time">${formatFullDate(op.createdAt)}</span>
                   </div>
                 </div>
@@ -13240,8 +13883,8 @@
                 ${op.video ? `<div class="post-video-wrap" onclick="openVideoLightbox(this)" data-lb-video="${op.video}" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}" title="Watch video"><video src="${op.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>`
                   : op.image ? `<img class="post-detail-img lb-thumb" src="${op.image}" loading="lazy" onclick="openLightbox(this)" data-lb-name="${escHtml(op.author)}" data-lb-picture="${escHtml(op.authorPicture || '')}" data-lb-user-id="${op.userId}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(op.text || '')}"/>` : ""}`;
               } else if (post.isRepost && post.originalPost && post.text) {
-                return `<div class="repost-embed" style="margin-bottom:14px;cursor:pointer" onclick="openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author)}">
-                  <div class="repost-embed-name">${escHtml(post.originalPost.author)}</div>
+                return `<div class="repost-embed" style="margin-bottom:14px;cursor:pointer" onclick="openOriginalPost(${post.originalPost.id})" title="View original post by ${escHtml(post.originalPost.author||'')}">
+                  <div class="repost-embed-name">${escHtml(post.originalPost.author||'')}</div>
                   ${post.originalPost.text ? `<div class="repost-embed-text">${escHtml(post.originalPost.text)}</div>` : ""}
                   ${post.originalPost.video ? `<div class="post-video-wrap repost-embed-video" onclick="event.stopPropagation();openVideoLightbox(this)" data-lb-video="${post.originalPost.video}" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || '')}" data-lb-user-id="${post.originalPost.userId || ''}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || '')}" title="Watch video" style="margin-top:8px"><video src="${post.originalPost.video}" preload="metadata" playsinline muted></video><div class="post-video-play-btn"><svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="28" fill="rgba(0,0,0,0.45)"/><polygon points="22,16 42,28 22,40" fill="white"/></svg></div></div>` : post.originalPost.image ? `<img class="post-detail-img repost-embed-img lb-thumb" src="${post.originalPost.image}" loading="lazy" data-lb-name="${escHtml(post.originalPost.author)}" data-lb-picture="${escHtml(post.originalPost.authorPicture || '')}" data-lb-user-id="${post.originalPost.userId || ''}" data-lb-post-id="${post.id}" data-lb-caption="${escHtml(post.originalPost.text || '')}" onclick="event.stopPropagation();openLightbox(this)" title="View full image"/>` : ""}
                 </div>`;
@@ -13260,14 +13903,22 @@
               </button>
               <button class="act-btn" onclick="document.getElementById('post-detail-reply-input').focus()">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                <span>Reply</span>
+                <span>${post.comments ? post.comments.length || "" : ""}</span>
               </button>
               ${
                 !post.isRepost
-                  ? `<button class="act-btn repost-btn${reposted ? " reposted" : ""}" onclick="openRepostModal(${post.id})">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
-                <span>${post.reposts ? post.reposts.length : 0}</span>
-              </button>`
+                  ? `<div class="post-menu-wrap" onclick="event.stopPropagation()">
+                <button class="act-btn repost-btn${reposted ? " reposted" : ""}" onclick="toggleRepostMenu(event,${post.id})">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+                  <span>${post.reposts ? post.reposts.length || "" : ""}</span>
+                </button>
+                <div class="post-dropdown" id="repost-menu-${post.id}">
+                  <button class="post-dropdown-item" id="repost-menu-do-${post.id}" onclick="closeRepostMenu(${post.id});confirmRepost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Repost</button>
+                  <button class="post-dropdown-item rp-undo" id="repost-menu-undo-${post.id}" onclick="closeRepostMenu(${post.id});undoRepost(${post.id})" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Undo repost</button>
+                  <div class="post-dropdown-divider"></div>
+                  <button class="post-dropdown-item" onclick="closeRepostMenu(${post.id});openQuoteModal(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quote</button>
+                </div>
+              </div>`
                   : ""
               }
             </div>
@@ -13277,8 +13928,43 @@
         const replyBar = document.getElementById("post-detail-reply-bar");
         replyBar.classList.toggle("visible", !!currentUser);
 
-        // Render comments
-        renderPostDetailComments(post);
+        // Show skeleton loaders while comments are being painted
+        const _commentSection = document.getElementById("post-detail-comments");
+        if (_commentSection) {
+          const _skel = (w1, w2) => `<div class="comment-skel-item">
+            <div class="comment-skel-avatar"></div>
+            <div class="comment-skel-body">
+              <div class="comment-skel-name"></div>
+              <div class="comment-skel-line long"></div>
+              <div class="comment-skel-line short"></div>
+            </div>
+          </div>`;
+          _commentSection.innerHTML = `<div class="post-detail-comments-section">
+            ${[1,2,3].map(_skel).join('')}
+          </div>`;
+        }
+        // Defer real render one frame so skeletons paint first
+        requestAnimationFrame(() => renderPostDetailComments(post));
+
+        // Sync follow button state from server (authoritative) — same logic as profile tab
+        if (currentUser && currentUser.id !== post.userId) {
+          (async () => {
+            try {
+              const res = await api("GET", `/api/users/${post.userId}/profile`);
+              const isFollowing = res.data?.isFollowing || false;
+              // Also keep _followingSet in sync
+              if (isFollowing) _followingSet.add(post.userId);
+              else _followingSet.delete(post.userId);
+              const btn = document.getElementById("pd-follow-btn");
+              if (btn) {
+                btn.dataset.following = isFollowing ? "true" : "false";
+                btn.textContent = isFollowing ? "Following" : "Follow";
+                btn.className = `btn ${isFollowing ? "btn-outline" : "btn-primary"}`;
+                btn.style.cssText = "font-size:12px;padding:6px 16px;border-radius:20px";
+              }
+            } catch (_) {}
+          })();
+        }
 
         // Store current post id for reply use
         document.getElementById("post-detail-reply-input").dataset.postId =
@@ -13665,6 +14351,7 @@
           posts.unshift(newPost);
           renderFeed();
           showToast("Posted! ✨");
+          loadTrending(true);
           closeComposeTab();
         } catch (e) {
           clearInterval(progressInterval);
@@ -13811,7 +14498,7 @@
         // Hook into goTo so images in a newly-visible view get observed.
         // Images that were hidden when first scanned (isHidden → skipped)
         // are now in a visible container and will fade in correctly.
-        const _origGoTo = goTo;
+        const _origGoTo = window.goTo;
         window.goTo = function(view) {
           _origGoTo(view);
           // Let the view become visible in the next frame before scanning
@@ -13832,6 +14519,224 @@
           });
         };
       })();
+
+      /* ══════════════════════════════════════════════════════════════════
+         PUSH NOTIFICATIONS
+         ══════════════════════════════════════════════════════════════════
+         Flow:
+           1. User flips toggle → request Notification permission
+           2. On grant → subscribe via pushManager with VAPID key
+           3. POST subscription endpoint to /api/push/subscribe
+           4. On unsubscribe → POST to /api/push/unsubscribe
+           5. Service worker handles push events and shows system notifications
+           6. Preference toggles (likes/comments/etc) POST to /api/push/preferences
+
+         VAPID public key: replace the placeholder below with your real key.
+         Generate with: npx web-push generate-vapid-keys
+      ══════════════════════════════════════════════════════════════════ */
+
+      // ── VAPID public key (replace with your real key) ──────────────
+      const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+
+      function _urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = atob(base64);
+        return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+      }
+
+      // ── Sync the push toggle to reflect actual subscription state ───
+      async function _syncPushToggle() {
+        const toggle = document.getElementById('notif-push');
+        const sub = document.getElementById('push-notif-sub');
+        const deniedBadge = document.getElementById('push-notif-denied-badge');
+        const toggleLabel = document.getElementById('push-notif-toggle-label');
+        if (!toggle) return;
+
+        if (!('Notification' in window) || !('PushManager' in window)) {
+          // Browser doesn't support push
+          toggle.disabled = true;
+          if (sub) sub.textContent = 'Not supported in this browser';
+          return;
+        }
+
+        const perm = Notification.permission;
+
+        if (perm === 'denied') {
+          toggle.checked = false;
+          toggle.disabled = true;
+          if (toggleLabel) toggleLabel.style.display = 'none';
+          if (deniedBadge) deniedBadge.style.display = '';
+          if (sub) sub.textContent = 'Blocked by browser — update in your browser settings';
+          return;
+        }
+
+        if (toggleLabel) toggleLabel.style.display = '';
+        if (deniedBadge) deniedBadge.style.display = 'none';
+        toggle.disabled = false;
+
+        if (perm === 'granted' && _swRegistration) {
+          try {
+            const existing = await _swRegistration.pushManager.getSubscription();
+            toggle.checked = !!existing;
+            if (sub) sub.textContent = existing
+              ? 'You\'re subscribed — notifications are active'
+              : 'Enable browser push notifications';
+          } catch {
+            toggle.checked = false;
+          }
+        } else {
+          toggle.checked = false;
+          if (sub) sub.textContent = 'Enable browser push notifications';
+        }
+      }
+
+      // ── Subscribe to push ───────────────────────────────────────────
+      async function _subscribePush() {
+        if (!_swRegistration) throw new Error('Service worker not ready');
+        const applicationServerKey = _urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+        const subscription = await _swRegistration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey,
+        });
+        // Send subscription to your backend
+        try {
+          await api('POST', '/api/push/subscribe', JSON.stringify({
+            subscription: subscription.toJSON(),
+            preferences: _getPushPreferences(),
+          }));
+        } catch {
+          // Server not yet set up — subscription is still stored client-side
+        }
+        return subscription;
+      }
+
+      // ── Unsubscribe from push ───────────────────────────────────────
+      async function _unsubscribePush() {
+        if (!_swRegistration) return;
+        const sub = await _swRegistration.pushManager.getSubscription();
+        if (!sub) return;
+        try {
+          await api('POST', '/api/push/unsubscribe', JSON.stringify({
+            endpoint: sub.endpoint,
+          }));
+        } catch { /* server may not be configured */ }
+        await sub.unsubscribe();
+      }
+
+      // ── Read the per-type notification preference toggles ───────────
+      function _getPushPreferences() {
+        return {
+          likes:      document.getElementById('notif-likes')?.checked ?? true,
+          comments:   document.getElementById('notif-comments')?.checked ?? true,
+          reposts:    document.getElementById('notif-reposts')?.checked ?? true,
+          new_post:   document.getElementById('notif-new_post')?.checked ?? true,
+          profile_pic:document.getElementById('notif-profile_pic')?.checked ?? true,
+          follows:    document.getElementById('notif-follows')?.checked ?? true,
+          mentions:   document.getElementById('notif-mentions')?.checked ?? true,
+        };
+      }
+
+      // ── Called when the push toggle is flipped ──────────────────────
+      async function handlePushToggle(enabled) {
+        const toggle = document.getElementById('notif-push');
+        const subEl = document.getElementById('push-notif-sub');
+
+        if (!('Notification' in window) || !('PushManager' in window)) {
+          showToast('Push notifications are not supported in this browser.');
+          if (toggle) toggle.checked = false;
+          return;
+        }
+
+        if (enabled) {
+          // Request permission first
+          const perm = await Notification.requestPermission();
+          if (perm !== 'granted') {
+            if (toggle) toggle.checked = false;
+            if (perm === 'denied') {
+              showToast('Notifications blocked. Please allow them in your browser settings.');
+              _syncPushToggle();
+            } else {
+              showToast('Notification permission was dismissed.');
+            }
+            return;
+          }
+
+          try {
+            if (toggle) toggle.disabled = true;
+            if (subEl) subEl.textContent = 'Subscribing…';
+            await _subscribePush();
+            showToast('Push notifications enabled! 🔔');
+            if (subEl) subEl.textContent = 'You\'re subscribed — notifications are active';
+
+            // Fire a welcome notification so the user can confirm it works
+            setTimeout(() => {
+              if (_swRegistration) {
+                _swRegistration.showNotification('Circle notifications are on! 🎉', {
+                  body: 'You\'ll now get notified about likes, comments, and more.',
+                  icon: './icon.svg',
+                  badge: './icon.svg',
+                  tag: 'circle-welcome',
+                  vibrate: [100, 50, 100],
+                });
+              }
+            }, 800);
+          } catch (err) {
+            showToast('Could not enable push notifications: ' + err.message);
+            if (toggle) toggle.checked = false;
+            if (subEl) subEl.textContent = 'Enable browser push notifications';
+          } finally {
+            if (toggle) toggle.disabled = false;
+          }
+        } else {
+          try {
+            await _unsubscribePush();
+            showToast('Push notifications disabled.');
+            if (subEl) subEl.textContent = 'Enable browser push notifications';
+          } catch (err) {
+            showToast('Error unsubscribing: ' + err.message);
+            // Re-sync to reflect true state
+            _syncPushToggle();
+          }
+        }
+      }
+
+      // ── Sync push prefs to server whenever a type toggle changes ────
+      async function _savePushPreferences() {
+        if (!_swRegistration) return;
+        const sub = await _swRegistration.pushManager.getSubscription().catch(() => null);
+        if (!sub) return;
+        try {
+          await api('POST', '/api/push/preferences', JSON.stringify({
+            endpoint: sub.endpoint,
+            preferences: _getPushPreferences(),
+          }));
+        } catch { /* server may not be configured */ }
+      }
+
+      // Attach preference-save listener to each per-type toggle
+      ['notif-likes','notif-comments','notif-reposts','notif-new_post','notif-profile_pic','notif-follows','notif-mentions'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', _savePushPreferences);
+      });
+
+      // Initial sync once DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _syncPushToggle);
+      } else {
+        _syncPushToggle();
+      }
     </script>
+  <!-- Avatar action menu — fixed position, anchored via JS to avatar -->
+  <div class="av-action-menu" id="profile-av-menu">
+    <button class="av-action-item" id="profile-av-view-btn" onclick="profileAvViewPhoto()">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      View Photo
+    </button>
+    <button class="av-action-item" onclick="profileAvChangePhoto()">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Change Photo
+    </button>
+  </div>
   </body>
 </html>

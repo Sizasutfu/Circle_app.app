@@ -8,15 +8,13 @@
 
 const PostModel             = require('../models/PostModel');
 const UserModel             = require('../models/userModel');
-const NotificationModel     = require('../models/notificationModel_v3');
+const NotificationModel     = require('../models/notificationModel');
 const FollowModel           = require('../models/followModel');
 const TopicPreferenceModel  = require('../models/TopicPreferenceModel');
-const NegativeSignalModel   = require('../models/NegativeSignalModel');
-const { getPostsPage }      = require('../feed/feedPipeline');
 const { db }                = require('../config/db');
 const { sendOk, sendError } = require('../middleware/response');
 
-// GET /api/posts?userId=<id>&feed=global|following&page=<n>&limit=<n>&media=video
+// GET /api/posts?userId=<id>&feed=global|following&page=<n>&limit=<n>
 async function getPosts(req, res) {
   const profileUserId = req.query.userId ? parseInt(req.query.userId) : null;
   const feedMode      = req.query.feed === 'following' ? 'following' : 'global';
@@ -25,19 +23,24 @@ async function getPosts(req, res) {
 
   try {
     if (profileUserId) {
-      // Profile pages are chronological — no scoring needed
-      const result  = await PostModel.getProfilePosts(profileUserId, page, limit);
+      const result = await PostModel.getProfilePosts(profileUserId, page, limit);
+
+      // Normalise: guarantee posts array and hasMore flag are always present
+      // so the frontend can rely on them regardless of what PostModel returns.
       const posts   = result.posts   ?? result ?? [];
       const hasMore = result.hasMore ?? (posts.length === limit);
+
       return sendOk(res, 200, 'Posts fetched.', { posts, hasMore, page, limit });
     }
 
-    const viewerUserId = req.actorId || (req.headers['x-user-id'] ? parseInt(req.headers['x-user-id']) : null);
-    const mediaFilter  = req.query.media === 'video' ? 'video' : null;
+    const viewerUserId  = req.actorId || (req.headers['x-user-id'] ? parseInt(req.headers['x-user-id']) : null);
+    const mediaFilter   = req.query.media === 'video' ? 'video' : null;
+    const result = await PostModel.getPostsPage(viewerUserId, feedMode, page, limit, mediaFilter);
 
-    // New feed pipeline (replaces PostModel.getPostsPage)
-    const result = await getPostsPage(viewerUserId, feedMode, page, limit, mediaFilter);
-    return sendOk(res, 200, 'Posts fetched.', result);
+    const posts   = result.posts   ?? result ?? [];
+    const hasMore = result.hasMore ?? (posts.length === limit);
+
+    return sendOk(res, 200, 'Posts fetched.', { posts, hasMore, page, limit });
   } catch (err) {
     console.error('getPosts error:', err);
     return sendError(res, 500, 'Server error.');
@@ -85,10 +88,13 @@ async function createPost(req, res) {
   const userId = req.actorId;
   const text   = req.body.text || '';
 
+  // Pull filenames set by compress middleware
   const imageFilename = req.compressedFiles?.image?.filename || null;
   const videoFilename = req.compressedFiles?.video?.filename || null;
 
   // Save only the relative path in the DB — never a hardcoded host/IP.
+  // This way the URL always works regardless of whether the client reaches
+  // the server via localhost, 192.168.x.x, or a real domain name.
   const imagePath = imageFilename ? `/uploads/${imageFilename}` : null;
   const videoPath = videoFilename ? `/uploads/${videoFilename}` : null;
 
@@ -104,12 +110,13 @@ async function createPost(req, res) {
     const user = await UserModel.findById(userId);
     if (!user) return sendError(res, 404, 'User not found.');
 
+    // Save relative path so media loads from any host
     const postId = await PostModel.createPost(userId, text, imagePath, videoPath);
 
-    // ── Extract and save hashtags ──────────────────────────────
+    // ── Extract and save hashtags ────────────────────────────
     await PostModel.savePostTopics(postId, text);
 
-    // ── Notify all followers about the new post ────────────────
+    // ── Notify all followers about the new post ──────────────
     const followerIds = await FollowModel.getFollowerIds(userId);
     await Promise.all(
       followerIds.map(fId =>
@@ -172,7 +179,7 @@ async function toggleLike(req, res) {
       if (post) {
         await NotificationModel.createNotification(post.user_id, userId, 'like', postId);
 
-        // ── Bump topic affinity ────────────────────────────────
+        // ── Bump topic affinity ──────────────────────────────
         const topics = await TopicPreferenceModel.getPostTopics(postId);
         await TopicPreferenceModel.recordEngagement(userId, topics, 'like');
       }
@@ -187,8 +194,8 @@ async function toggleLike(req, res) {
 
 // POST /api/posts/:id/comment
 async function addComment(req, res) {
-  const postId             = parseInt(req.params.id);
-  const userId             = req.actorId;
+  const postId      = parseInt(req.params.id);
+  const userId      = req.actorId;
   const { text, parentId } = req.body;
 
   if (!text) return sendError(res, 400, 'Comment text is required.');
@@ -209,7 +216,7 @@ async function addComment(req, res) {
 
     await NotificationModel.createNotification(post.user_id, userId, 'comment', postId);
 
-    // ── Bump topic affinity ──────────────────────────────────
+    // ── Bump topic affinity ────────────────────────────────────
     const topics = await TopicPreferenceModel.getPostTopics(postId);
     await TopicPreferenceModel.recordEngagement(userId, topics, 'comment');
 
@@ -231,8 +238,8 @@ async function addComment(req, res) {
 
 // POST /api/posts/:id/repost
 async function repost(req, res) {
-  const origId  = parseInt(req.params.id);
-  const userId  = req.actorId;
+  const origId = parseInt(req.params.id);
+  const userId = req.actorId;
   const { text } = req.body;
   const isQuote = text && text.trim().length > 0;
 
@@ -254,7 +261,7 @@ async function repost(req, res) {
 
     await NotificationModel.createNotification(original.user_id, userId, 'repost', origId);
 
-    // ── Bump topic affinity ──────────────────────────────────
+    // ── Bump topic affinity ────────────────────────────────────
     const topics = await TopicPreferenceModel.getPostTopics(origId);
     await TopicPreferenceModel.recordEngagement(userId, topics, 'repost');
 
@@ -296,52 +303,22 @@ async function unrepost(req, res) {
 }
 
 // POST /api/posts/:id/view
-// Body: { fingerprint?: string, dwellMs?: number }
-// Auth is optional — logged-in users identified by actorId,
-// guests by a client-generated fingerprint or IP fallback.
-// dwellMs: milliseconds the post was visible in the viewport.
-//   If provided and below SHORT_VIEW_THRESHOLD, a short_view
-//   negative signal is also recorded for the authenticated user.
+// Called by the frontend when a post enters the viewport.
+// Auth is optional — logged-in users are identified by userId,
+// guests by a client-generated fingerprint passed in the body.
 async function recordView(req, res) {
   const postId = parseInt(req.params.id);
   if (isNaN(postId)) return sendError(res, 400, 'Invalid post ID.');
 
-  const userId   = req.actorId;
-  const viewerId = userId || req.body.fingerprint || req.ip;
-  const dwellMs  = req.body.dwellMs != null ? Number(req.body.dwellMs) : null;
+  // Prefer authenticated user id; fall back to anonymous fingerprint
+  const viewerId = req.actorId || req.body.fingerprint || req.ip;
 
   try {
     await PostModel.recordView(postId, viewerId);
-
-    // Record dwell time and emit short_view signal if below threshold
-    if (userId && dwellMs !== null) {
-      await NegativeSignalModel.recordDwellView(userId, postId, dwellMs);
-    }
-
     const total = await PostModel.getViewCount(postId);
     return sendOk(res, 200, 'View recorded.', { views: total });
   } catch (err) {
     console.error('recordView error:', err);
-    return sendError(res, 500, 'Server error.');
-  }
-}
-
-// POST /api/posts/:id/skip
-// Called by the client when the user scrolls past a post without
-// any meaningful pause (client decides threshold, e.g. < 1 second
-// in viewport). Requires authentication — guest skips are ignored.
-async function recordSkip(req, res) {
-  const postId = parseInt(req.params.id);
-  if (isNaN(postId)) return sendError(res, 400, 'Invalid post ID.');
-
-  const userId = req.actorId;
-  if (!userId) return sendOk(res, 200, 'Skip ignored (guest).');
-
-  try {
-    await NegativeSignalModel.recordSkip(userId, postId);
-    return sendOk(res, 200, 'Skip recorded.');
-  } catch (err) {
-    console.error('recordSkip error:', err);
     return sendError(res, 500, 'Server error.');
   }
 }
@@ -358,11 +335,11 @@ async function getTopics(req, res) {
   }
 }
 
-// GET /api/topics/:topic/posts?page=<n>&limit=<n>
+// GET /api/topics/:topic/posts?page=<n>
 async function getPostsByTopic(req, res) {
   const topic = req.params.topic?.toLowerCase();
   if (!topic) return sendError(res, 400, 'Topic is required.');
-  const page  = Math.max(1, parseInt(req.query.page)  || 1);
+  const page  = Math.max(1, parseInt(req.query.page) || 1);
   const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
   try {
     const result = await PostModel.getPostsByTopic(topic, page, limit);
@@ -373,17 +350,4 @@ async function getPostsByTopic(req, res) {
   }
 }
 
-module.exports = {
-  getPosts,
-  getPostById,
-  createPost,
-  deletePost,
-  toggleLike,
-  addComment,
-  repost,
-  unrepost,
-  recordView,
-  recordSkip,
-  getTopics,
-  getPostsByTopic,
-};
+module.exports = { getPosts, getPostById, createPost, deletePost, toggleLike, addComment, repost, unrepost, recordView, getTopics, getPostsByTopic };

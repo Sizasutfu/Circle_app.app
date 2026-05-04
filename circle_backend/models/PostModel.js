@@ -9,27 +9,24 @@ const {
   WEIGHT_LIKE, WEIGHT_COMMENT, WEIGHT_REPOST, WEIGHT_VIEW,
   BOOST_OWN, BOOST_FOLLOW, BOOST_REPOST,
   WEIGHT_ENGAGEMENT_LIKE, WEIGHT_ENGAGEMENT_COMMENT, WEIGHT_ENGAGEMENT_REPOST,
+  WEIGHT_TOPIC,
   RECENCY_SCALE, RECENCY_SHIFT, FEED_PAGE_SIZE,
   FEED_CANDIDATE_MULTIPLIER, SEEN_PENALTY,
 } = require('../config/constants');
+const TopicPreferenceModel = require('./TopicPreferenceModel');
 
 // ── Normalise a stored media URL to a relative path ──────────
-// Old posts saved before the fix may have a full URL like
-// http://192.168.x.x:3000/uploads/foo.webp stored in the DB.
-// This strips the origin so only /uploads/foo.webp is returned,
-// keeping media accessible from any host the server runs on.
 function toRelativePath(url) {
   if (!url) return url;
   try {
     const u = new URL(url);
-    // Only strip if it looks like a local/LAN upload URL
     if (u.pathname.startsWith('/uploads/')) return u.pathname;
   } catch {}
-  return url; // already relative or an external URL — leave it alone
+  return url;
 }
 
 // ── Score a single post ────────────────────────────────────
-function computeScore(post, viewerUserId, followingIds = [], engagementMap = {}) {
+function computeScore(post, viewerUserId, followingIds = [], engagementMap = {}, topicScoreMap = {}) {
   const hoursOld     = (Date.now() - new Date(post.createdAt).getTime()) / 3_600_000;
   const recency      = RECENCY_SCALE / (hoursOld + RECENCY_SHIFT);
   const likeScore    = (post.likes?.length    || 0) * WEIGHT_LIKE;
@@ -40,15 +37,22 @@ function computeScore(post, viewerUserId, followingIds = [], engagementMap = {})
   const followBoost  = followingIds.includes(post.userId)  ? BOOST_FOLLOW : 0;
   const repostBoost  = post.isRepost                       ? BOOST_REPOST : 0;
 
-  // Personal engagement boost — how much this viewer has engaged with this author
   const eng = engagementMap[post.userId] || {};
   const engagementBoost =
     (eng.likes    || 0) * WEIGHT_ENGAGEMENT_LIKE +
     (eng.comments || 0) * WEIGHT_ENGAGEMENT_COMMENT +
     (eng.reposts  || 0) * WEIGHT_ENGAGEMENT_REPOST;
 
+  // Topic affinity boost
+  let topicBoost = 0;
+  if (post._topics?.length && Object.keys(topicScoreMap).length) {
+    post._topics.forEach(t => {
+      topicBoost += (topicScoreMap[t] || 0) * WEIGHT_TOPIC;
+    });
+  }
+
   return recency + likeScore + commentScore + repostScore + viewScore +
-         ownBoost + followBoost + repostBoost + engagementBoost;
+         ownBoost + followBoost + repostBoost + engagementBoost + topicBoost;
 }
 
 // ── Nest flat comment rows into a parent → replies tree ───
@@ -80,7 +84,12 @@ async function hydratePosts(posts) {
 
   const [[allLikes], [allReposts], [allComments], [allViews]] = await Promise.all([
     db.query(`SELECT user_id, post_id FROM likes WHERE post_id IN (${ph})`, ids),
-    db.query(`SELECT user_id, original_post_id FROM reposts WHERE original_post_id IN (${ph})`, ids),
+    db.query(
+      `SELECT r.user_id, r.original_post_id FROM reposts r
+       JOIN posts p ON p.id = r.repost_post_id
+       WHERE r.original_post_id IN (${ph}) AND (p.text IS NULL OR p.text='')`,
+      ids
+    ),
     db.query(
       `SELECT c.id, c.post_id, c.user_id AS userId,
               c.parent_id AS parentId,
@@ -105,7 +114,6 @@ async function hydratePosts(posts) {
   allComments.forEach(c => cMap[c.post_id]?.push(c));
   allViews.forEach(v   => { if (vMap[v.post_id] !== undefined) vMap[v.post_id] = Number(v.view_count); });
 
-  // Embed original posts for repost cards
   const origIds = [
     ...new Set(
       posts.filter(p => p.isRepost && p.originalPostId).map(p => p.originalPostId)
@@ -115,7 +123,8 @@ async function hydratePosts(posts) {
   if (origIds.length) {
     const oph = origIds.map(() => '?').join(',');
     const [origRows] = await db.query(
-      `SELECT p.id, u.name AS author, u.picture AS authorPicture, p.text, p.image, p.video
+      `SELECT p.id, p.user_id AS userId, u.name AS author, u.picture AS authorPicture,
+              p.text, p.image, p.video, p.created_at AS createdAt
        FROM posts p
        JOIN users u ON u.id = p.user_id
        WHERE p.id IN (${oph})`,
@@ -132,8 +141,6 @@ async function hydratePosts(posts) {
     if (p.isRepost && p.originalPostId)
       p.originalPost = origMap[p.originalPostId] || null;
 
-    // Normalise any legacy full URLs (e.g. http://192.168.x.x/uploads/...)
-    // down to relative paths so media works from any host
     p.image         = toRelativePath(p.image);
     p.video         = toRelativePath(p.video);
     p.authorPicture = toRelativePath(p.authorPicture);
@@ -186,7 +193,6 @@ async function getEngagementMap(viewerUserId) {
 }
 
 // ── Fetch post IDs the viewer has already seen ────────────
-// Returns a Set of post IDs so lookups stay O(1).
 async function getSeenPostIds(viewerKey) {
   if (!viewerKey) return new Set();
   const [rows] = await db.query(
@@ -197,15 +203,7 @@ async function getSeenPostIds(viewerKey) {
 }
 
 // ── Fetch one page of posts ────────────────────────────────
-// Strategy:
-//   1. Pull a large candidate pool (FEED_CANDIDATE_MULTIPLIER x limit)
-//      so the scorer has real variety to work with.
-//   2. Fetch which posts this viewer has already seen.
-//   3. Hydrate + score all candidates, applying SEEN_PENALTY to
-//      seen posts rather than dropping them — keeps the feed from
-//      going empty for active users or small apps.
-//   4. Sort by score descending, return the top `limit` posts.
-async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE) {
+async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE, mediaFilter = null) {
   const LIMIT     = limit;
   const POOL_SIZE = LIMIT * FEED_CANDIDATE_MULTIPLIER;
   const OFFSET    = (page - 1) * LIMIT;
@@ -222,8 +220,12 @@ async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE
     whereParams = followingIds;
   }
 
-  // Fetch POOL_SIZE + 1 so we can detect whether more posts exist
-  // beyond this pool without a separate COUNT query.
+  if (mediaFilter === 'video') {
+    whereClause = whereClause
+      ? `${whereClause} AND p.video IS NOT NULL AND p.video != ''`
+      : `WHERE p.video IS NOT NULL AND p.video != ''`;
+  }
+
   const [rawPosts] = await db.query(
     `SELECT
        p.id,
@@ -249,21 +251,31 @@ async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE
 
   if (!candidates.length) return { posts: [], hasMore: false };
 
-  // Resolve the viewer key — same logic as recordView so the
-  // seen-post set is always consistent with what was recorded.
   const viewerKey = viewerUserId ? String(viewerUserId) : null;
 
-  // Run hydration, seen-ID lookup, and engagement map in parallel.
-  const [hydratedCandidates, seenIds, engagementMap] = await Promise.all([
+  const [hydratedCandidates, seenIds, engagementMap, topicScoreMap] = await Promise.all([
     hydratePosts(candidates),
     getSeenPostIds(viewerKey),
     getEngagementMap(viewerUserId),
+    TopicPreferenceModel.getTopicScoreMap(viewerUserId),
   ]);
 
-  // Score every candidate. Seen posts get SEEN_PENALTY applied so
-  // they sink to the bottom without vanishing entirely.
+  // Bulk-fetch topics for all candidate posts
+  if (Object.keys(topicScoreMap).length && hydratedCandidates.length) {
+    const ids = hydratedCandidates.map(p => p.id);
+    const ph  = ids.map(() => '?').join(',');
+    const [topicRows] = await db.query(
+      `SELECT post_id, topic FROM post_topics WHERE post_id IN (${ph})`,
+      ids
+    );
+    const topicsByPost = {};
+    ids.forEach(id => { topicsByPost[id] = []; });
+    topicRows.forEach(r => topicsByPost[r.post_id]?.push(r.topic));
+    hydratedCandidates.forEach(p => { p._topics = topicsByPost[p.id] || []; });
+  }
+
   hydratedCandidates.forEach(p => {
-    const base = computeScore(p, viewerUserId, followingIds, engagementMap);
+    const base = computeScore(p, viewerUserId, followingIds, engagementMap, topicScoreMap);
     p._score   = seenIds.has(p.id) ? base * SEEN_PENALTY : base;
   });
 
@@ -272,7 +284,7 @@ async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE
   const pagePosts = hydratedCandidates.slice(0, LIMIT);
   const hasMore   = hydratedCandidates.length > LIMIT || poolHasMore;
 
-  pagePosts.forEach(p => delete p._score);
+  pagePosts.forEach(p => { delete p._score; delete p._topics; });
 
   return { posts: pagePosts, hasMore };
 }
@@ -323,7 +335,7 @@ async function deletePost(postId) {
   await db.query('DELETE FROM posts WHERE id=?', [postId]);
 }
 
-// ── Find a post by id (returns full row) ───────────────────
+// ── Find a post by id ──────────────────────────────────────
 async function findById(postId) {
   const [rows] = await db.query('SELECT * FROM posts WHERE id=?', [postId]);
   return rows[0] || null;
@@ -370,41 +382,73 @@ async function addComment(postId, userId, text, parentId = null) {
     'INSERT INTO comments (post_id, user_id, text, parent_id) VALUES (?,?,?,?)',
     [postId, userId, text, parentId]
   );
+
+  await saveCommentTopics(postId, text);
+
   return result.insertId;
 }
 
 // ── Repost ─────────────────────────────────────────────────
 async function getExistingRepost(userId, originalPostId) {
   const [rows] = await db.query(
-    'SELECT id FROM reposts WHERE user_id=? AND original_post_id=?',
+    `SELECT r.id FROM reposts r
+     JOIN posts p ON p.id = r.repost_post_id
+     WHERE r.user_id=? AND r.original_post_id=? AND (p.text IS NULL OR p.text='')`,
     [userId, originalPostId]
   );
   return rows[0] || null;
 }
 
 async function createRepost(userId, text, originalPostId) {
+  if (!text) {
+    const [existRows] = await db.query(
+      `SELECT r.repost_post_id FROM reposts r
+       JOIN posts p ON p.id = r.repost_post_id
+       WHERE r.user_id=? AND r.original_post_id=? AND (p.text IS NULL OR p.text='')
+       LIMIT 1`,
+      [userId, originalPostId]
+    );
+    if (existRows.length) return existRows[0].repost_post_id;
+  }
+
   const [result] = await db.query(
     'INSERT INTO posts (user_id, text, is_repost, original_post_id) VALUES (?,?,1,?)',
     [userId, text || null, originalPostId]
   );
   const repostPostId = result.insertId;
   await db.query(
-    'INSERT INTO reposts (user_id, original_post_id, repost_post_id) VALUES (?,?,?)',
+    'INSERT IGNORE INTO reposts (user_id, original_post_id, repost_post_id) VALUES (?,?,?)',
     [userId, originalPostId, repostPostId]
   );
+  if (text) await savePostTopics(repostPostId, text);
   return repostPostId;
+}
+
+async function deleteRepost(userId, originalPostId) {
+  const [rows] = await db.query(
+    `SELECT r.repost_post_id FROM reposts r
+     JOIN posts p ON p.id = r.repost_post_id
+     WHERE r.user_id=? AND r.original_post_id=? AND (p.text IS NULL OR p.text='')
+     LIMIT 1`,
+    [userId, originalPostId]
+  );
+  if (!rows.length) return;
+  const repostPostId = rows[0].repost_post_id;
+  await db.query('DELETE FROM reposts WHERE repost_post_id=?', [repostPostId]);
+  await db.query('DELETE FROM posts   WHERE id=?',             [repostPostId]);
 }
 
 async function getOriginalPostEmbed(originalPostId) {
   const [rows] = await db.query(
-    `SELECT p.id, u.name AS author, u.picture AS authorPicture, p.text, p.image, p.video
+    `SELECT p.id, p.user_id AS userId, u.name AS author, u.picture AS authorPicture,
+            p.text, p.image, p.video, p.created_at AS createdAt
      FROM posts p JOIN users u ON u.id=p.user_id WHERE p.id=?`,
     [originalPostId]
   );
   return rows[0] || null;
 }
 
-// ── Trending posts (last 24 hours, ranked by engagement) ──
+// ── Trending posts ─────────────────────────────────────────
 async function getTrendingPosts(limit = 20) {
   const [rawPosts] = await db.query(
     `SELECT
@@ -437,7 +481,6 @@ async function getTrendingPosts(limit = 20) {
 
 // ── Search posts ───────────────────────────────────────────
 async function searchPosts(query, { limit = 20, offset = 0 } = {}) {
-  // Escape SQL LIKE wildcards so a query of "%" doesn't match every row
   const escaped = query.replace(/[%_\\]/g, '\\$&');
   const like = `%${escaped}%`;
   const [rows] = await db.query(
@@ -456,9 +499,7 @@ async function searchPosts(query, { limit = 20, offset = 0 } = {}) {
 }
 
 // ── View counts ────────────────────────────────────────────
-// Records a view each session — allows return visit recounts like Facebook/X.
 async function recordView(postId, viewerId) {
-  // viewerId can be a userId (int) or an anonymous fingerprint string
   await db.query(
     `INSERT INTO post_views (post_id, viewer_key) VALUES (?, ?)`,
     [postId, String(viewerId)]
@@ -473,20 +514,63 @@ async function getViewCount(postId) {
   return Number(total);
 }
 
-// ── Parse hashtags from post text ─────────────────────────
-function extractHashtags(text) {
+// ── Topic stopwords ────────────────────────────────────────
+const TOPIC_STOPWORDS = new Set([
+  'the','and','for','are','but','not','you','all','can','her','was','one',
+  'our','out','day','get','has','him','his','how','its','let','may','new',
+  'now','old','see','two','way','who','boy','did','man','men','put','say',
+  'she','too','use','had','have','that','this','with','they','from','been',
+  'will','what','were','when','your','said','each','just','into','then',
+  'than','some','more','also','over','such','here','know','like','time',
+  'very','even','most','make','after','first','well','much','good','want',
+  'came','come','back','does','made','many','them','these','other','about',
+  'their','there','which','would','could','should','really','think','going',
+  'still','being','where','every','those','while','before','again','through',
+  'because','always','never','people','thing','things','anyone','someone',
+  'something','anything','nothing','everyone','everything','little','great',
+  'might','only','both','same','last','long','life','give','work','need',
+  'feel','seem','keep','tell','next','best','high','look','place','actually',
+  'usually','already','another','between','together','without','year','years',
+  'today','right','left','sure','stop','took','take','away','around',
+  'different','during','since','until','while','just','here','http','https',
+  'with','from','that','this','have','been',
+]);
+
+// ── Extract topics from post text ─────────────────────────
+function extractTopics(text) {
   if (!text) return [];
-  const matches = text.match(/#([a-zA-Z0-9_]+)/g) || [];
-  return [...new Set(matches.map(t => t.slice(1).toLowerCase()))];
+  const topics = new Set();
+  const hashtags = text.match(/#([a-zA-Z0-9_]+)/g) || [];
+  hashtags.forEach(t => topics.add(t.slice(1).toLowerCase()));
+  text
+    .replace(/#[a-zA-Z0-9_]+/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length >= 3 && !TOPIC_STOPWORDS.has(w) && !/^\d+$/.test(w))
+    .forEach(w => topics.add(w));
+  return [...topics];
 }
 
-// ── Save hashtags for a post ───────────────────────────────
+// ── Save topics for a post ─────────────────────────────────
 async function savePostTopics(postId, text) {
-  const tags = extractHashtags(text);
-  if (!tags.length) return;
-  const values = tags.map(tag => [postId, tag]);
+  const topics = extractTopics(text);
+  if (!topics.length) return;
+  const values = topics.map(topic => [postId, topic, new Date()]);
   await db.query(
-    'INSERT IGNORE INTO post_topics (post_id, topic) VALUES ?',
+    'INSERT IGNORE INTO post_topics (post_id, topic, created_at) VALUES ?',
+    [values]
+  );
+}
+
+// ── Save comment topics back to the parent post ────────────
+async function saveCommentTopics(postId, text) {
+  const topics = extractTopics(text);
+  if (!topics.length) return;
+  const values = topics.map(topic => [postId, topic, new Date()]);
+  await db.query(
+    `INSERT INTO post_topics (post_id, topic, created_at) VALUES ?
+     ON DUPLICATE KEY UPDATE created_at = VALUES(created_at)`,
     [values]
   );
 }
@@ -496,6 +580,7 @@ async function getTopics(limit = 20) {
   const [rows] = await db.query(
     `SELECT topic, COUNT(*) AS post_count
      FROM post_topics
+     WHERE created_at >= NOW() - INTERVAL 24 HOUR
      GROUP BY topic
      ORDER BY post_count DESC, topic ASC
      LIMIT ?`,
@@ -553,9 +638,11 @@ module.exports = {
   addComment,
   getExistingRepost,
   createRepost,
+  deleteRepost,
   getOriginalPostEmbed,
   searchPosts,
   savePostTopics,
+  saveCommentTopics,
   getTopics,
   getPostsByTopic,
   recordView,

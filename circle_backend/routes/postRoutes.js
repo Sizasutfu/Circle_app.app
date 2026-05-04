@@ -26,9 +26,13 @@ router.delete('/:id', requireAuth, postController.deletePost);
 // Interactions — all require auth
 router.post('/:id/like',    requireAuth, postController.toggleLike);
 router.post('/:id/comment', requireAuth, postController.addComment);
-router.post('/:id/repost',  requireAuth, postController.repost);
+router.post('/:id/repost',   requireAuth, postController.repost);
+router.delete('/:id/repost', requireAuth, postController.unrepost);
 
 // View count — auth optional (guests tracked by fingerprint)
 router.post('/:id/view', postController.recordView);
+
+//router.post('/:id/skip',  postController.recordSkip);
+router.post('/:id/skip', requireAuth, postController.recordSkip);
 
 module.exports = router;

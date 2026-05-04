@@ -1,16 +1,23 @@
-// ============================================================
-//  routes/topicRoutes.js
-//  /api/topics — hashtag topic browsing
-//  Register in your main app: app.use('/api/topics', require('./routes/topicRoutes'))
-// ============================================================
+const express          = require('express');
+const router           = express.Router();
+const { requireAuth }  = require('../middleware/auth');
+const {
+  getTopics,
+  getMyTopics,
+  followTopic,
+  unfollowTopic,
+  getPostsByTopic,
+  getTopicFeed,
+} = require('../controllers/topicController');
 
-const router         = require('express').Router();
-const postController = require('../controllers/postController');
+// ── Static/named routes FIRST ──────────────────────────────
+router.get('/',        getTopics);                    // GET /api/topics
+router.get('/mine',    requireAuth, getMyTopics);     // GET /api/topics/mine
+router.get('/feed',    requireAuth, getTopicFeed);    // GET /api/topics/feed
 
-// GET /api/topics?limit=20  — trending topics ranked by post count
-router.get('/', postController.getTopics);
-
-// GET /api/topics/:topic/posts?page=1  — paginated posts for a topic
-router.get('/:topic/posts', postController.getPostsByTopic);
+// ── Parameterised routes LAST ──────────────────────────────
+router.get('/:topic/posts',     getPostsByTopic);                  // GET /api/topics/:topic/posts
+router.post('/:topic/follow',   requireAuth, followTopic);         // POST /api/topics/:topic/follow
+router.delete('/:topic/follow', requireAuth, unfollowTopic);       // DELETE /api/topics/:topic/follow
 
 module.exports = router;

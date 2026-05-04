@@ -5,7 +5,6 @@
 //    • API calls (/api/*)                → Network-only
 //    • Static assets (JS/CSS inline)     → Cache-first
 //    • Everything else                   → Network, fall back to cache
-//    • Push notifications                → Show system notification
 // ============================================================
 
 const CACHE_NAME    = 'circle-v1';
@@ -37,87 +36,6 @@ self.addEventListener('activate', event => {
           .map(key => caches.delete(key))
       )
     ).then(() => self.clients.claim())
-  );
-});
-
-// ── Push: receive and display notifications ───────────────
-self.addEventListener('push', event => {
-  let data = {
-    title: 'Circle',
-    body: 'You have a new notification',
-    icon: './icon.svg',
-    badge: './icon.svg',
-    tag: 'circle-notification',
-    data: { url: './index.html' },
-  };
-
-  if (event.data) {
-    try {
-      const payload = event.data.json();
-      data = { ...data, ...payload };
-    } catch {
-      data.body = event.data.text();
-    }
-  }
-
-  const options = {
-    body: data.body,
-    icon: data.icon || './icon.svg',
-    badge: data.badge || './icon.svg',
-    tag: data.tag || 'circle-notification',
-    data: data.data || { url: './index.html' },
-    vibrate: [100, 50, 100],
-    renotify: true,
-    requireInteraction: false,
-    actions: data.actions || [],
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
-});
-
-// ── Notification click: focus or open the app ────────────
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-
-  const targetUrl = (event.notification.data && event.notification.data.url)
-    ? event.notification.data.url
-    : './index.html';
-
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-      // If the app is already open, focus it
-      for (const client of windowClients) {
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.postMessage({ type: 'NOTIFICATION_CLICK', url: targetUrl, action: event.action });
-          return client.focus();
-        }
-      }
-      // Otherwise open a new window
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
-    })
-  );
-});
-
-// ── Push subscription change: re-subscribe automatically ──
-self.addEventListener('pushsubscriptionchange', event => {
-  event.waitUntil(
-    self.registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: event.oldSubscription
-        ? event.oldSubscription.options.applicationServerKey
-        : null,
-    }).then(subscription => {
-      // POST new subscription to server
-      return fetch('/api/push/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscription }),
-      });
-    })
   );
 });
 

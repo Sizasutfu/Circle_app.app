@@ -8,7 +8,7 @@
 const bcrypt            = require('bcrypt');
 const UserModel         = require('../models/userModel');
 const FollowModel       = require('../models/followModel');
-const NotificationModel = require('../models/notificationModel');
+const NotificationModel = require('../models/notificationModel_v3');
 const { sendOk, sendError } = require('../middleware/response');
 
 // POST /api/users/register

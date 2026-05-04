@@ -3,23 +3,9 @@
 require('dotenv').config();
 
 const express            = require('express');
-const webpush            = require('web-push');
 const { connectDB }      = require('./config/db');
 const { cors }           = require('./middleware/cors');
 const { sendError }      = require('./middleware/response');
-
-// ── VAPID setup ───────────────────────────────────────────
-if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-  webpush.setVapidDetails(
-    process.env.VAPID_MAILTO || 'mailto:admin@circle.app',
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY,
-  );
-  global.webpush = webpush;
-  console.log('🔔 Web push (VAPID) configured.');
-} else {
-  console.warn('⚠️  VAPID keys not set — push notifications disabled.');
-}
 
 // ── Routes ────────────────────────────────────────────────
 const adminRoutes        = require('./routes/adminRoutes');
@@ -32,7 +18,6 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const dmRoutes           = require('./routes/dm');
 const exploreRoutes      = require('./routes/exploreRoutes');
 const topicRoutes        = require('./routes/topicRoutes');
-const pushRoutes         = require('./routes/pushRoutes');
 
 // authRoutes is optional (Google OAuth) — only load if the file exists
 let authRoutes = null;
@@ -69,7 +54,6 @@ app.use('/api',               followRoutes);
 app.use('/api/dm',            dmRoutes);
 app.use('/api/explore',       exploreRoutes);
 app.use('/api/topics',        topicRoutes);
-app.use('/api/push',          pushRoutes);
 
 // 404
 app.use((req, res) => sendError(res, 404, `Route '${req.originalUrl}' not found.`));

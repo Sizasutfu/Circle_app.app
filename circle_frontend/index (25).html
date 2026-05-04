@@ -2966,46 +2966,6 @@
       .av-upload-wrap.av-disabled-mode { cursor: default; }
       .av-upload-wrap.av-disabled-mode:hover .av-upload-overlay,
       .av-upload-wrap.av-disabled-mode:hover .av-upload-badge { opacity: 0; }
-      /* ── Avatar action menu (own profile) — fixed so it floats above all layout ── */
-      .av-action-menu {
-        position: fixed;
-        z-index: 9999;
-        background: var(--card);
-        border: 1px solid var(--border2);
-        border-radius: var(--radius-sm);
-        box-shadow: var(--shadow-lg);
-        min-width: 180px;
-        overflow: hidden;
-        opacity: 0;
-        pointer-events: none;
-        transform: scale(0.92);
-        transform-origin: top left;
-        transition: opacity 0.15s ease, transform 0.18s cubic-bezier(0.34,1.4,0.64,1);
-      }
-      .av-action-menu.open {
-        opacity: 1;
-        transform: scale(1);
-        pointer-events: auto;
-      }
-      .av-action-item {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        padding: 12px 16px;
-        font-size: 13.5px;
-        font-weight: 600;
-        color: var(--txt);
-        cursor: pointer;
-        transition: background var(--tr), color var(--tr);
-        border: none;
-        background: none;
-        font-family: inherit;
-        width: 100%;
-        text-align: left;
-      }
-      .av-action-item:hover { background: var(--accent-bg); color: var(--accent); }
-      .av-action-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-      .av-action-item + .av-action-item { border-top: 1px solid var(--border); }
       .av img,
       .av.lg img {
         width: 100%;
@@ -6058,7 +6018,7 @@
                   ></label>
                 </div>
               </div>
-              <div class="settings-row" id="push-notif-row">
+              <div class="settings-row">
                 <div class="settings-row-icon purple">
                   <svg
                     fill="none"
@@ -6072,17 +6032,16 @@
                 </div>
                 <div class="settings-row-body">
                   <div class="settings-row-title">Push Notifications</div>
-                  <div class="settings-row-sub" id="push-notif-sub">
+                  <div class="settings-row-sub">
                     Receive browser push notifications
                   </div>
                 </div>
                 <div class="settings-row-end">
-                  <label class="toggle" id="push-notif-toggle-label">
-                    <input type="checkbox" id="notif-push" onchange="handlePushToggle(this.checked)" />
+                  <label class="toggle"
+                    ><input type="checkbox" id="notif-push" />
                     <div class="toggle-track"></div>
-                    <div class="toggle-thumb"></div>
-                  </label>
-                  <span id="push-notif-denied-badge" style="display:none;font-size:11px;font-weight:700;color:var(--rose);background:var(--rose-bg);padding:3px 8px;border-radius:6px;white-space:nowrap;">Blocked</span>
+                    <div class="toggle-thumb"></div
+                  ></label>
                 </div>
               </div>
               <div class="settings-row">
@@ -7538,7 +7497,7 @@
       // Dynamically point to the server using whatever host the page loaded from.
       // Works on PC (localhost:5000), phone over LAN (192.168.x.x:5000),
       // or a real domain — no hardcoded IP needed.
-    const API = 'http://localhost:5000';
+    const API = 'http://localhost:5000'; // ← update this IP when your hotspot changes
 
       let posts = [],
         currentUser = null,
@@ -7548,25 +7507,16 @@
       let currentFeedTab = "global";
       const _followingSet = new Set(); // IDs of users the current user follows
 
-      // Register service worker for PWA + push notification functionality
-      let _swRegistration = null;
+      // Register service worker for PWA functionality
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
             .then(registration => {
-              _swRegistration = registration;
-              // Listen for messages from SW (e.g. notification clicks)
-              navigator.serviceWorker.addEventListener('message', event => {
-                if (event.data && event.data.type === 'NOTIFICATION_CLICK') {
-                  const url = event.data.url || '';
-                  if (url.includes('view=notifications')) goTo('notifications');
-                  else goTo('feed');
-                }
-              });
-              // Sync push toggle once SW is ready
-              _syncPushToggle();
+              console.log('Service Worker registered successfully:', registration.scope);
             })
-            .catch(() => { /* SW registration failed silently */ });
+            .catch(error => {
+              console.log('Service Worker registration failed:', error);
+            });
         });
       }
 
@@ -7609,29 +7559,25 @@
         const _profiles = {}; // userId → { ids[], ts }
 
         // ── Persistence ─────────────────────────────────────────────
-        let _saveTimer = null;
         function _save() {
-          // Debounce: batch rapid consecutive saves (e.g. rendering 20 posts)
-          // into a single write 200ms after the last call.
-          if (_saveTimer) return;
-          _saveTimer = setTimeout(() => {
-            _saveTimer = null;
+          try {
+            // Only persist the most recent posts to stay under 5MB quota
+            const recent = [..._byId.values()]
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .slice(0, MAX_STORED);
+            const payload = {
+              posts: recent,
+              feeds: _feeds,
+              profiles: _profiles,
+              savedAt: Date.now(),
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          } catch (e) {
+            // Storage quota exceeded — clear and retry once
             try {
-              const recent = [..._byId.values()]
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .slice(0, MAX_STORED);
-              const payload = {
-                posts: recent,
-                feeds: _feeds,
-                profiles: _profiles,
-                savedAt: Date.now(),
-              };
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-            } catch (e) {
-              // Storage quota exceeded — clear and retry once
-              try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-            }
-          }, 200);
+              localStorage.removeItem(STORAGE_KEY);
+            } catch (_) {}
+          }
         }
 
         function _load() {
@@ -7759,8 +7705,6 @@
             _byId.clear();
             Object.keys(_feeds).forEach((k) => delete _feeds[k]);
             Object.keys(_profiles).forEach((k) => delete _profiles[k]);
-            // Cancel any pending debounced save so stale data isn't written after logout
-            if (_saveTimer) { clearTimeout(_saveTimer); _saveTimer = null; }
             try {
               localStorage.removeItem(STORAGE_KEY);
             } catch (_) {}
@@ -7795,17 +7739,7 @@
         }
         if (signal) opts.signal = signal;
         const res = await fetch(API + path, opts);
-        let data;
-        try { data = await res.json(); } catch (_) { data = {}; }
-        if (res.status === 401) {
-          // Token expired or invalid — clear session and redirect to login
-          localStorage.removeItem("circle_token");
-          localStorage.removeItem("circle_user");
-          PostCache.clear();
-          // Redirect without calling logout() to avoid re-entering api()
-          setTimeout(() => goTo("login"), 0);
-          throw new Error("Session expired. Please log in again.");
-        }
+        const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Something went wrong.");
         return data;
       }
@@ -9449,17 +9383,11 @@
         avWrap.classList.remove("av-view-mode", "av-disabled-mode");
         avWrap.onclick = null;
         if (isOwnProfile) {
-          // Own profile: clicking opens the avatar action menu (View / Change)
-          avWrap.title = pic ? "View or change profile picture" : "Add profile picture";
-          // Camera icon in overlay
+          // Own profile: clicking opens file picker
+          avWrap.title = "Change profile picture";
+          // Restore camera icon in overlay
           avOverlay.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
-          // Show/hide "View Photo" option depending on whether they have a pic
-          const viewBtn = document.getElementById("profile-av-view-btn");
-          if (viewBtn) viewBtn.style.display = pic ? "flex" : "none";
-          // Store current pic on wrap for the menu functions to read
-          avWrap.dataset.currentPic = pic || "";
-          avWrap.dataset.currentName = name;
-          avWrap.onclick = (e) => { e.stopPropagation(); toggleAvatarMenu(); };
+          avWrap.onclick = () => document.getElementById("profile-pic-input").click();
         } else if (pic) {
           // Other profile with picture: clicking shows full-size photo in lightbox
           avWrap.classList.add("av-view-mode");
@@ -9848,49 +9776,6 @@
         }
       }
 
-      /* ── Avatar action menu (own profile) ── */
-      function toggleAvatarMenu() {
-        const menu = document.getElementById('profile-av-menu');
-        if (!menu) return;
-        const isOpen = menu.classList.contains('open');
-        if (isOpen) {
-          closeAvatarMenu();
-        } else {
-          // Position the menu below the avatar using fixed coords
-          const wrap = document.getElementById('profile-av-wrap');
-          if (wrap) {
-            const r = wrap.getBoundingClientRect();
-            const menuW = 180;
-            let left = r.left + r.width / 2 - menuW / 2;
-            // Clamp to viewport
-            left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
-            menu.style.top  = (r.bottom + 10) + 'px';
-            menu.style.left = left + 'px';
-            menu.style.transformOrigin = 'top center';
-          }
-          menu.classList.add('open');
-          // Close on next outside click
-          setTimeout(() => {
-            document.addEventListener('click', closeAvatarMenu, { once: true });
-          }, 0);
-        }
-      }
-      function closeAvatarMenu() {
-        const menu = document.getElementById('profile-av-menu');
-        if (menu) menu.classList.remove('open');
-      }
-      function profileAvViewPhoto() {
-        closeAvatarMenu();
-        const wrap = document.getElementById('profile-av-wrap');
-        const pic  = wrap?.dataset.currentPic;
-        const name = wrap?.dataset.currentName || 'Your';
-        if (pic) openProfilePicLightbox(pic, name);
-      }
-      function profileAvChangePhoto() {
-        closeAvatarMenu();
-        document.getElementById('profile-pic-input').click();
-      }
-
       /* PROFILE PICTURE LIGHTBOX (other users) */
       function openProfilePicLightbox(picUrl, userName) {
         // Reuse the existing lightbox overlay in a minimal "profile pic" mode:
@@ -10231,14 +10116,7 @@
           // (same source the profile tab uses) — avoids N extra API calls
           if (searchTab === "people" && currentUser && resultData.length) {
             resultData.forEach(user => {
-              // Prefer server-returned isFollowing if present, otherwise use local set
-              if (typeof user.isFollowing !== "boolean") {
-                user.isFollowing = _followingSet.has(user.id);
-              } else {
-                // Sync local set to match server truth
-                if (user.isFollowing) _followingSet.add(user.id);
-                else _followingSet.delete(user.id);
-              }
+              user.isFollowing = _followingSet.has(user.id);
             });
           }
 
@@ -11593,7 +11471,7 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
+          
       }
       function formatTime(date) {
         if (!date) return "";
@@ -12359,13 +12237,6 @@
         _lbOrigin = imgEl.getBoundingClientRect();
 
         const lb = document.getElementById('lightbox');
-
-        // Clear any leftover profile-pic mode state so the username chip and
-        // action buttons render correctly for this post's lightbox.
-        if (lb.dataset.profilePicMode) delete lb.dataset.profilePicMode;
-        const lbActsReset = document.getElementById('lb-actions');
-        if (lbActsReset) lbActsReset.style.display = 'none'; // _lbRenderProfile will show if needed
-
         const lbImg = document.getElementById('lb-img');
         const lbVid = document.getElementById('lb-video');
         lbVid.pause && lbVid.pause(); lbVid.style.display = 'none'; lbVid.src = '';
@@ -12416,13 +12287,6 @@
         _lbScale = 1; _lbTranslateX = 0; _lbTranslateY = 0;
 
         const lb = document.getElementById('lightbox');
-
-        // Clear any leftover profile-pic mode state so the username chip and
-        // action buttons render correctly for this post's lightbox.
-        if (lb.dataset.profilePicMode) delete lb.dataset.profilePicMode;
-        const lbActsReset2 = document.getElementById('lb-actions');
-        if (lbActsReset2) lbActsReset2.style.display = 'none'; // _lbRenderProfile will show if needed
-
         lb.style.display = 'flex';
         lb.style.opacity = '0';
         lb.style.transition = 'opacity 0.18s ease';
@@ -12516,12 +12380,7 @@
           delete lb.dataset.profilePicMode;
           const lbProf = document.getElementById('lb-profile');
           if (lbProf) {
-            // Restore the chip's child structure that openProfilePicLightbox replaced
-            // with plain text, so _lbRenderProfile can write to lb-profile-av / lb-profile-name.
-            lbProf.innerHTML = `<div id="lb-profile-av" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;background:var(--accent);display:grid;place-items:center;font-family:var(--font-head);font-size:13px;font-weight:800;color:#fff;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,0.18)"></div><div><div id="lb-profile-name" style="font-family:var(--font-head);font-size:13px;font-weight:800;color:#fff;line-height:1.2;white-space:nowrap"></div><div style="font-size:11px;color:rgba(255,255,255,0.5)">View profile</div></div>`;
-            lbProf.style.display  = 'none';
-            lbProf.style.cursor   = '';
-            lbProf.onclick        = null;
+            lbProf.style.cursor = '';
             lbProf.onmouseover = function() {
               this.style.background = 'rgba(255,255,255,0.12)';
               this.style.transform  = 'scale(1.03)';
@@ -13857,10 +13716,7 @@
                 <span class="post-detail-name" onclick="viewProfile(${post.userId})">${escHtml(post.author||'')}</span>
                 <span class="post-detail-time">${dateStr}</span>
               </div>
-              <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-                ${canDelete ? `<button class="post-del" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
-                ${(currentUser && currentUser.id !== post.userId) ? (() => { const isFollowing = _followingSet.has(post.userId); return `<button class="btn ${isFollowing ? "btn-outline" : "btn-primary"}" id="pd-follow-btn" style="font-size:12px;padding:6px 16px;border-radius:20px" data-following="${isFollowing}" onclick="toggleFollow(${post.userId}, this)">${isFollowing ? "Following" : "Follow"}</button>`; })() : ""}
-              </div>
+              ${canDelete ? `<button class="post-del" style="margin-left:auto" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
             </div>` : ""}
 
             ${post.text ? `<div class="post-detail-body">${escHtml(post.text)}</div>` : ""}
@@ -13945,26 +13801,6 @@
         }
         // Defer real render one frame so skeletons paint first
         requestAnimationFrame(() => renderPostDetailComments(post));
-
-        // Sync follow button state from server (authoritative) — same logic as profile tab
-        if (currentUser && currentUser.id !== post.userId) {
-          (async () => {
-            try {
-              const res = await api("GET", `/api/users/${post.userId}/profile`);
-              const isFollowing = res.data?.isFollowing || false;
-              // Also keep _followingSet in sync
-              if (isFollowing) _followingSet.add(post.userId);
-              else _followingSet.delete(post.userId);
-              const btn = document.getElementById("pd-follow-btn");
-              if (btn) {
-                btn.dataset.following = isFollowing ? "true" : "false";
-                btn.textContent = isFollowing ? "Following" : "Follow";
-                btn.className = `btn ${isFollowing ? "btn-outline" : "btn-primary"}`;
-                btn.style.cssText = "font-size:12px;padding:6px 16px;border-radius:20px";
-              }
-            } catch (_) {}
-          })();
-        }
 
         // Store current post id for reply use
         document.getElementById("post-detail-reply-input").dataset.postId =
@@ -14519,225 +14355,6 @@
           });
         };
       })();
-
-      /* ══════════════════════════════════════════════════════════════════
-         PUSH NOTIFICATIONS
-         ══════════════════════════════════════════════════════════════════
-         Flow:
-           1. User flips toggle → request Notification permission
-           2. On grant → subscribe via pushManager with VAPID key
-           3. POST subscription endpoint to /api/push/subscribe
-           4. On unsubscribe → POST to /api/push/unsubscribe
-           5. Service worker handles push events and shows system notifications
-           6. Preference toggles (likes/comments/etc) POST to /api/push/preferences
-
-         VAPID public key: replace the placeholder below with your real key.
-         Generate with: npx web-push generate-vapid-keys
-      ══════════════════════════════════════════════════════════════════ */
-
-      // ── VAPID public key (replace with your real key) ──────────────
-      const VAPID_PUBLIC_KEY = 'BDrQXFG6fUBbN110-JFtCCpHYAcHYvIdoExS1tolzULYEOBI1Ky2d-Rdsk-q071dk1DE7o_n2sje_xvxLUOFPWQ';
-
-      function _urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-        const rawData = atob(base64);
-        return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-      }
-
-      // ── Sync the push toggle to reflect actual subscription state ───
-      async function _syncPushToggle() {
-        const toggle = document.getElementById('notif-push');
-        const sub = document.getElementById('push-notif-sub');
-        const deniedBadge = document.getElementById('push-notif-denied-badge');
-        const toggleLabel = document.getElementById('push-notif-toggle-label');
-        if (!toggle) return;
-
-        if (!('Notification' in window) || !('PushManager' in window)) {
-          // Browser doesn't support push
-          toggle.disabled = true;
-          if (sub) sub.textContent = 'Not supported in this browser';
-          return;
-        }
-
-        const perm = Notification.permission;
-
-        if (perm === 'denied') {
-          toggle.checked = false;
-          toggle.disabled = true;
-          if (toggleLabel) toggleLabel.style.display = 'none';
-          if (deniedBadge) deniedBadge.style.display = '';
-          if (sub) sub.textContent = 'Blocked by browser — update in your browser settings';
-          return;
-        }
-
-        if (toggleLabel) toggleLabel.style.display = '';
-        if (deniedBadge) deniedBadge.style.display = 'none';
-        toggle.disabled = false;
-
-        if (perm === 'granted' && _swRegistration) {
-          try {
-            const existing = await _swRegistration.pushManager.getSubscription();
-            toggle.checked = !!existing;
-            if (sub) sub.textContent = existing
-              ? 'You\'re subscribed — notifications are active'
-              : 'Enable browser push notifications';
-          } catch {
-            toggle.checked = false;
-          }
-        } else {
-          toggle.checked = false;
-          if (sub) sub.textContent = 'Enable browser push notifications';
-        }
-      }
-
-      // ── Subscribe to push ───────────────────────────────────────────
-      async function _subscribePush() {
-        if (!_swRegistration) throw new Error('Service worker not ready');
-        const applicationServerKey = _urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
-        const subscription = await _swRegistration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey,
-        });
-        // Send subscription to your backend
-        try {
-          await api('POST', '/api/push/subscribe',{
-            subscription: subscription.toJSON(),
-            preferences: _getPushPreferences(),
-            userId: currentUser?.id || JSON.parse(localStorage.getItem('circle_user'))?.id,
-          });
-        } catch {
-          // Server not yet set up — subscription is still stored client-side
-        }
-        return subscription;
-      }
-
-      // ── Unsubscribe from push ───────────────────────────────────────
-      async function _unsubscribePush() {
-        if (!_swRegistration) return;
-        const sub = await _swRegistration.pushManager.getSubscription();
-        if (!sub) return;
-        try {
-          await api('POST', '/api/push/unsubscribe', JSON.stringify({
-            endpoint: sub.endpoint,
-          }));
-        } catch { /* server may not be configured */ }
-        await sub.unsubscribe();
-      }
-
-      // ── Read the per-type notification preference toggles ───────────
-      function _getPushPreferences() {
-        return {
-          likes:      document.getElementById('notif-likes')?.checked ?? true,
-          comments:   document.getElementById('notif-comments')?.checked ?? true,
-          reposts:    document.getElementById('notif-reposts')?.checked ?? true,
-          new_post:   document.getElementById('notif-new_post')?.checked ?? true,
-          profile_pic:document.getElementById('notif-profile_pic')?.checked ?? true,
-          follows:    document.getElementById('notif-follows')?.checked ?? true,
-          mentions:   document.getElementById('notif-mentions')?.checked ?? true,
-        };
-      }
-
-      // ── Called when the push toggle is flipped ──────────────────────
-      async function handlePushToggle(enabled) {
-        const toggle = document.getElementById('notif-push');
-        const subEl = document.getElementById('push-notif-sub');
-
-        if (!('Notification' in window) || !('PushManager' in window)) {
-          showToast('Push notifications are not supported in this browser.');
-          if (toggle) toggle.checked = false;
-          return;
-        }
-
-        if (enabled) {
-          // Request permission first
-          const perm = await Notification.requestPermission();
-          if (perm !== 'granted') {
-            if (toggle) toggle.checked = false;
-            if (perm === 'denied') {
-              showToast('Notifications blocked. Please allow them in your browser settings.');
-              _syncPushToggle();
-            } else {
-              showToast('Notification permission was dismissed.');
-            }
-            return;
-          }
-
-          try {
-            if (toggle) toggle.disabled = true;
-            if (subEl) subEl.textContent = 'Subscribing…';
-            await _subscribePush();
-            showToast('Push notifications enabled! 🔔');
-            if (subEl) subEl.textContent = 'You\'re subscribed — notifications are active';
-
-            // Fire a welcome notification so the user can confirm it works
-            setTimeout(() => {
-              if (_swRegistration) {
-                _swRegistration.showNotification('Circle notifications are on! 🎉', {
-                  body: 'You\'ll now get notified about likes, comments, and more.',
-                  icon: './icon.svg',
-                  badge: './icon.svg',
-                  tag: 'circle-welcome',
-                  vibrate: [100, 50, 100],
-                });
-              }
-            }, 800);
-          } catch (err) {
-            showToast('Could not enable push notifications: ' + err.message);
-            if (toggle) toggle.checked = false;
-            if (subEl) subEl.textContent = 'Enable browser push notifications';
-          } finally {
-            if (toggle) toggle.disabled = false;
-          }
-        } else {
-          try {
-            await _unsubscribePush();
-            showToast('Push notifications disabled.');
-            if (subEl) subEl.textContent = 'Enable browser push notifications';
-          } catch (err) {
-            showToast('Error unsubscribing: ' + err.message);
-            // Re-sync to reflect true state
-            _syncPushToggle();
-          }
-        }
-      }
-
-      // ── Sync push prefs to server whenever a type toggle changes ────
-      async function _savePushPreferences() {
-        if (!_swRegistration) return;
-        const sub = await _swRegistration.pushManager.getSubscription().catch(() => null);
-        if (!sub) return;
-        try {
-          await api('POST', '/api/push/preferences', JSON.stringify({
-            endpoint: sub.endpoint,
-            preferences: _getPushPreferences(),
-          }));
-        } catch { /* server may not be configured */ }
-      }
-
-      // Attach preference-save listener to each per-type toggle
-      ['notif-likes','notif-comments','notif-reposts','notif-new_post','notif-profile_pic','notif-follows','notif-mentions'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('change', _savePushPreferences);
-      });
-
-      // Initial sync once DOM is ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', _syncPushToggle);
-      } else {
-        _syncPushToggle();
-      }
     </script>
-  <!-- Avatar action menu — fixed position, anchored via JS to avatar -->
-  <div class="av-action-menu" id="profile-av-menu">
-    <button class="av-action-item" id="profile-av-view-btn" onclick="profileAvViewPhoto()">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      View Photo
-    </button>
-    <button class="av-action-item" onclick="profileAvChangePhoto()">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Change Photo
-    </button>
-  </div>
   </body>
 </html>
