@@ -4,7 +4,7 @@
 // ============================================================
 
 const { db } = require('../config/db');
-const { sendPushToUser } = require('../models/pushModel');
+const { sendPushToUser } = require('./pushModel');
 
 // ── Human-readable push copy for each notification type ────
 const PUSH_COPY = {
@@ -51,6 +51,7 @@ async function createNotification(recipientId, actorId, type, postId = null) {
     // ── Fire push notification ──────────────────────────────
     // Fetch actor name for the notification body (non-blocking)
     const prefType = TYPE_TO_PREF[type];
+    console.log('push firing:', { recipientId, type, prefType });
     const copyFn   = PUSH_COPY[type];
     if (prefType && copyFn) {
       db.query('SELECT name FROM users WHERE id = ?', [actorId])

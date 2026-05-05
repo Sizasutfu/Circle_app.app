@@ -1124,7 +1124,7 @@
         padding: 10px 16px 0;
         font-size: 12px;
         font-weight: 700;
-        color: var(--green);
+        color: var(--txt2);
       }
       .repost-strip svg {
         width: 13px;
@@ -2896,7 +2896,7 @@
       }
       /* Prevent the label from ever growing beyond its avatar child */
       .av-upload-wrap .av {
-        display: block;
+        display: grid;
       }
       /* Lock the label to exactly the avatar size so the hit area never bleeds */
       .av-upload-wrap:has(.av.lg) {
@@ -13897,7 +13897,12 @@
             })()}
 
             <div class="post-detail-actions">
-              <button class="act-btn like-btn${liked ? " liked" : ""}" id="pd-like-btn" onclick="pdToggleLike(${post.id})">
+              ${(() => {
+                const isNoQuoteRepost = post.isRepost && post.originalPost && !post.text;
+                const targetId       = isNoQuoteRepost ? post.originalPost.id  : post.id;
+                const targetReposts  = isNoQuoteRepost ? (post.originalPost.reposts || []) : (post.reposts || []);
+                const targetReposted = currentUser && targetReposts.some(r => (r.userId || r) === currentUser.id);
+                return `<button class="act-btn like-btn${liked ? " liked" : ""}" id="pd-like-btn" onclick="pdToggleLike(${post.id})">
                 <svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                 <span id="pd-like-count">${post.likes ? post.likes.length : 0}</span>
               </button>
@@ -13905,22 +13910,19 @@
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                 <span>${post.comments ? post.comments.length || "" : ""}</span>
               </button>
-              ${
-                !post.isRepost
-                  ? `<div class="post-menu-wrap" onclick="event.stopPropagation()">
-                <button class="act-btn repost-btn${reposted ? " reposted" : ""}" onclick="toggleRepostMenu(event,${post.id})">
+              <div class="post-menu-wrap" onclick="event.stopPropagation()">
+                <button class="act-btn repost-btn${targetReposted ? " reposted" : ""}" onclick="toggleRepostMenu(event,${targetId})">
                   <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
-                  <span>${post.reposts ? post.reposts.length || "" : ""}</span>
+                  <span>${targetReposts.length || ""}</span>
                 </button>
-                <div class="post-dropdown" id="repost-menu-${post.id}">
-                  <button class="post-dropdown-item" id="repost-menu-do-${post.id}" onclick="closeRepostMenu(${post.id});confirmRepost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Repost</button>
-                  <button class="post-dropdown-item rp-undo" id="repost-menu-undo-${post.id}" onclick="closeRepostMenu(${post.id});undoRepost(${post.id})" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Undo repost</button>
+                <div class="post-dropdown" id="repost-menu-${targetId}">
+                  <button class="post-dropdown-item" id="repost-menu-do-${targetId}" onclick="closeRepostMenu(${targetId});confirmRepost(${targetId})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Repost</button>
+                  <button class="post-dropdown-item rp-undo" id="repost-menu-undo-${targetId}" onclick="closeRepostMenu(${targetId});undoRepost(${targetId})" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Undo repost</button>
                   <div class="post-dropdown-divider"></div>
-                  <button class="post-dropdown-item" onclick="closeRepostMenu(${post.id});openQuoteModal(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quote</button>
+                  <button class="post-dropdown-item" onclick="closeRepostMenu(${targetId});openQuoteModal(${targetId})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quote</button>
                 </div>
-              </div>`
-                  : ""
-              }
+              </div>`;
+              })()}
             </div>
           </div>`;
 

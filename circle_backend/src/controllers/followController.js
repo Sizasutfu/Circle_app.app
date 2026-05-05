@@ -5,7 +5,7 @@
 
 const FollowModel       = require('../models/followModel');
 const UserModel         = require('../models/userModel');
-const NotificationModel = require('../models/notificationModel_v3');
+const NotificationModel = require('../models/notificationModel');
 const { sendOk, sendError } = require('../middleware/response');
 
 // POST /api/follow/:targetId
