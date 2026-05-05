@@ -19,6 +19,17 @@ const PREF_COLS = {
   mentions:    'pref_mentions',
 };
 
+// Maps prefKey → notifType string the client router expects
+const NOTIF_TYPE_MAP = {
+  likes:       'like',
+  comments:    'comment',
+  reposts:     'repost',
+  new_post:    'new_post',
+  mentions:    'mention',
+  follows:     'follow',
+  profile_pic: 'profile_pic',
+};
+
 // ── Save or update a subscription ─────────────────────────
 async function upsertSubscription(userId, subscription, preferences = {}) {
   const {
@@ -81,7 +92,13 @@ async function updatePreferences(endpoint, preferences = {}) {
 }
 
 // ── Fan out a push to all of a user's subscribed devices ──
-async function sendPushToUser(userId, prefKey, title, body, url = './index.html') {
+//
+//  options (all optional but needed for deep navigation on click):
+//    postId  — the post the notification is about (likes, comments, reposts, mentions, new_post)
+//    actorId — the user who triggered the notification (follows, profile_pic)
+//    notifId — the DB notification row id (used by the client to mark as read)
+//
+async function sendPushToUser(userId, prefKey, title, body, url = './', { postId = null, actorId = null, notifId = null } = {}) {
   if (!global.webpush) return;
 
   const col = PREF_COLS[prefKey];
@@ -93,12 +110,31 @@ async function sendPushToUser(userId, prefKey, title, body, url = './index.html'
   );
   if (!rows.length) return;
 
+  // Build a tag that embeds the target ID so the SW can parse it as a fallback
+  const POST_TYPES  = ['likes', 'comments', 'reposts', 'new_post', 'mentions'];
+  const ACTOR_TYPES = ['follows', 'profile_pic'];
+  let tag;
+  if (POST_TYPES.includes(prefKey) && postId) {
+    tag = `${prefKey}-${postId}`;   // e.g. "likes-42", "comments-42"
+  } else if (ACTOR_TYPES.includes(prefKey) && actorId) {
+    tag = `${prefKey}-${actorId}`; // e.g. "follows-7"
+  } else {
+    tag = `circle-${prefKey}`;     // fallback for milestone etc.
+  }
+
   const payload = JSON.stringify({
-    title, body,
+    title,
+    body,
     icon:  './icon.svg',
     badge: './icon.svg',
-    tag:   `circle-${prefKey}`,
-    data:  { url },
+    tag,
+    data: {
+      notifType: NOTIF_TYPE_MAP[prefKey] || prefKey,
+      postId:    postId  ? Number(postId)  : null,
+      actorId:   actorId ? Number(actorId) : null,
+      notifId:   notifId ? Number(notifId) : null,
+      url,
+    },
   });
 
   await Promise.allSettled(

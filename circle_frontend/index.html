@@ -7558,9 +7558,7 @@
               // Listen for messages from SW (e.g. notification clicks)
               navigator.serviceWorker.addEventListener('message', event => {
                 if (event.data && event.data.type === 'NOTIFICATION_CLICK') {
-                  const url = event.data.url || '';
-                  if (url.includes('view=notifications')) goTo('notifications');
-                  else goTo('feed');
+                  _handlePushNotifClick(event.data);
                 }
               });
               // Sync push toggle once SW is ready
@@ -13712,6 +13710,43 @@
           const ftFollowing = document.getElementById("ftab-following");
           if (ftFollowing) ftFollowing.style.opacity = "0.5";
         }
+
+        // ── Cold-start push notification deep-link ────────────────
+        // When the user taps a notification while the app is closed, the SW
+        // opens a new tab with a hash like #notif:post:42 or #notif:profile:7.
+        // We parse it here and navigate after the feed has loaded.
+        const _coldHash = window.location.hash;
+        if (_coldHash && _coldHash.startsWith('#notif:')) {
+          // Strip the hash immediately so refreshing doesn't re-trigger
+          history.replaceState({ view: 'feed' }, '', window.location.pathname + window.location.search);
+          const parts = _coldHash.slice(1).split(':'); // ['notif','post','42']
+          const _coldTarget = parts[1]; // 'post' | 'profile'
+          const _coldId = parts[2];    // id as string or 'me'
+
+          // Defer until after loadPosts() so the cache has a chance to fill
+          setTimeout(async () => {
+            if (_coldTarget === 'post' && _coldId) {
+              const pid = parseInt(_coldId, 10);
+              const cached = posts.find(p => p.id === pid) || PostCache.getPost(pid);
+              if (cached) {
+                renderPostDetail(cached);
+                goTo('post-detail');
+              } else {
+                try {
+                  const res = await api('GET', `/api/posts/${pid}`);
+                  if (res.data) { PostCache.putPost(res.data); renderPostDetail(res.data); goTo('post-detail'); }
+                } catch (_) {}
+              }
+            } else if (_coldTarget === 'profile') {
+              if (_coldId === 'me') {
+                goTo('profile');
+              } else if (_coldId) {
+                viewProfile(parseInt(_coldId, 10));
+              }
+            }
+          }, 800);
+        }
+
         loadPosts();
         loadTrending();
       })();
@@ -14638,6 +14673,64 @@
           follows:    document.getElementById('notif-follows')?.checked ?? true,
           mentions:   document.getElementById('notif-mentions')?.checked ?? true,
         };
+      }
+
+      // ── Handle a push notification click → navigate to the right place ──
+      async function _handlePushNotifClick(data) {
+        // data shape sent by the service worker:
+        // { type: 'NOTIFICATION_CLICK', notifType, postId, actorId, notifId }
+        const { notifType, postId, actorId, notifId } = data;
+
+        // Debug: open DevTools Console to see exactly what arrived
+        console.log('[Circle] _handlePushNotifClick received:', data);
+
+        // Mark as read server-side (best-effort)
+        if (notifId) {
+          try { await api('PUT', `/api/notifications/${notifId}/read`); } catch (_) {}
+        }
+
+        // Bring the window to the foreground (no-op if already focused)
+        window.focus();
+
+        // Route exactly like onNotifClick() does for in-app notification taps
+        if (notifType === 'profile_pic' || notifType === 'follow') {
+          if (actorId) { viewProfile(actorId); }
+          else goTo('feed');
+        } else if (notifType === 'milestone') {
+          goTo('profile');
+        } else if (postId) {
+          // like / comment / repost / mention / reply / new_post → open the post
+          const cached = posts.find(p => p.id === postId) || PostCache.getPost(postId);
+          if (cached) {
+            renderPostDetail(cached);
+            goTo('post-detail');
+          } else {
+            showToast('Loading post…');
+            try {
+              const res = await api('GET', `/api/posts/${postId}`);
+              const found = res.data;
+              if (found) {
+                PostCache.putPost(found);
+                renderPostDetail(found);
+                goTo('post-detail');
+              } else {
+                showToast('Post not found.');
+                goTo('feed');
+              }
+            } catch (e) {
+              showToast('Could not load post.');
+              goTo('feed');
+            }
+          }
+        } else {
+          // Fallback: open notifications panel so user can see what's new
+          goTo('feed');
+          setTimeout(openNotifPanel, 300);
+        }
+
+        // Refresh notification badge / list
+        fetchUnreadCount();
+        fetchNotifications(true);
       }
 
       // ── Called when the push toggle is flipped ──────────────────────

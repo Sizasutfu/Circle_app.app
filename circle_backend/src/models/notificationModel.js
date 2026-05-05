@@ -8,13 +8,13 @@ const { sendPushToUser } = require('./pushModel');
 
 // ── Human-readable push copy for each notification type ────
 const PUSH_COPY = {
-  like:       (actor)        => ({ title: 'New like ❤️',        body: `${actor} liked your post` }),
-  comment:    (actor)        => ({ title: 'New comment 💬',      body: `${actor} commented on your post` }),
-  repost:     (actor)        => ({ title: 'New repost 🔁',       body: `${actor} reposted your post` }),
-  follow:     (actor)        => ({ title: 'New follower 👤',     body: `${actor} started following you` }),
-  mention:    (actor)        => ({ title: 'You were mentioned 📣', body: `${actor} mentioned you in a post` }),
-  new_post:   (actor)        => ({ title: 'New post ✨',         body: `${actor} published a new post` }),
-  profile_pic:(actor)        => ({ title: 'Profile updated 📸',  body: `${actor} updated their profile photo` }),
+  like:        (actor, snippet) => ({ title: 'New like ❤️',           body: snippet ? `${actor} liked your post: "${snippet}"` : `${actor} liked your post` }),
+  comment:     (actor, snippet) => ({ title: 'New comment 💬',         body: snippet ? `${actor} commented: "${snippet}"` : `${actor} commented on your post` }),
+  repost:      (actor, snippet) => ({ title: 'New repost 🔁',          body: `${actor} reposted your post` }),
+  follow:      (actor)          => ({ title: 'New follower 👤',         body: `${actor} started following you` }),
+  mention:     (actor, snippet) => ({ title: 'You were mentioned 📣',   body: snippet ? `${actor} mentioned you: "${snippet}"` : `${actor} mentioned you in a post` }),
+  new_post:    (actor, snippet) => ({ title: 'New post ✨',             body: snippet ? `${actor} posted: "${snippet}"` : `${actor} published a new post` }),
+  profile_pic: (actor)          => ({ title: 'Profile updated 📸',      body: `${actor} updated their profile photo` }),
 };
 
 // Maps notification `type` values to push_subscriptions pref columns
@@ -41,24 +41,36 @@ async function createNotification(recipientId, actorId, type, postId = null) {
     );
     if (dup.length > 0) return; // already exists
 
-    await db.query(
+    // INSERT and capture the new row's id for the push payload
+    const [result] = await db.query(
       `INSERT INTO notifications (recipient_id, actor_id, type, post_id)
        VALUES (?, ?, ?, ?)`,
       [recipientId, actorId, type, postId]
-      
     );
-     console.log(`Notification created: recipient=${recipientId} actor=${actorId} type=${type} postId=${postId}`);
-    // ── Fire push notification ──────────────────────────────
-    // Fetch actor name for the notification body (non-blocking)
+    const notifId = result.insertId;
+
+    console.log(`Notification created: recipient=${recipientId} actor=${actorId} type=${type} postId=${postId} notifId=${notifId}`);
+
+    // ── Fire push notification (non-blocking) ───────────────
     const prefType = TYPE_TO_PREF[type];
-    console.log('push firing:', { recipientId, type, prefType });
     const copyFn   = PUSH_COPY[type];
     if (prefType && copyFn) {
-      db.query('SELECT name FROM users WHERE id = ?', [actorId])
-        .then(([[actor]]) => {
-          if (!actor) return;
-          const { title, body } = copyFn(actor.name);
-          return sendPushToUser(recipientId, prefType, title, body);
+      db.query(
+        // Fetch actor name + post snippet in one query
+        `SELECT u.name AS actorName, LEFT(p.text, 60) AS snippet
+         FROM users u
+         LEFT JOIN posts p ON p.id = ?
+         WHERE u.id = ?`,
+        [postId, actorId]
+      )
+        .then(([[row]]) => {
+          if (!row) return;
+          const { title, body } = copyFn(row.actorName, row.snippet || null);
+          return sendPushToUser(recipientId, prefType, title, body, './', {
+            postId,           // ← which post (null for follow/profile_pic)
+            actorId,          // ← who triggered it
+            notifId,          // ← DB row id so client can mark as read
+          });
         })
         .catch(err => console.error('push dispatch error:', err.message));
     }
