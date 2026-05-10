@@ -1,17 +1,16 @@
 // ============================================================
 //  models/PostModel.js
 //  All database queries related to posts, plus the
-//  hydration helper and feed scoring algorithm.
+//  hydration helper.
+//
+//  Feed scoring and pagination have moved to feed/feedPipeline.js.
+//  computeScore lives in feed/feedScorer.js.
+//  getPostsPage lives in feed/feedPipeline.js.
 // ============================================================
 
 const { db }          = require('../config/db');
 const {
-  WEIGHT_LIKE, WEIGHT_COMMENT, WEIGHT_REPOST, WEIGHT_VIEW,
-  BOOST_OWN, BOOST_FOLLOW, BOOST_REPOST,
-  WEIGHT_ENGAGEMENT_LIKE, WEIGHT_ENGAGEMENT_COMMENT, WEIGHT_ENGAGEMENT_REPOST,
-  WEIGHT_TOPIC,
-  RECENCY_SCALE, RECENCY_SHIFT, FEED_PAGE_SIZE,
-  FEED_CANDIDATE_MULTIPLIER, SEEN_PENALTY,
+  FEED_PAGE_SIZE,
 } = require('../config/constants');
 const TopicPreferenceModel = require('./TopicPreferenceModel');
 
@@ -23,36 +22,6 @@ function toRelativePath(url) {
     if (u.pathname.startsWith('/uploads/')) return u.pathname;
   } catch {}
   return url;
-}
-
-// ── Score a single post ────────────────────────────────────
-function computeScore(post, viewerUserId, followingIds = [], engagementMap = {}, topicScoreMap = {}) {
-  const hoursOld     = (Date.now() - new Date(post.createdAt).getTime()) / 3_600_000;
-  const recency      = RECENCY_SCALE / (hoursOld + RECENCY_SHIFT);
-  const likeScore    = (post.likes?.length    || 0) * WEIGHT_LIKE;
-  const commentScore = (post.comments?.length || 0) * WEIGHT_COMMENT;
-  const repostScore  = (post.reposts?.length  || 0) * WEIGHT_REPOST;
-  const viewScore    = (post.views            || 0) * WEIGHT_VIEW;
-  const ownBoost     = post.userId === viewerUserId        ? BOOST_OWN    : 0;
-  const followBoost  = followingIds.includes(post.userId)  ? BOOST_FOLLOW : 0;
-  const repostBoost  = post.isRepost                       ? BOOST_REPOST : 0;
-
-  const eng = engagementMap[post.userId] || {};
-  const engagementBoost =
-    (eng.likes    || 0) * WEIGHT_ENGAGEMENT_LIKE +
-    (eng.comments || 0) * WEIGHT_ENGAGEMENT_COMMENT +
-    (eng.reposts  || 0) * WEIGHT_ENGAGEMENT_REPOST;
-
-  // Topic affinity boost
-  let topicBoost = 0;
-  if (post._topics?.length && Object.keys(topicScoreMap).length) {
-    post._topics.forEach(t => {
-      topicBoost += (topicScoreMap[t] || 0) * WEIGHT_TOPIC;
-    });
-  }
-
-  return recency + likeScore + commentScore + repostScore + viewScore +
-         ownBoost + followBoost + repostBoost + engagementBoost + topicBoost;
 }
 
 // ── Nest flat comment rows into a parent → replies tree ───
@@ -133,6 +102,18 @@ async function hydratePosts(posts) {
     origRows.forEach(o => { origMap[o.id] = o; });
   }
 
+  // ── Resolve group names for any post that has a group_id ──
+  const groupIds = [...new Set(posts.map(p => p.groupId).filter(Boolean))];
+  let groupMap = {};
+  if (groupIds.length) {
+    const gph = groupIds.map(() => '?').join(',');
+    const [gRows] = await db.query(
+      `SELECT id, display_name AS displayName, topic FROM \`groups\` WHERE id IN (${gph})`,
+      groupIds
+    );
+    gRows.forEach(g => { groupMap[g.id] = g; });
+  }
+
   posts.forEach(p => {
     p.likes    = lMap[p.id] || [];
     p.reposts  = rMap[p.id] || [];
@@ -140,6 +121,10 @@ async function hydratePosts(posts) {
     p.views    = vMap[p.id] || 0;
     if (p.isRepost && p.originalPostId)
       p.originalPost = origMap[p.originalPostId] || null;
+    if (p.groupId && groupMap[p.groupId]) {
+      p.groupName  = groupMap[p.groupId].displayName;
+      p.groupTopic = groupMap[p.groupId].topic;
+    }
 
     p.image         = toRelativePath(p.image);
     p.video         = toRelativePath(p.video);
@@ -155,6 +140,7 @@ async function hydratePosts(posts) {
 }
 
 // ── Fetch IDs the viewer follows ──────────────────────────
+// Still used by feedPipeline.js via PostModel.getFollowingIds()
 async function getFollowingIds(viewerUserId) {
   if (!viewerUserId) return [];
   const [rows] = await db.query(
@@ -165,6 +151,7 @@ async function getFollowingIds(viewerUserId) {
 }
 
 // ── Fetch viewer's personal engagement with each author ───
+// Still used by feedPipeline.js via PostModel.getEngagementMap()
 async function getEngagementMap(viewerUserId) {
   if (!viewerUserId) return {};
   const [rows] = await db.query(
@@ -193,6 +180,7 @@ async function getEngagementMap(viewerUserId) {
 }
 
 // ── Fetch post IDs the viewer has already seen ────────────
+// Still used by feedPipeline.js via PostModel.getSeenPostIds()
 async function getSeenPostIds(viewerKey) {
   if (!viewerKey) return new Set();
   const [rows] = await db.query(
@@ -200,93 +188,6 @@ async function getSeenPostIds(viewerKey) {
     [String(viewerKey)]
   );
   return new Set(rows.map(r => r.post_id));
-}
-
-// ── Fetch one page of posts ────────────────────────────────
-async function getPostsPage(viewerUserId, feedMode, page, limit = FEED_PAGE_SIZE, mediaFilter = null) {
-  const LIMIT     = limit;
-  const POOL_SIZE = LIMIT * FEED_CANDIDATE_MULTIPLIER;
-  const OFFSET    = (page - 1) * LIMIT;
-
-  const followingIds = await getFollowingIds(viewerUserId);
-
-  let whereClause = '';
-  let whereParams = [];
-
-  if (feedMode === 'following' && viewerUserId) {
-    if (!followingIds.length) return { posts: [], hasMore: false };
-    const ph = followingIds.map(() => '?').join(',');
-    whereClause = `WHERE p.user_id IN (${ph})`;
-    whereParams = followingIds;
-  }
-
-  if (mediaFilter === 'video') {
-    whereClause = whereClause
-      ? `${whereClause} AND p.video IS NOT NULL AND p.video != ''`
-      : `WHERE p.video IS NOT NULL AND p.video != ''`;
-  }
-
-  const [rawPosts] = await db.query(
-    `SELECT
-       p.id,
-       p.user_id          AS userId,
-       u.name             AS author,
-       u.picture          AS authorPicture,
-       p.text,
-       p.image,
-       p.video,
-       p.is_repost        AS isRepost,
-       p.original_post_id AS originalPostId,
-       p.created_at       AS createdAt
-     FROM posts p
-     JOIN users u ON u.id = p.user_id
-     ${whereClause}
-     ORDER BY p.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [...whereParams, POOL_SIZE + 1, OFFSET]
-  );
-
-  const poolHasMore = rawPosts.length > POOL_SIZE;
-  const candidates  = rawPosts.slice(0, POOL_SIZE);
-
-  if (!candidates.length) return { posts: [], hasMore: false };
-
-  const viewerKey = viewerUserId ? String(viewerUserId) : null;
-
-  const [hydratedCandidates, seenIds, engagementMap, topicScoreMap] = await Promise.all([
-    hydratePosts(candidates),
-    getSeenPostIds(viewerKey),
-    getEngagementMap(viewerUserId),
-    TopicPreferenceModel.getTopicScoreMap(viewerUserId),
-  ]);
-
-  // Bulk-fetch topics for all candidate posts
-  if (Object.keys(topicScoreMap).length && hydratedCandidates.length) {
-    const ids = hydratedCandidates.map(p => p.id);
-    const ph  = ids.map(() => '?').join(',');
-    const [topicRows] = await db.query(
-      `SELECT post_id, topic FROM post_topics WHERE post_id IN (${ph})`,
-      ids
-    );
-    const topicsByPost = {};
-    ids.forEach(id => { topicsByPost[id] = []; });
-    topicRows.forEach(r => topicsByPost[r.post_id]?.push(r.topic));
-    hydratedCandidates.forEach(p => { p._topics = topicsByPost[p.id] || []; });
-  }
-
-  hydratedCandidates.forEach(p => {
-    const base = computeScore(p, viewerUserId, followingIds, engagementMap, topicScoreMap);
-    p._score   = seenIds.has(p.id) ? base * SEEN_PENALTY : base;
-  });
-
-  hydratedCandidates.sort((a, b) => b._score - a._score);
-
-  const pagePosts = hydratedCandidates.slice(0, LIMIT);
-  const hasMore   = hydratedCandidates.length > LIMIT || poolHasMore;
-
-  pagePosts.forEach(p => { delete p._score; delete p._topics; });
-
-  return { posts: pagePosts, hasMore };
 }
 
 // ── Fetch all posts for a specific user profile ────────────
@@ -305,6 +206,7 @@ async function getProfilePosts(profileUserId, page = 1, limit = FEED_PAGE_SIZE) 
        p.video,
        p.is_repost        AS isRepost,
        p.original_post_id AS originalPostId,
+       p.group_id         AS groupId,
        p.created_at       AS createdAt
      FROM posts p
      JOIN users u ON u.id = p.user_id
@@ -322,17 +224,64 @@ async function getProfilePosts(profileUserId, page = 1, limit = FEED_PAGE_SIZE) 
 }
 
 // ── Create a post ──────────────────────────────────────────
-async function createPost(userId, text, image, video) {
+// groupId (optional) scopes the post to a group.
+async function createPost(userId, text, image, video, groupId = null) {
   const [result] = await db.query(
-    'INSERT INTO posts (user_id, text, image, video) VALUES (?, ?, ?, ?)',
-    [userId, text || null, image || null, video || null]
+    'INSERT INTO posts (user_id, text, image, video, group_id) VALUES (?, ?, ?, ?, ?)',
+    [userId, text || null, image || null, video || null, groupId || null]
   );
   return result.insertId;
+}
+
+// ── Fetch posts scoped to a group ──────────────────────────
+// Returns only posts whose group_id matches — no membership
+// check here; the controller enforces that.
+async function getGroupPosts(groupId, page = 1, limit = 20) {
+  const OFFSET = (page - 1) * limit;
+  const [rawPosts] = await db.query(
+    `SELECT
+       p.id,
+       p.user_id          AS userId,
+       u.name             AS author,
+       u.picture          AS authorPicture,
+       p.text,
+       p.image,
+       p.video,
+       p.is_repost        AS isRepost,
+       p.original_post_id AS originalPostId,
+       p.group_id         AS groupId,
+       p.created_at       AS createdAt
+     FROM posts p
+     JOIN users u ON u.id = p.user_id
+     WHERE p.group_id = ?
+     ORDER BY p.created_at DESC
+     LIMIT ? OFFSET ?`,
+    [groupId, limit + 1, OFFSET]
+  );
+  const hasMore   = rawPosts.length > limit;
+  const pagePosts = rawPosts.slice(0, limit);
+  const posts     = await hydratePosts(pagePosts);
+  return { posts, hasMore };
 }
 
 // ── Delete a post ──────────────────────────────────────────
 async function deletePost(postId) {
   await db.query('DELETE FROM posts WHERE id=?', [postId]);
+}
+
+// ── Update a post's text ───────────────────────────────────
+async function updatePost(postId, text) {
+  const [result] = await db.query(
+    'UPDATE posts SET text = ?, edited = 1, updated_at = NOW() WHERE id = ?',
+    [text, postId]
+  );
+  if (!result.affectedRows) throw new Error('Post not found.');
+
+  // Re-extract and sync topics: delete stale ones, insert fresh ones
+  await db.query('DELETE FROM post_topics WHERE post_id = ?', [postId]);
+  await savePostTopics(postId, text);
+
+  return result.affectedRows;
 }
 
 // ── Find a post by id ──────────────────────────────────────
@@ -540,15 +489,53 @@ const TOPIC_STOPWORDS = new Set([
 function extractTopics(text) {
   if (!text) return [];
   const topics = new Set();
+
+  // 1. Hashtags → always kept as single-word topics
   const hashtags = text.match(/#([a-zA-Z0-9_]+)/g) || [];
   hashtags.forEach(t => topics.add(t.slice(1).toLowerCase()));
-  text
+
+  // 2. Clean body text (strip hashtags, punctuation, lowercase)
+  const tokens = text
     .replace(/#[a-zA-Z0-9_]+/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter(w => w.length >= 3 && !TOPIC_STOPWORDS.has(w) && !/^\d+$/.test(w))
+    .filter(w => w.length >= 2 && !/^\d+$/.test(w));
+
+  const isStop  = w => TOPIC_STOPWORDS.has(w);
+  const isValid = w => !isStop(w) && !/^\d+$/.test(w) && w.length >= 2;
+
+  // Helper: build an n-gram phrase from consecutive tokens
+  // Rules: trim leading/trailing stopwords, at least one non-stopword must remain,
+  // joined phrase >= 5 chars
+  function tryPhrase(slice) {
+    let start = 0;
+    let end = slice.length - 1;
+    while (start <= end && isStop(slice[start])) start++;
+    while (end >= start && isStop(slice[end]))   end--;
+    const trimmed = slice.slice(start, end + 1);
+    if (trimmed.length < 2) return;
+    if (!trimmed.some(isValid)) return;
+    const phrase = trimmed.join(' ');
+    if (phrase.length < 5) return;
+    topics.add(phrase);
+  }
+
+  // 3. Single words (3+ chars, not a stopword)
+  tokens
+    .filter(w => w.length >= 3 && isValid(w))
     .forEach(w => topics.add(w));
+
+  // 4. Bigrams
+  for (let i = 0; i < tokens.length - 1; i++) {
+    tryPhrase(tokens.slice(i, i + 2));
+  }
+
+  // 5. Trigrams
+  for (let i = 0; i < tokens.length - 2; i++) {
+    tryPhrase(tokens.slice(i, i + 3));
+  }
+
   return [...topics];
 }
 
@@ -619,16 +606,15 @@ async function getPostsByTopic(topic, page = 1, limit = 20) {
 }
 
 module.exports = {
-  computeScore,
   hydratePosts,
   nestComments,
   getFollowingIds,
   getEngagementMap,
   getSeenPostIds,
-  getPostsPage,
   getProfilePosts,
   getTrendingPosts,
   createPost,
+  updatePost,
   deletePost,
   findById,
   getLike,
@@ -645,6 +631,7 @@ module.exports = {
   saveCommentTopics,
   getTopics,
   getPostsByTopic,
+  getGroupPosts,
   recordView,
   getViewCount,
 };

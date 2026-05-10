@@ -21,7 +21,7 @@ const os      = require('os');
 ffmpeg.setFfmpegPath(ffmpegP);
 
 // ── Where to save final compressed files ──────────────────
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+const UPLOAD_DIR = path.join(__dirname, '..', '..','uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 // ── Where to write temp video files before compression ────
@@ -33,9 +33,16 @@ const TMP_DIR = os.tmpdir();
 //  Output : .webp file saved to UPLOAD_DIR
 //  Result : { filename, savedBytes }
 // ─────────────────────────────────────────────────────────
-async function compressImage(buffer) {
+async function compressImage(buffer, mimetype = '') {
   const filename   = crypto.randomBytes(16).toString('hex') + '.webp';
   const outputPath = path.join(UPLOAD_DIR, filename);
+
+  if (mimetype === 'image/webp') {
+    // Frontend already compressed — save directly, skip Sharp entirely
+    fs.writeFileSync(outputPath, buffer);
+    console.log('[compress] image skipped (already webp from client)');
+    return { filename, savedBytes: 0 };
+  }
 
   await sharp(buffer)
     .rotate()                                   // auto-rotate from EXIF
@@ -53,15 +60,22 @@ async function compressImage(buffer) {
 //  Output : .mp4 file saved to UPLOAD_DIR
 //  Result : { filename, savedBytes }
 // ─────────────────────────────────────────────────────────
-function compressVideo(buffer) {
+function compressVideo(buffer, clientCompressed = false) {
   return new Promise((resolve, reject) => {
+    const filename   = crypto.randomBytes(16).toString('hex') + '.mp4';
+    const outputPath = path.join(UPLOAD_DIR, filename);
+
+    if (clientCompressed) {
+      // Frontend already compressed — save directly, skip FFmpeg entirely
+      fs.writeFileSync(outputPath, buffer);
+      console.log('[compress] video skipped (already compressed by client)');
+      return resolve({ filename, savedBytes: 0 });
+    }
+
     // Write buffer to a temp file — FFmpeg needs a file path
     const tmpName = crypto.randomBytes(16).toString('hex') + '.tmp';
     const tmpPath = path.join(TMP_DIR, tmpName);
     fs.writeFileSync(tmpPath, buffer);
-
-    const filename   = crypto.randomBytes(16).toString('hex') + '.mp4';
-    const outputPath = path.join(UPLOAD_DIR, filename);
 
     ffmpeg(tmpPath)
       .videoCodec('libx264')          // H.264 — widest device support
@@ -98,7 +112,7 @@ async function compressUploads(req, _res, next) {
     const videoFile = req.files?.video?.[0];
 
     if (imageFile) {
-      const result = await compressImage(imageFile.buffer);
+      const result = await compressImage(imageFile.buffer, imageFile.mimetype);
       req.compressedFiles.image = result;
       console.log(
         `[compress] image saved — reduced by ${(result.savedBytes / 1024).toFixed(0)} KB`
@@ -106,7 +120,8 @@ async function compressUploads(req, _res, next) {
     }
 
     if (videoFile) {
-      const result = await compressVideo(videoFile.buffer);
+      const clientCompressed = req.body?.video_compressed === '1';
+      const result = await compressVideo(videoFile.buffer, clientCompressed);
       req.compressedFiles.video = result;
       console.log(
         `[compress] video saved — reduced by ${(result.savedBytes / 1024 / 1024).toFixed(1)} MB`

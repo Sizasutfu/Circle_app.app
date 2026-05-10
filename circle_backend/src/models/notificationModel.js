@@ -49,7 +49,7 @@ async function createNotification(recipientId, actorId, type, postId = null) {
     );
     const notifId = result.insertId;
 
-    console.log(`Notification created: recipient=${recipientId} actor=${actorId} type=${type} postId=${postId} notifId=${notifId}`);
+   //console.log(`Notification created: recipient=${recipientId} actor=${actorId} type=${type} postId=${postId} notifId=${notifId}`);
 
     // ── Fire push notification (non-blocking) ───────────────
     const prefType = TYPE_TO_PREF[type];

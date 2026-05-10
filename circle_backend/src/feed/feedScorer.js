@@ -42,7 +42,7 @@ function exponentialDecay(hoursOld, halfLifeHours) {
  * @param {Object} post            - Hydrated post row (with likes[], comments[], reposts[], views, createdAt)
  * @param {Object} context
  * @param {number|null}  context.viewerUserId
- * @param {number[]}     context.followingIds   - IDs the viewer follows
+ * @param {Set<number>}  context.followingIds   - IDs the viewer follows (as a Set for O(1) lookup)
  * @param {Object}       context.engagementMap  - { [authorId]: { likes, comments, reposts } }
  * @param {Object}       context.topicScoreMap  - { [topic]: score } from user_topic_preferences
  * @param {Set<number>}  context.seenPostIds    - post IDs already viewed
@@ -52,7 +52,7 @@ function exponentialDecay(hoursOld, halfLifeHours) {
  */
 function computeScore(post, {
   viewerUserId   = null,
-  followingIds   = [],
+  followingIds   = new Set(),  // FIX: default to Set (not Array) — use .has() not .includes()
   engagementMap  = {},
   topicScoreMap  = {},
   seenPostIds    = new Set(),
@@ -92,7 +92,8 @@ function computeScore(post, {
   // ── 5. Affinity multiplier ─────────────────────────────
   // Reflects how much the viewer has engaged with this author historically.
   const eng = engagementMap[post.userId] || {};
-  const isFollowing = followingIds.includes(post.userId);
+  // FIX: use .has() since followingIds is a Set (not an Array)
+  const isFollowing = followingIds.has(post.userId);
 
   const rawAffinity =
     (eng.likes    || 0) * C.AFFINITY_LIKE_WEIGHT    +

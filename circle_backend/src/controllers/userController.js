@@ -11,9 +11,40 @@ const FollowModel       = require('../models/followModel');
 const NotificationModel = require('../models/notificationModel');
 const { sendOk, sendError } = require('../middleware/response');
 
-// POST /api/users/register
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * Cleans and validates the extra profile fields coming from req.body.
+ * Returns a safe `extras` object ready to pass into the model.
+ */
+function extractExtras(body) {
+  const {
+    phone, location, school,
+    occupation, website, dateOfBirth, gender,
+  } = body;
+
+  // Phone is stored as "dialCode|digits", e.g. "+254|712345678"
+  // Strip anything that isn't digits, +, -, spaces, (, ) or |
+  const cleanPhone = phone
+    ? String(phone).replace(/[^\d+\-\s()|]/g, '').slice(0, 25) || null
+    : null;
+
+  return {
+    phone:       cleanPhone,
+    location:    location    ? String(location).slice(0, 120).trim()   || null : null,
+    school:      school      ? String(school).slice(0, 120).trim()     || null : null,
+    occupation:  occupation  ? String(occupation).slice(0, 100).trim() || null : null,
+    website:     website     ? String(website).slice(0, 255).trim()    || null : null,
+    // dateOfBirth must be a valid YYYY-MM-DD string or null
+    dateOfBirth: dateOfBirth && /^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth) ? dateOfBirth : null,
+    gender:      gender      ? String(gender).slice(0, 30).trim()      || null : null,
+  };
+}
+
+// ─── POST /api/users/register ──────────────────────────────────────────────────
+
 async function register(req, res) {
-  const { name, email, password, bio } = req.body;
+  const { name, email, password } = req.body;
   if (!name || !email || !password)
     return sendError(res, 400, 'Name, email, and password are required.');
 
@@ -33,7 +64,8 @@ async function register(req, res) {
   }
 }
 
-// POST /api/users/login
+// ─── POST /api/users/login ─────────────────────────────────────────────────────
+
 async function login(req, res) {
   const { email, password } = req.body;
   if (!email || !password)
@@ -55,7 +87,8 @@ async function login(req, res) {
   }
 }
 
-// GET /api/users/:id/profile
+// ─── GET /api/users/:id/profile ───────────────────────────────────────────────
+
 async function getProfile(req, res) {
   const targetId = parseInt(req.params.id);
   const viewerId = parseInt(req.headers['x-user-id']) || null;
@@ -70,8 +103,9 @@ async function getProfile(req, res) {
   }
 }
 
-// PUT /api/users/:id/picture
+// ─── PUT /api/users/:id/picture ───────────────────────────────────────────────
 // Route must use: upload.fields([{ name: 'image', maxCount: 1 }]), compressUploads
+
 async function updatePicture(req, res) {
   const userId = parseInt(req.params.id);
 
@@ -91,7 +125,7 @@ async function updatePicture(req, res) {
 
     await UserModel.updatePicture(userId, pictureUrl);
 
-    // ── Notify all followers about the new profile picture ───
+    // Notify all followers about the new profile picture
     const followerIds = await FollowModel.getFollowerIds(userId);
     await Promise.all(
       followerIds.map(fId =>
@@ -106,7 +140,8 @@ async function updatePicture(req, res) {
   }
 }
 
-// PUT /api/users/:id
+// ─── PUT /api/users/:id ───────────────────────────────────────────────────────
+
 async function updateProfile(req, res) {
   const userId = parseInt(req.params.id);
   const { name, email, password, bio } = req.body;
@@ -119,15 +154,18 @@ async function updateProfile(req, res) {
   // Cap bio at 160 chars and treat empty string as null
   const cleanBio = bio ? String(bio).slice(0, 160).trim() || null : null;
 
+  // Extract and sanitise the extra fields
+  const extras = extractExtras(req.body);
+
   try {
     if (await UserModel.emailTakenByOther(email, userId))
       return sendError(res, 409, 'Email already in use.');
 
     if (password && password.length >= 6) {
       const hash = await bcrypt.hash(password, 10);
-      await UserModel.updateUserWithPassword(userId, name, email, hash, cleanBio);
+      await UserModel.updateUserWithPassword(userId, name, email, hash, cleanBio, extras);
     } else {
-      await UserModel.updateUser(userId, name, email, cleanBio);
+      await UserModel.updateUser(userId, name, email, cleanBio, extras);
     }
 
     const updated = await UserModel.findById(userId);
@@ -138,13 +176,14 @@ async function updateProfile(req, res) {
   }
 }
 
-// GET /api/users?search=<query>&limit=<n>
+// ─── GET /api/users?search=<query>&limit=<n> ──────────────────────────────────
 // Used by the New Message modal to find people to DM.
 // Requires auth (x-user-id header) so the caller is excluded from results.
+
 async function searchUsers(req, res) {
   const search = (req.query.search || '').trim();
   const limit  = Math.min(parseInt(req.query.limit) || 10, 20);
-  const selfId = req.actorId; // set by requireAuth middleware
+  const selfId = req.actorId;
 
   if (!search) {
     return sendOk(res, 200, 'No query provided.', []);
@@ -159,8 +198,9 @@ async function searchUsers(req, res) {
   }
 }
 
-// GET /api/users/new-members?limit=10
+// ─── GET /api/users/new-members?limit=10 ──────────────────────────────────────
 // Returns users who joined in the last 7 days, excluding self and already-followed.
+
 async function getNewMembers(req, res) {
   const limit    = Math.min(parseInt(req.query.limit) || 10, 20);
   const viewerId = req.actorId || null;
@@ -174,4 +214,12 @@ async function getNewMembers(req, res) {
   }
 }
 
-module.exports = { register, login, getProfile, updatePicture, updateProfile, searchUsers, getNewMembers };
+module.exports = {
+  register,
+  login,
+  getProfile,
+  updatePicture,
+  updateProfile,
+  searchUsers,
+  getNewMembers,
+};

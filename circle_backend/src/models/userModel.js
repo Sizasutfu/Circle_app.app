@@ -13,7 +13,13 @@ const UserModel = {
 
   async findById(id) {
     const [rows] = await db.query(
-      "SELECT id, name, email, bio, picture, created_at AS createdAt FROM users WHERE id = ?",
+      `SELECT
+         id, name, email, bio, picture,
+         phone, location, school, occupation, website,
+         date_of_birth  AS dateOfBirth,
+         gender,
+         created_at     AS createdAt
+       FROM users WHERE id = ?`,
       [id]
     );
     return rows[0] || null;
@@ -44,17 +50,47 @@ const UserModel = {
 
   // ─── Update ────────────────────────────────────────────────────────────────
 
-  async updateUser(id, name, email, bio = null) {
+  async updateUser(id, name, email, bio = null, extras = {}) {
+    const {
+      phone       = null,
+      location    = null,
+      school      = null,
+      occupation  = null,
+      website     = null,
+      dateOfBirth = null,
+      gender      = null,
+    } = extras;
+
     await db.query(
-      "UPDATE users SET name = ?, email = ?, bio = ? WHERE id = ?",
-      [name, email, bio, id]
+      `UPDATE users
+       SET name = ?, email = ?, bio = ?,
+           phone = ?, location = ?, school = ?,
+           occupation = ?, website = ?,
+           date_of_birth = ?, gender = ?
+       WHERE id = ?`,
+      [name, email, bio, phone, location, school, occupation, website, dateOfBirth, gender, id]
     );
   },
 
-  async updateUserWithPassword(id, name, email, hashedPassword, bio = null) {
+  async updateUserWithPassword(id, name, email, hashedPassword, bio = null, extras = {}) {
+    const {
+      phone       = null,
+      location    = null,
+      school      = null,
+      occupation  = null,
+      website     = null,
+      dateOfBirth = null,
+      gender      = null,
+    } = extras;
+
     await db.query(
-      "UPDATE users SET name = ?, email = ?, password = ?, bio = ? WHERE id = ?",
-      [name, email, hashedPassword, bio, id]
+      `UPDATE users
+       SET name = ?, email = ?, password = ?, bio = ?,
+           phone = ?, location = ?, school = ?,
+           occupation = ?, website = ?,
+           date_of_birth = ?, gender = ?
+       WHERE id = ?`,
+      [name, email, hashedPassword, bio, phone, location, school, occupation, website, dateOfBirth, gender, id]
     );
   },
 
@@ -62,11 +98,15 @@ const UserModel = {
     await db.query("UPDATE users SET picture = ? WHERE id = ?", [picture, id]);
   },
 
-  // ─── Profile ───────────────────────────────────────────────────────────────
+  // ─── Profile (public view) ─────────────────────────────────────────────────
+  // NOTE: phone and dateOfBirth are intentionally excluded — private fields.
 
   async getProfile(targetId, viewerId = null) {
     const [rows] = await db.query(
-      "SELECT id, name, email, bio, picture FROM users WHERE id = ?",
+      `SELECT
+         id, name, bio, picture,
+         location, school, occupation, website, gender
+       FROM users WHERE id = ?`,
       [targetId]
     );
     if (!rows.length) return null;
@@ -135,17 +175,11 @@ const UserModel = {
       [hashedPassword, userId]
     );
   },
-
-  
 };
 
-// ============================================================
-//  ADD THIS FUNCTION to models/userModel.js
-//  Then add 'getNewMembers' to the module.exports at the bottom.
-// ============================================================
-
-// ── New members (joined in last 7 days) ───────────────────
+// ─── New members (joined in last 7 days) ──────────────────────────────────────
 // Excludes the viewer and users they already follow.
+
 async function getNewMembers(viewerId, limit = 10) {
   let query, params;
 
@@ -185,6 +219,4 @@ async function getNewMembers(viewerId, limit = 10) {
   return rows;
 }
 
-
-//module.exports = ;
-module.exports = {...UserModel, getNewMembers };
+module.exports = { ...UserModel, getNewMembers };

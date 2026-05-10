@@ -32,6 +32,7 @@ const dmRoutes             = require('./routes/dm');
 const exploreRoutes        = require('./routes/exploreRoutes');
 const topicRoutes          = require('./routes/topicRoutes');
 const pushRoutes           = require('./routes/pushRoutes');
+const groupRoutes          = require('./routes/groupsRoutes');
 
 // authRoutes is optional (Google OAuth) — only load if the file exists
 let authRoutes = null;
@@ -68,8 +69,17 @@ app.use('/api/dm',              dmRoutes);
 app.use('/api/explore',         exploreRoutes);
 app.use('/api/topics',          topicRoutes);
 app.use('/api/push',            pushRoutes);
+app.use('/api/groups',          groupRoutes);
 
 // 404
 app.use((req, res) => sendError(res, 404, `Route '${req.originalUrl}' not found.`));
+
+// ── Start cron LAST — after all requires are fully resolved ──
+// Placing this after module.exports would be too late; placing
+// it before routes caused a circular-dependency ReferenceError.
+// Bottom of the file (before module.exports) is the safe spot.
+const { startGroupCron } = require('./models/GroupModel');
+startGroupCron();
+console.log('👥 Group auto-creation cron started.');
 
 module.exports = app;

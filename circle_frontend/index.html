@@ -223,6 +223,34 @@
         height: 20px;
         flex-shrink: 0;
       }
+      .sidebar-create-btn {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 11px 12px;
+        margin: 12px 10px 0;
+        width: calc(100% - 20px);
+        border-radius: var(--radius-sm);
+        background: var(--accent);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: var(--font-body);
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 4px 14px var(--accent-glow);
+        transition: background var(--tr), transform var(--tr), box-shadow var(--tr);
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .sidebar-create-btn:hover {
+        background: var(--accent-h);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px var(--accent-glow);
+      }
+      @media (max-width: 767px) {
+        .sidebar-create-btn { display: none; }
+      }
       .nav-label {
         opacity: 1;
         width: auto;
@@ -724,6 +752,42 @@
         display: block;
         background: #000;
       }
+      /* Video compression progress overlay (modal compose) */
+      .video-compress-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .video-compress-overlay.hidden { display: none; }
+      .video-compress-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 0.2px;
+      }
+      .video-compress-track {
+        width: 70%;
+        height: 4px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .video-compress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-h));
+        border-radius: 4px;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 6px var(--accent-glow);
+      }
       .img-remove {
         position: absolute;
         top: 8px;
@@ -809,6 +873,10 @@
         display: flex;
         gap: 24px;
         align-items: flex-start;
+      }
+      @keyframes livePostIn {
+        from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0)     scale(1); }
       }
       .feed-main {
         flex: 1;
@@ -1072,17 +1140,39 @@
         white-space: nowrap;
       }
       .topic-show-more {
-        background: none;
-        border: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--accent-bg);
+        border: 1px solid var(--border2);
+        border-radius: var(--radius-sm);
         color: var(--accent);
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        padding: 8px 10px 2px;
-        text-align: left;
+        padding: 9px 14px;
+        margin-top: 6px;
         width: 100%;
+        transition: background var(--tr), border-color var(--tr);
       }
-      .topic-show-more:hover { text-decoration: underline; }
+      .topic-show-more:hover { background: var(--accent-bg); border-color: var(--accent); text-decoration: none; }
+      .topic-show-more svg {
+        width: 14px; height: 14px; flex-shrink: 0;
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      }
+      .topic-show-more.open svg { transform: rotate(180deg); }
+
+      /* Animated drawer for extra topics */
+      .topic-extra-drawer {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+        opacity: 0;
+      }
+      .topic-extra-drawer.open {
+        max-height: 2000px;
+        opacity: 1;
+      }
 
       .trending-footer {
         margin-top: 12px;
@@ -4859,6 +4949,43 @@
       #view-compose.active {
         display: flex;
       }
+      @media (min-width: 768px) {
+        #view-compose {
+          background: rgba(0,0,0,0.55);
+          backdrop-filter: blur(4px);
+          align-items: center;
+          justify-content: center;
+        }
+        #view-compose.active {
+          display: flex;
+        }
+        .compose-tab-inner {
+          width: 100%;
+          max-width: 580px;
+          max-height: 80vh;
+          background: var(--bg);
+          border-radius: var(--radius);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border);
+        }
+        .compose-tab-media-preview {
+          max-height: 220px;
+        }
+        .compose-tab-media-preview img,
+        .compose-tab-media-preview video {
+          max-height: 220px;
+        }
+      }
+      .compose-tab-inner {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
       .compose-tab-header {
         display: flex;
         align-items: center;
@@ -5138,6 +5265,12 @@
             </svg>
             <span class="nav-label">Settings</span>
           </div>
+          <button class="sidebar-create-btn" onclick="openComposeTab()">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="18" height="18">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span class="nav-label">Create a post</span>
+          </button>
         </nav>
         <div
           class="sidebar-bottom"
@@ -5238,65 +5371,7 @@
               </button>
             </div>
             <p class="feed-personalised-hint" id="feed-personalised-hint">✨ Ranked for you based on your interests</p>
-            <div class="compose" id="compose-box" style="display: none">
-              <div class="compose-row">
-                <div class="av" id="compose-av">?</div>
-                <textarea
-                  class="compose-field"
-                  id="post-text"
-                  placeholder="What's on your mind?"
-                  rows="2"
-                ></textarea>
-              </div>
-              <div class="img-preview-wrap" id="img-preview-wrap">
-                <img id="img-preview" src="" alt="" />
-                <video id="video-preview" controls style="display:none"></video>
-                <button class="img-remove" onclick="removeMedia()">✕</button>
-              </div>
-              <div class="compose-bar">
-                <label class="compose-action" for="img-input">
-                  <svg
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
-                  </svg>
-                  Photo
-                </label>
-                <input
-                  type="file"
-                  id="img-input"
-                  class="hidden"
-                  accept="image/*"
-                  onchange="previewImage(event)"
-                />
-                <label class="compose-action" for="video-input">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <polygon points="23 7 16 12 23 17 23 7"/>
-                    <rect x="1" y="5" width="15" height="14" rx="2"/>
-                  </svg>
-                  Video
-                </label>
-                <input
-                  type="file"
-                  id="video-input"
-                  class="hidden"
-                  accept="video/*"
-                  onchange="previewVideo(event)"
-                />
-                <button
-                  class="post-btn"
-                  onclick="createPost()"
-                  id="post-submit-btn"
-                >
-                  Post
-                </button>
-              </div>
-            </div>
+            <!-- inline compose removed; use sidebar "Create a post" button or mobile + button -->
             <div class="login-nudge" id="login-nudge">
               <div class="login-nudge-icon">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -5975,6 +6050,44 @@
               </div>
             </div>
             <div class="settings-section">
+              <div class="settings-section-title">Media</div>
+              <div class="settings-row" style="align-items:flex-start;padding-bottom:6px">
+                <div class="settings-row-icon purple">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/>
+                  </svg>
+                </div>
+                <div class="settings-row-body">
+                  <div class="settings-row-title">Lightbox Navigation</div>
+                  <div class="settings-row-sub">Swipe &amp; scroll direction to browse images and videos</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;padding:4px 16px 14px;">
+                <button id="lb-nav-lr-btn" onclick="lbSetNavAxis('lr')" style="
+                  flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;
+                  padding:14px 10px;border-radius:12px;border:2px solid var(--border2);
+                  background:var(--card);color:var(--txt2);font-family:var(--font-body);
+                  font-size:12px;font-weight:600;cursor:pointer;transition:all 0.18s;
+                ">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14"/><path d="M15 7l5 5-5 5"/><path d="M9 7L4 12l5 5"/>
+                  </svg>
+                  Left / Right
+                </button>
+                <button id="lb-nav-ud-btn" onclick="lbSetNavAxis('ud')" style="
+                  flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;
+                  padding:14px 10px;border-radius:12px;border:2px solid var(--border2);
+                  background:var(--card);color:var(--txt2);font-family:var(--font-body);
+                  font-size:12px;font-weight:600;cursor:pointer;transition:all 0.18s;
+                ">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14"/><path d="M7 15l5 5 5-5"/><path d="M7 9l5-5 5 5"/>
+                  </svg>
+                  Up / Down
+                </button>
+              </div>
+            </div>
+            <div class="settings-section">
               <div class="settings-section-title">Notifications</div>
               <div class="settings-row">
                 <div class="settings-row-icon purple">
@@ -6482,7 +6595,8 @@
         </div>
 
         <!-- ── Compose full-tab view ── -->
-        <div class="view" id="view-compose">
+        <div class="view" id="view-compose" onclick="handleComposeBackdropClick(event)">
+          <div class="compose-tab-inner">
           <div class="compose-tab-header">
             <button class="compose-tab-cancel" onclick="closeComposeTab()">Cancel</button>
             <span class="compose-tab-title">New Post</span>
@@ -6530,6 +6644,7 @@
             <input type="file" id="compose-tab-video-input" class="hidden" accept="video/*" onchange="composeTabPreviewVideo(event)"/>
             <span class="compose-tab-char-count" id="compose-tab-char-count"></span>
           </div>
+          </div><!-- /.compose-tab-inner -->
         </div>
       </main>
     </div>
@@ -6663,6 +6778,44 @@
             "
           >
             Submit Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT POST MODAL -->
+    <div
+      class="modal-backdrop"
+      id="edit-post-modal"
+      onclick="closeEditPostModal(event)"
+    >
+      <div class="modal">
+        <div class="modal-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color:var(--accent)">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Edit Post
+        </div>
+        <p style="font-size:13px;color:var(--txt2);margin-bottom:14px">Make changes to your post below.</p>
+        <textarea
+          id="edit-post-textarea"
+          placeholder="What's on your mind?"
+          rows="5"
+          style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;color:var(--txt);outline:none;resize:vertical;line-height:1.55;font-family:inherit;transition:border-color 0.2s;"
+          oninput="onEditTextareaInput()"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--border)'"
+        ></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:6px;margin-bottom:4px">
+          <span id="edit-post-char-count" style="font-size:12px;color:var(--txt3)">0 / 500</span>
+        </div>
+        <div class="modal-actions" style="margin-top:10px">
+          <button class="modal-cancel" onclick="closeEditPostModal()">Cancel</button>
+          <button class="modal-confirm" id="edit-post-submit-btn" onclick="submitEditPost()">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            Save Changes
           </button>
         </div>
       </div>
@@ -7166,7 +7319,7 @@
           transition: opacity 2s;
         "
       >
-        Scroll or pinch to zoom · Double-click to reset · ← → to navigate
+        Swipe or scroll ← → to navigate · Pinch to zoom · Double-click to reset
       </div>
 
       <!-- Caption (bottom-left) -->
@@ -7544,6 +7697,7 @@
         currentUser = null,
         pendingImageDataUrl = null,
         pendingVideoDataUrl = null,
+        pendingVideoCompressed = false,   // true only when client compression succeeded
         repostTargetId = null;
       let currentFeedTab = "global";
       const _followingSet = new Set(); // IDs of users the current user follows
@@ -7908,7 +8062,8 @@
           DM.init(); // reload inbox from backend
           DM.clearDMBadge(); // clear notification badge on open
         }
-        if (view === "feed") loadPosts();
+        if (view === "feed") resumeFeed();
+        if (view !== "feed") _stopLivePolling();
         if (view === "profile") renderProfile();
         if (view === "feed" && currentUser && !_suggestionsLoaded)
           loadSuggestions();
@@ -8200,7 +8355,6 @@
         _activeFilter = null;
         document.getElementById("trending-filter-bar").style.display = "none";
         document.getElementById("sidebar-user-area").style.display = "none";
-        document.getElementById("compose-box").style.display = "none";
         document.getElementById("login-nudge").style.display = "flex";
         document.getElementById("feed-tabs").style.display = "none";
         const hint = document.getElementById("feed-personalised-hint");
@@ -8268,7 +8422,6 @@
             ta.innerHTML = defaultAvatar();
           }
         }
-        document.getElementById("compose-box").style.display = "block";
         document.getElementById("login-nudge").style.display = "none";
         document.getElementById("feed-tabs").style.display = "flex";
         const hint = document.getElementById("feed-personalised-hint");
@@ -8447,6 +8600,23 @@
       }
 
       /* POSTS */
+
+      /**
+       * Called by goTo('feed') — restores the feed without wiping it.
+       * If posts are already in memory, just re-render and do a silent
+       * background refresh. Only falls through to a full loadPosts()
+       * when the feed is genuinely empty (first load / after logout).
+       */
+      function resumeFeed() {
+        if (posts.length > 0) {
+          renderFeed();
+          updateScrollSentinel();
+          _backgroundRefreshFeed();
+          return;
+        }
+        loadPosts();
+      }
+
       async function loadPosts() {
         // Guests can view the global feed without logging in
         feedPage = 1;
@@ -8531,6 +8701,136 @@
         }
       }
 
+      // ═══════════════════════════════════════════════════════════════
+      //  REAL-TIME NEW POST INJECTION
+      //
+      //  Every 30 s we poll page 1 to see if new posts appeared.
+      //  New posts (ids not yet in the feed) are held in _liveQueue.
+      //  As the user scrolls and fetchMorePosts() appends a new page,
+      //  we splice a few queued posts naturally into that batch so they
+      //  feel like organic feed content — not a jarring prepend.
+      //
+      //  Drip rate: up to MIX_PER_PAGE live posts per page load.
+      //  If the user is near the top (page 1 area) we also prepend
+      //  quietly so page-1 stays fresh without a full reload.
+      // ═══════════════════════════════════════════════════════════════
+
+      let _liveQueue      = [];   // new posts waiting to be injected
+      let _liveSeenIds    = new Set(); // all post ids currently in feed
+      let _liveTimer      = null;
+      const LIVE_INTERVAL = 30_000;   // poll every 30 s
+      const MIX_PER_PAGE  = 2;        // inject up to 2 live posts per page
+
+      function _startLivePolling() {
+        if (_liveTimer) return; // already running
+        // Seed seen-ids from whatever is loaded now
+        posts.forEach(p => _liveSeenIds.add(p.id));
+        _liveTimer = setInterval(_pollForNewPosts, LIVE_INTERVAL);
+      }
+
+      function _stopLivePolling() {
+        if (_liveTimer) { clearInterval(_liveTimer); _liveTimer = null; }
+        _liveQueue   = [];
+        _liveSeenIds = new Set();
+        document.getElementById('new-posts-banner')?.remove();
+      }
+
+      async function _pollForNewPosts() {
+        // Only poll when the feed view is active
+        if (!document.getElementById('view-feed')?.classList.contains('active')) return;
+        try {
+          const feedTab = currentUser ? currentFeedTab : 'global';
+          const res = await api('GET', `/api/posts?feed=${feedTab}&page=1`);
+          const { posts: fresh } = res.data ?? res;
+          if (!Array.isArray(fresh)) return;
+
+          let truly_new = fresh.filter(p => !_liveSeenIds.has(p.id));
+          // Don't surface reposts from people the current user doesn't follow
+          if (currentUser && currentFeedTab !== 'following') {
+            truly_new = truly_new.filter(p => !p.isRepost || _followingSet.has(p.userId));
+          }
+          if (!truly_new.length) return;
+
+          // Mark them so we don't re-queue on next poll
+          truly_new.forEach(p => _liveSeenIds.add(p.id));
+
+          // Add to front of queue (newest first)
+          _liveQueue = [...truly_new, ..._liveQueue];
+
+          // Show a "New posts" banner instead of auto-injecting
+          _showNewPostsBanner(_liveQueue.length);
+        } catch (_) { /* silent — next interval will retry */ }
+      }
+
+      // Prepend all queued posts to the top of the feed DOM & posts array
+      function _drainQueueToTop(feedList) {
+        if (!_liveQueue.length) return;
+        const toInsert = _liveQueue.splice(0); // take all
+        // Prepend to data array
+        posts = [...toInsert, ...posts];
+        // Prepend cards to DOM without re-rendering everything
+        const frag = document.createDocumentFragment();
+        toInsert.reverse().forEach(p => { // reverse so first ends up on top
+          const d = document.createElement('div');
+          d.innerHTML = buildPostCard(p);
+          const card = d.firstElementChild;
+          if (card) {
+            card.style.animation = 'livePostIn 0.4s cubic-bezier(0.34,1.4,0.64,1)';
+            frag.prepend(card);
+          }
+        });
+        // Insert after any sentinel/banner, before first real card
+        const firstCard = feedList.querySelector('.post-card');
+        if (firstCard) feedList.insertBefore(frag, firstCard);
+        else feedList.prepend(frag);
+      }
+
+      // Show a sticky banner so the user can choose when to load new posts
+      function _showNewPostsBanner(count) {
+        let banner = document.getElementById('new-posts-banner');
+        if (!banner) {
+          banner = document.createElement('div');
+          banner.id = 'new-posts-banner';
+          banner.style.cssText = `
+            position: sticky; top: 12px; z-index: 50; margin: 0 auto 12px;
+            max-width: 360px; background: var(--accent); color: #fff;
+            border-radius: 999px; padding: 10px 20px; font-size: 14px;
+            font-weight: 600; text-align: center; cursor: pointer;
+            box-shadow: 0 4px 16px var(--accent-glow);
+            animation: livePostIn 0.3s cubic-bezier(0.34,1.4,0.64,1);
+          `;
+          banner.onclick = () => {
+            const feedList = document.getElementById('feed-list');
+            if (feedList) _drainQueueToTop(feedList);
+            banner.remove();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+          const feedList = document.getElementById('feed-list');
+          if (feedList) feedList.parentNode.insertBefore(banner, feedList);
+        }
+        // Update count label on every poll
+        banner.textContent = `↑ ${count} new post${count !== 1 ? 's' : ''} — tap to load`;
+      }
+
+      // Called by fetchMorePosts after it appends a new page —
+      // splices up to MIX_PER_PAGE live posts into the just-added cards.
+      function _mixLivePostsIntoPage(newCards, feedList) {
+        if (!_liveQueue.length || !newCards.length) return;
+        const toMix = _liveQueue.splice(0, MIX_PER_PAGE);
+        toMix.forEach(p => {
+          posts.push(p); // keep data array consistent
+          const d = document.createElement('div');
+          d.innerHTML = buildPostCard(p);
+          const card = d.firstElementChild;
+          if (!card) return;
+          card.style.animation = 'livePostIn 0.4s cubic-bezier(0.34,1.4,0.64,1)';
+          // Insert at a natural-looking spot: after the 2nd card of the page
+          const insertAfter = newCards[Math.min(1, newCards.length - 1)];
+          if (insertAfter?.nextSibling) feedList.insertBefore(card, insertAfter.nextSibling);
+          else feedList.appendChild(card);
+        });
+      }
+
       async function fetchMorePosts(isFirstPage = false) {
         if (feedLoading || !feedHasMore) return;
 
@@ -8542,12 +8842,15 @@
           feedPage++;
           const c = document.getElementById("feed-list");
           const frag = document.createDocumentFragment();
+          const addedCards = [];
           cached.posts.forEach((p) => {
             const d = document.createElement("div");
             d.innerHTML = buildPostCard(p);
-            frag.appendChild(d.firstElementChild);
+            const card = d.firstElementChild;
+            if (card) { frag.appendChild(card); addedCards.push(card); }
           });
           c.appendChild(frag);
+          _mixLivePostsIntoPage(addedCards, c);
           updateScrollSentinel();
           return;
         }
@@ -8609,21 +8912,36 @@
           // Remove skeleton cards before inserting real posts
           _skelIds.forEach((id) => { const el = document.getElementById(id); if (el) el.remove(); });
 
+          // On non-following tabs, hide repost cards from people the current user doesn't follow.
+          // (On the "following" tab the server already scopes results correctly.)
+          if (currentUser && currentFeedTab !== 'following') {
+            newPosts = newPosts.filter(p =>
+              !p.isRepost || _followingSet.has(p.userId)
+            );
+          }
+
           feedHasMore = hasMore;
           PostCache.storeFeedPage(currentFeedTab, feedPage, newPosts, hasMore);
           feedPage++;
           posts = isFirstPage ? newPosts : [...posts, ...newPosts].slice(-100);
           if (isFirstPage) {
+            // Seed live-polling seen-ids from the first page
+            newPosts.forEach(p => _liveSeenIds.add(p.id));
             renderFeed();
+            _startLivePolling();
           } else {
             const c = document.getElementById("feed-list");
             const frag = document.createDocumentFragment();
+            const addedCards = [];
             newPosts.forEach((p) => {
+              _liveSeenIds.add(p.id);
               const d = document.createElement("div");
               d.innerHTML = buildPostCard(p);
-              frag.appendChild(d.firstElementChild);
+              const card = d.firstElementChild;
+              if (card) { frag.appendChild(card); addedCards.push(card); }
             });
             c.appendChild(frag);
+            _mixLivePostsIntoPage(addedCards, c);
           }
           updateScrollSentinel();
         } catch (e) {
@@ -8638,10 +8956,14 @@
       }
 
       let _scrollObserver = null;
+      let _prefetchObserver = null;
+      let _prefetching = false;
+
       function updateScrollSentinel() {
         let s = document.getElementById("feed-sentinel");
         if (!feedHasMore) {
           if (s) s.remove();
+          _cleanupPrefetchObserver();
           return;
         }
         if (!s) {
@@ -8650,14 +8972,69 @@
           s.style.cssText = "height:40px;width:100%";
           document.getElementById("feed-list").appendChild(s);
         }
+
+        // ── Sentinel observer: fires ~800px before bottom ─────────────
+        // This is the safety net — by this point the prefetcher should
+        // have already loaded the next page silently.
         if (_scrollObserver) _scrollObserver.disconnect();
         _scrollObserver = new IntersectionObserver(
           (entries) => {
             if (entries[0].isIntersecting) fetchMorePosts();
           },
-          { rootMargin: "200px" },
+          { rootMargin: "800px" },
         );
         _scrollObserver.observe(s);
+
+        // ── Prefetch observer: fires when ~60% of feed is scrolled ────
+        // Watches a mid-feed anchor so we start loading the next page
+        // well before the user reaches the bottom.
+        _setupPrefetchObserver();
+      }
+
+      function _cleanupPrefetchObserver() {
+        if (_prefetchObserver) { _prefetchObserver.disconnect(); _prefetchObserver = null; }
+        _prefetching = false;
+      }
+
+      function _setupPrefetchObserver() {
+        _cleanupPrefetchObserver();
+        const cards = document.querySelectorAll("#feed-list .post-card");
+        if (cards.length < 4) return; // not enough posts to warrant a mid-anchor
+        // Place the trigger at ~60% through the rendered cards
+        const anchorIdx = Math.floor(cards.length * 0.6);
+        const anchor = cards[anchorIdx];
+        if (!anchor) return;
+
+        _prefetchObserver = new IntersectionObserver(
+          (entries) => {
+            if (!entries[0].isIntersecting) return;
+            if (_prefetching || feedLoading || !feedHasMore) return;
+            // Check cache first — if page is already cached, nothing to prefetch
+            const cached = PostCache.getFeedPage(currentFeedTab, feedPage);
+            if (cached) return;
+            // Silently prefetch next page into cache so scroll-sentinel serves instantly
+            _prefetching = true;
+            _prefetchNextPage().finally(() => { _prefetching = false; });
+          },
+          { rootMargin: "0px" },
+        );
+        _prefetchObserver.observe(anchor);
+      }
+
+      async function _prefetchNextPage() {
+        if (!feedHasMore || feedLoading) return;
+        try {
+          const feedTab = currentUser ? currentFeedTab : "global";
+          const qs = currentUser
+            ? `?feed=${feedTab}&page=${feedPage}`
+            : `?feed=global&page=${feedPage}`;
+          const res = await api("GET", `/api/posts${qs}`);
+          const { posts: newPosts, hasMore } = res.data ?? res;
+          // Store in cache — fetchMorePosts() will pick it up instantly
+          PostCache.storeFeedPage(currentFeedTab, feedPage, newPosts, hasMore);
+        } catch (e) {
+          /* silent — fetchMorePosts() will retry on scroll */
+        }
       }
       async function createPost() {
         if (!currentUser) {
@@ -8676,7 +9053,10 @@
           const fd = new FormData();
           fd.append("text", text);
           if (pendingImageDataUrl instanceof File) fd.append("image", pendingImageDataUrl);
-          if (pendingVideoDataUrl instanceof File) fd.append("video", pendingVideoDataUrl);
+          if (pendingVideoDataUrl instanceof File) {
+            fd.append("video", pendingVideoDataUrl);
+            fd.append("video_compressed", pendingVideoCompressed ? "1" : "0");
+          }
 
           const res = await api("POST", "/api/posts", fd);
           const newPost = res.data;
@@ -8693,6 +9073,82 @@
         } finally {
           btn.disabled = false;
           btn.textContent = "Post";
+        }
+      }
+
+      /* ── Edit Post ────────────────────────────────────────────────── */
+      let _editingPostId = null;
+      const EDIT_MAX_CHARS = 500;
+
+      function openEditPostModal(postId) {
+        const post = posts.find(p => p.id === postId) || PostCache.getPost(postId);
+        if (!post) { showToast('Post not found.'); return; }
+        _editingPostId = postId;
+        const ta = document.getElementById('edit-post-textarea');
+        const counter = document.getElementById('edit-post-char-count');
+        ta.value = post.text || '';
+        if (counter) counter.textContent = `${ta.value.length} / ${EDIT_MAX_CHARS}`;
+        document.getElementById('edit-post-modal').classList.add('open');
+        setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 120);
+      }
+
+      function closeEditPostModal(e) {
+        if (e && e.target !== document.getElementById('edit-post-modal')) return;
+        _closeEditModal();
+      }
+      function _closeEditModal() {
+        document.getElementById('edit-post-modal').classList.remove('open');
+        _editingPostId = null;
+      }
+
+      function onEditTextareaInput() {
+        const ta = document.getElementById('edit-post-textarea');
+        const counter = document.getElementById('edit-post-char-count');
+        const len = ta.value.length;
+        if (counter) {
+          counter.textContent = `${len} / ${EDIT_MAX_CHARS}`;
+          counter.style.color = len > EDIT_MAX_CHARS ? 'var(--rose)' : 'var(--txt3)';
+        }
+        const btn = document.getElementById('edit-post-submit-btn');
+        if (btn) btn.disabled = len === 0 || len > EDIT_MAX_CHARS;
+      }
+
+      async function submitEditPost() {
+        if (!_editingPostId || !currentUser) return;
+        const ta = document.getElementById('edit-post-textarea');
+        const newText = ta.value.trim();
+        if (!newText) { showToast('Post cannot be empty.'); return; }
+        if (newText.length > EDIT_MAX_CHARS) { showToast(`Keep it under ${EDIT_MAX_CHARS} characters.`); return; }
+
+        const btn = document.getElementById('edit-post-submit-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+
+        try {
+          await api('PUT', `/api/posts/${_editingPostId}`, { text: newText });
+
+          // Update in-memory caches
+          const inFeed = posts.find(p => p.id === _editingPostId);
+          if (inFeed) { inFeed.text = newText; inFeed.edited = true; }
+          const cached = PostCache.getPost(_editingPostId);
+          if (cached) { cached.text = newText; cached.edited = true; PostCache.putPost(cached); }
+
+          PostCache.invalidateFeed('global');
+          PostCache.invalidateFeed('following');
+
+          _closeEditModal();
+          showToast('Post updated ✓');
+
+          // Refresh whichever view is active
+          if (document.getElementById('view-feed').classList.contains('active')) renderFeed();
+          if (document.getElementById('view-profile').classList.contains('active')) renderProfile();
+          if (document.getElementById('view-post-detail').classList.contains('active')) {
+            const updated = posts.find(p => p.id === _editingPostId) || PostCache.getPost(_editingPostId);
+            if (updated) renderPostDetail(updated);
+          }
+        } catch (e) {
+          showToast('Could not save: ' + e.message);
+        } finally {
+          if (btn) { btn.disabled = false; btn.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Save Changes`; }
         }
       }
 
@@ -8921,9 +9377,21 @@
         if (postId) repostTargetId = _resolveRepostTarget(postId).targetId;
         closeRepostPopover();
         if (!currentUser || !repostTargetId) return;
-        const orig = posts.find(p => p.id === repostTargetId) || PostCache.getPost(repostTargetId);
+        let orig = posts.find(p => p.id === repostTargetId) || PostCache.getPost(repostTargetId);
         if (!orig) return;
         try {
+          // Fetch fresh original post so likes/comments/reposts counts are accurate
+          try {
+            const freshRes = await api("GET", `/api/posts/${repostTargetId}`);
+            if (freshRes && freshRes.data) {
+              orig = Object.assign({}, orig, freshRes.data);
+              PostCache.putPost(orig);
+              // Also update in the feed array if present
+              const feedIdx = posts.findIndex(p => p.id === repostTargetId);
+              if (feedIdx !== -1) posts[feedIdx] = orig;
+            }
+          } catch (_) { /* best-effort — proceed with cached data */ }
+
           const res = await api("POST", `/api/posts/${repostTargetId}/repost`, {
             userId: currentUser.id,
             text: null,
@@ -8933,10 +9401,10 @@
           if (!Array.isArray(orig.reposts)) orig.reposts = [];
           orig.reposts.push(currentUser.id);
           PostCache.putPost(orig);
-          // Merge in full original data the server may have omitted
+          // Merge fresh original data — server data wins over local for counts
           if (repost.isRepost) {
             if (!repost.originalPost) repost.originalPost = {};
-            repost.originalPost = Object.assign({}, orig, repost.originalPost);
+            repost.originalPost = Object.assign({}, repost.originalPost, orig);
           }
           posts.unshift(repost);
           repostTargetId = null;
@@ -9053,41 +9521,184 @@
       });
 
       /* IMAGE & VIDEO */
-      function previewImage(event) {
+      // ── Client-side image compression ──────────────────────────────
+      // Resizes to maxW/maxH (never upscales), converts to WebP, returns a File.
+      // Handles EXIF orientation via CSS image-orientation (supported in all
+      // modern browsers); no extra library needed.
+      async function compressImage(file, { maxW = 1920, maxH = 1080, quality = 0.82 } = {}) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const objectUrl = URL.createObjectURL(file);
+          img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            let { naturalWidth: w, naturalHeight: h } = img;
+            const ratio = Math.min(maxW / w, maxH / h, 1); // never upscale
+            const canvas = document.createElement('canvas');
+            canvas.width  = Math.round(w * ratio);
+            canvas.height = Math.round(h * ratio);
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) { reject(new Error('Canvas toBlob failed')); return; }
+                const outName = file.name.replace(/\.[^.]+$/, '.webp');
+                resolve(new File([blob], outName, { type: 'image/webp' }));
+              },
+              'image/webp',
+              quality
+            );
+          };
+          img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Image load failed')); };
+          // Let CSS handle EXIF orientation automatically
+          img.style.imageOrientation = 'from-image';
+          img.src = objectUrl;
+        });
+      }
+
+      async function previewImage(event) {
         const file = event.target.files[0];
         if (!file) return;
         if (file.size > 10 * 1024 * 1024) { showToast("Image must be under 10 MB."); event.target.value = ""; return; }
-        pendingImageDataUrl = file;   // store File object for FormData upload
         pendingVideoDataUrl = null;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          document.getElementById("img-preview").src = e.target.result;
-          document.getElementById("img-preview").style.display = "block";
-          document.getElementById("video-preview").style.display = "none";
-          document.getElementById("video-preview").src = "";
-          document.getElementById("img-preview-wrap").style.display = "block";
-        };
-        reader.readAsDataURL(file);
+        // Show original instantly for snappy UX, then swap in compressed version
+        const previewEl  = document.getElementById("img-preview");
+        const wrapEl     = document.getElementById("img-preview-wrap");
+        const videoEl    = document.getElementById("video-preview");
+        const rawUrl = URL.createObjectURL(file);
+        previewEl.src = rawUrl;
+        previewEl.style.display = "block";
+        videoEl.style.display = "none";
+        videoEl.src = "";
+        wrapEl.style.display = "block";
+        try {
+          const compressed = await compressImage(file);
+          pendingImageDataUrl = compressed; // store compressed File for FormData upload
+          // Swap preview to the compressed version and free the raw object URL
+          const compressedUrl = URL.createObjectURL(compressed);
+          previewEl.onload = () => URL.revokeObjectURL(compressedUrl);
+          previewEl.src = compressedUrl;
+          URL.revokeObjectURL(rawUrl);
+        } catch (err) {
+          // Compression failed — fall back to raw file silently
+          console.warn('[Circle] Image compression failed, using original:', err);
+          pendingImageDataUrl = file;
+        }
       }
-      function previewVideo(event) {
+      // ── Client-side video compression (FFmpeg.wasm) ────────────────
+      // Loaded lazily from CDN the first time a video is picked.
+      // onProgress(pct: 0–100) is called as FFmpeg works.
+      let _ffmpegInstance  = null;
+      let _ffmpegLoaded    = false;
+      let _ffmpegUnavailable = false; // true if CDN failed — skip all future attempts
+
+      async function _loadFFmpeg() {
+        if (_ffmpegLoaded) return _ffmpegInstance;
+        if (_ffmpegUnavailable) throw new Error('FFmpeg unavailable');
+        // Dynamically load FFmpeg.wasm from CDN (only when needed)
+        try {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js';
+            s.onload  = resolve;
+            s.onerror = () => reject(new Error('Failed to load FFmpeg.wasm from CDN'));
+            document.head.appendChild(s);
+          });
+          const { createFFmpeg, fetchFile } = FFmpeg;
+          _ffmpegInstance = createFFmpeg({ log: false });
+          _ffmpegInstance._fetchFile = fetchFile;
+          await _ffmpegInstance.load();
+          _ffmpegLoaded = true;
+          return _ffmpegInstance;
+        } catch (err) {
+          _ffmpegUnavailable = true; // don't retry on future picks
+          throw err;
+        }
+      }
+
+      async function compressVideo(file, onProgress) {
+        if (_ffmpegUnavailable) throw new Error('FFmpeg unavailable');
+        const ff = await _loadFFmpeg();
+        ff.setProgress(({ ratio }) => onProgress?.(Math.min(99, Math.round(ratio * 100))));
+        const inName  = 'input'  + file.name.replace(/[^.a-zA-Z0-9]/g, '') ;
+        const outName = 'output.mp4';
+        ff.FS('writeFile', inName, await ff._fetchFile(file));
+        await ff.run(
+          '-i',     inName,
+          '-vcodec','libx264',
+          '-crf',   '26',           // 18=best quality, 28=smallest, 26=sweet spot
+          '-preset','fast',
+          '-movflags','+faststart', // metadata at front for instant streaming
+          '-acodec','aac',
+          '-vf',    'scale=\'min(1280,iw)\':-2', // cap width, preserve aspect
+          outName
+        );
+        const data = ff.FS('readFile', outName);
+        // Clean up FFmpeg virtual FS
+        try { ff.FS('unlink', inName);  } catch (_) {}
+        try { ff.FS('unlink', outName); } catch (_) {}
+        onProgress?.(100);
+        return new File([data.buffer], file.name.replace(/\.[^.]+$/, '.mp4'), { type: 'video/mp4' });
+      }
+
+      async function previewVideo(event) {
         const file = event.target.files[0];
         if (!file) return;
-        if (file.size > 200 * 1024 * 1024) { showToast("Video must be under 100 MB."); return; }
-        pendingVideoDataUrl = file;   // store File object for FormData upload
+        if (file.size > 200 * 1024 * 1024) { showToast("Video must be under 200 MB."); return; }
         pendingImageDataUrl = null;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          document.getElementById("video-preview").src = e.target.result;
-          document.getElementById("video-preview").style.display = "block";
-          document.getElementById("img-preview").style.display = "none";
-          document.getElementById("img-preview").src = "";
-          document.getElementById("img-preview-wrap").style.display = "block";
-        };
-        reader.readAsDataURL(file);
+
+        // Show raw video preview immediately
+        const videoEl   = document.getElementById("video-preview");
+        const imgEl     = document.getElementById("img-preview");
+        const wrapEl    = document.getElementById("img-preview-wrap");
+        const overlay   = document.getElementById("video-compress-overlay");
+        const fillEl    = document.getElementById("video-compress-fill");
+        const labelEl   = document.getElementById("video-compress-label");
+        const submitBtn = document.getElementById("post-submit-btn");
+
+        const rawUrl = URL.createObjectURL(file);
+        videoEl.src = rawUrl;
+        videoEl.style.display = "block";
+        imgEl.style.display = "none";
+        imgEl.src = "";
+        wrapEl.style.display = "block";
+
+        // Lock Post button and show overlay while compressing
+        submitBtn.disabled = true;
+        overlay.classList.remove("hidden");
+        fillEl.style.width = "0%";
+        labelEl.textContent = "Compressing… 0%";
+
+        pendingVideoDataUrl = file; // fallback: use raw if compression fails
+        pendingVideoCompressed = false;
+
+        try {
+          const compressed = await compressVideo(file, (pct) => {
+            fillEl.style.width = pct + "%";
+            labelEl.textContent = pct < 100 ? `Compressing… ${pct}%` : "Done ✓";
+          });
+          pendingVideoDataUrl = compressed;
+          pendingVideoCompressed = true; // client compression succeeded
+          // Swap preview to compressed version
+          URL.revokeObjectURL(rawUrl);
+          videoEl.src = URL.createObjectURL(compressed);
+        } catch (err) {
+          console.warn('[Circle] Video compression failed, using original:', err);
+          const msg = _ffmpegUnavailable
+            ? "Compressor unavailable — uploading original video."
+            : "Compression failed — uploading original.";
+          showToast(msg);
+        } finally {
+          overlay.classList.add("hidden");
+          fillEl.style.width = "0%";
+          submitBtn.disabled = false;
+        }
       }
       function removeMedia() {
         pendingImageDataUrl = null;
         pendingVideoDataUrl = null;
+        pendingVideoCompressed = false;
         document.getElementById("img-preview").src = "";
         document.getElementById("img-preview").style.display = "block";
         const vp = document.getElementById("video-preview");
@@ -9745,7 +10356,12 @@
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
             Block
           </button>
-          ${canDelete ? `<div class="post-dropdown-divider"></div><button class="post-dropdown-item danger" onclick="closePostMenu(${post.id});deletePost(${post.id})">
+          ${canDelete ? `<div class="post-dropdown-divider"></div>
+          <button class="post-dropdown-item" onclick="closePostMenu(${post.id});openEditPostModal(${post.id})">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Edit
+          </button>
+          <button class="post-dropdown-item danger" onclick="closePostMenu(${post.id});deletePost(${post.id})">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
             Delete
           </button>` : ""}
@@ -9817,9 +10433,15 @@
         showToast("Uploading…");
         event.target.value = "";
         try {
-          // Send as multipart/form-data — server compresses to .webp and returns a URL
+          // Compress to 400×400 WebP before uploading — server no longer needs to do this
+          let uploadFile = file;
+          try {
+            uploadFile = await compressImage(file, { maxW: 400, maxH: 400, quality: 0.88 });
+          } catch (err) {
+            console.warn('[Circle] Profile pic compression failed, using original:', err);
+          }
           const fd = new FormData();
-          fd.append("image", file);
+          fd.append("image", uploadFile);
           const res = await api(
             "PUT",
             `/api/users/${currentUser.id}/picture`,
@@ -10632,13 +11254,17 @@
           goTo("profile");
         } else {
           if (postId) {
-            const post = posts.find((p) => p.id === postId) || PostCache.getPost(postId);
-            if (post) {
-              renderPostDetail(post);
+            // For comment/like/repost/reply notifications, always fetch a fresh
+            // copy from the API so the new comment/reaction is visible immediately
+            // without requiring a manual refresh.
+            const needsFresh = (type === "comment" || type === "like" || type === "repost" || type === "reply");
+            const cached = !needsFresh && (posts.find((p) => p.id === postId) || PostCache.getPost(postId));
+            if (cached) {
+              renderPostDetail(cached);
               goTo("post-detail");
             } else {
               try {
-                showToast("Loading post…");
+                if (!needsFresh) showToast("Loading post…");
                 const res = await api("GET", `/api/posts/${postId}`);
                 const found = res.data;
                 if (found) {
@@ -11033,12 +11659,12 @@
           }
 
           const VISIBLE = 10;
-          const renderRows = (items) => items.map((t, i) => {
+          const renderRows = (items, offset = 0) => items.map((t, i) => {
             const count = t.post_count >= 1000
               ? (t.post_count / 1000).toFixed(1) + 'k'
               : t.post_count;
             return `<div class="topic-list-row" onclick="openTopicFeed('${escHtml(t.topic)}')">
-              <span class="topic-list-rank">${i + 1}</span>
+              <span class="topic-list-rank">${offset + i + 1}</span>
               <span class="topic-list-name">#${escHtml(t.topic)}</span>
               <span class="topic-list-count">${count} posts</span>
             </div>`;
@@ -11047,13 +11673,20 @@
           if (topics.length <= VISIBLE) {
             list.innerHTML = `<div class="topic-list">${renderRows(topics)}</div>`;
           } else {
+            const remaining = topics.slice(VISIBLE);
             list.innerHTML = `
               <div class="topic-list" id="topic-list-inner">
                 ${renderRows(topics.slice(0, VISIBLE))}
               </div>
+              <div class="topic-extra-drawer" id="topic-extra-drawer">
+                <div class="topic-list" style="margin-top:2px">
+                  ${renderRows(remaining, VISIBLE)}
+                </div>
+              </div>
               <button class="topic-show-more" id="topic-show-more-btn"
-                onclick="expandTopicList(${JSON.stringify(topics.slice(VISIBLE))})">
-                Show ${topics.length - VISIBLE} more topics ↓
+                onclick="toggleTopicDrawer(${remaining.length})">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                Show ${remaining.length} more topics
               </button>`;
           }
         } catch (e) {
@@ -11063,25 +11696,18 @@
         }
       }
 
-      function expandTopicList(remaining) {
-        const inner = document.getElementById('topic-list-inner');
-        const btn   = document.getElementById('topic-show-more-btn');
-        if (!inner || !remaining.length) return;
-        const offset = inner.querySelectorAll('.topic-list-row').length;
-        remaining.forEach((t, i) => {
-          const count = t.post_count >= 1000
-            ? (t.post_count / 1000).toFixed(1) + 'k'
-            : t.post_count;
-          const row = document.createElement('div');
-          row.className = 'topic-list-row';
-          row.onclick = () => openTopicFeed(t.topic);
-          row.innerHTML = `
-            <span class="topic-list-rank">${offset + i + 1}</span>
-            <span class="topic-list-name">#${escHtml(t.topic)}</span>
-            <span class="topic-list-count">${count} posts</span>`;
-          inner.appendChild(row);
-        });
-        if (btn) btn.remove();
+      function toggleTopicDrawer(count) {
+        const drawer = document.getElementById('topic-extra-drawer');
+        const btn    = document.getElementById('topic-show-more-btn');
+        if (!drawer || !btn) return;
+        const isOpen = drawer.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        const svg = btn.querySelector('svg').outerHTML;
+        btn.innerHTML = svg + (isOpen
+          ? ` Show less`
+          : ` Show ${count} more topics`);
+        // re-bind click since innerHTML replaced it
+        btn.onclick = () => toggleTopicDrawer(count);
       }
 
       /* ── Topic feed view ─────────────────────────────────────────── */
@@ -12437,22 +13063,23 @@
         if (_lbAnimating || newIdx < 0 || newIdx >= _lbItems.length) return;
         _lbAnimating = true;
         const dir = newIdx > _lbIndex ? 1 : -1;
+        const ud = _lbNavAxis === 'ud';
         const lbImg = document.getElementById('lb-img');
         const lbVid = document.getElementById('lb-video');
         const fromVideo = _lbIsVideo();
         const toItem = _lbItems[newIdx];
 
-        // Fade/slide out current item
+        // Slide out along the chosen axis
         const outEl = fromVideo ? lbVid : lbImg;
+        const outTranslate = ud ? `translateY(${-dir * 60}px)` : `translateX(${-dir * 60}px)`;
         outEl.style.transition = 'opacity 0.18s ease, transform 0.2s ease';
         outEl.style.opacity = '0';
-        outEl.style.transform = `translateX(${-dir * 60}px)`;
+        outEl.style.transform = outTranslate;
         if (fromVideo) lbVid.pause();
 
         setTimeout(() => {
           _lbIndex = newIdx;
           _lbScale = 1; _lbTranslateX = 0; _lbTranslateY = 0;
-          // Reset outgoing element
           outEl.style.transition = 'none';
           outEl.style.transform = '';
 
@@ -12461,11 +13088,11 @@
             lbVid.style.display = 'block';
             lbVid.src = toItem.src;
             lbVid.style.opacity = '0';
-            lbVid.style.transform = `translateX(${dir * 60}px)`;
+            lbVid.style.transform = ud ? `translateY(${dir * 60}px)` : `translateX(${dir * 60}px)`;
             requestAnimationFrame(() => {
               lbVid.style.transition = 'opacity 0.22s ease, transform 0.28s cubic-bezier(0.34,1.2,0.64,1)';
               lbVid.style.opacity = '1';
-              lbVid.style.transform = 'translateX(0)';
+              lbVid.style.transform = ud ? 'translateY(0)' : 'translateX(0)';
               lbVid.play().catch(() => {});
               setTimeout(() => { _lbAnimating = false; }, 300);
             });
@@ -12474,10 +13101,12 @@
             lbImg.style.display = '';
             lbImg.src = toItem.src;
             lbImg.style.opacity = '0.2';
-            lbImg.style.transform = `translateX(${dir * 60}px) scale(0.88)`;
+            lbImg.style.transform = ud
+              ? `translateY(${dir * 60}px) scale(0.88)`
+              : `translateX(${dir * 60}px) scale(0.88)`;
             requestAnimationFrame(() => {
               lbImg.style.transition = 'transform 0.3s cubic-bezier(0.34,1.2,0.64,1), opacity 0.22s ease';
-              lbImg.style.transform = 'translateX(0) scale(1)';
+              lbImg.style.transform = ud ? 'translateY(0) scale(1)' : 'translateX(0) scale(1)';
               lbImg.style.opacity = '1';
               setTimeout(() => { _lbAnimating = false; }, 320);
             });
@@ -12584,11 +13213,51 @@
         }
       }
 
+      /* ── Lightbox nav axis: 'lr' = left/right (default), 'ud' = up/down ── */
+      let _lbNavAxis = localStorage.getItem('circle_lb_nav_axis') || 'lr';
+
+      function lbSetNavAxis(axis) {
+        _lbNavAxis = axis;
+        localStorage.setItem('circle_lb_nav_axis', axis);
+        _lbSyncNavAxisSetting();
+      }
+
+      function _lbSyncNavAxisSetting() {
+        const lrBtn = document.getElementById('lb-nav-lr-btn');
+        const udBtn = document.getElementById('lb-nav-ud-btn');
+        const isLR = _lbNavAxis === 'lr';
+        [lrBtn, udBtn].forEach(btn => {
+          if (!btn) return;
+          btn.style.borderColor = 'var(--border2)';
+          btn.style.background = 'var(--card)';
+          btn.style.color = 'var(--txt2)';
+        });
+        const activeBtn = isLR ? lrBtn : udBtn;
+        if (activeBtn) {
+          activeBtn.style.borderColor = 'var(--accent)';
+          activeBtn.style.background = 'var(--accent-bg)';
+          activeBtn.style.color = 'var(--accent)';
+        }
+        // Update hint text
+        const hint = document.getElementById('lb-hint');
+        if (hint) hint.textContent = isLR
+          ? 'Swipe or scroll ← → to navigate · Pinch to zoom · Double-click to reset'
+          : 'Swipe or scroll ↑ ↓ to navigate · Pinch to zoom · Double-click to reset';
+      }
+
+      // Sync on page load
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _lbSyncNavAxisSetting);
+      } else {
+        _lbSyncNavAxisSetting();
+      }
+
       /* ── Touch / Pointer events for zoom & swipe ── */
       function lbPointerDown(e) {
         _lbPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
         if (_lbPointers.size === 1) {
           _lbSwipeStartX = e.clientX;
+          _lbSwipeStartY = e.clientY;
           _lbDragStartX = e.clientX - _lbTranslateX;
           _lbDragStartY = e.clientY - _lbTranslateY;
           _lbSwiping = _lbIsVideo() ? true : _lbScale <= 1;
@@ -12627,31 +13296,45 @@
 
       function lbPointerUp(e) {
         const startX = _lbSwipeStartX;
+        const startY = _lbSwipeStartY || 0;
         _lbPointers.delete(e.pointerId);
         if (_lbPointers.size === 0 && _lbSwiping) {
-          const dx = e.clientX - startX;
-          if (Math.abs(dx) > 55) {
-            if (_lbScale <= 1 || _lbIsVideo()) {
-              lbGoTo(_lbIndex + (dx < 0 ? 1 : -1));
+          if (_lbScale <= 1 || _lbIsVideo()) {
+            if (_lbNavAxis === 'ud') {
+              const dy = e.clientY - startY;
+              if (Math.abs(dy) > 55) lbGoTo(_lbIndex + (dy < 0 ? 1 : -1));
+            } else {
+              const dx = e.clientX - startX;
+              if (Math.abs(dx) > 55) lbGoTo(_lbIndex + (dx < 0 ? 1 : -1));
             }
           }
           _lbSwiping = false;
         }
       }
 
-      /* ── Wheel zoom ── */
+      /* ── Wheel: navigate on chosen axis, zoom on the other ── */
       function lbWheel(e) {
-        if (_lbIsVideo()) return;
         e.preventDefault();
-        const lbImg = document.getElementById("lb-img");
-        _lbScale = Math.min(
-          5,
-          Math.max(1, _lbScale * (e.deltaY < 0 ? 1.12 : 0.9)),
-        );
-        if (_lbScale <= 1) {
-          _lbTranslateX = 0;
-          _lbTranslateY = 0;
+        // Both axes use scroll to navigate; for LR mode horizontal scroll navigates,
+        // vertical scroll zooms (images only). For UD mode vertical scroll navigates.
+        const isUD = _lbNavAxis === 'ud';
+        const navDelta = isUD ? e.deltaY : e.deltaX;
+        const zoomDelta = isUD ? e.deltaX : e.deltaY;
+
+        // Navigate if the user scrolled on the navigation axis
+        if (Math.abs(navDelta) > Math.abs(zoomDelta) || isUD) {
+          if (!lbWheel._t) {
+            lbGoTo(_lbIndex + (navDelta > 0 ? 1 : -1));
+            lbWheel._t = setTimeout(() => { lbWheel._t = null; }, 350);
+          }
+          return;
         }
+
+        // Otherwise zoom (images only, LR mode vertical scroll)
+        if (_lbIsVideo()) return;
+        const lbImg = document.getElementById("lb-img");
+        _lbScale = Math.min(5, Math.max(1, _lbScale * (zoomDelta < 0 ? 1.12 : 0.9)));
+        if (_lbScale <= 1) { _lbTranslateX = 0; _lbTranslateY = 0; }
         lbImg.style.transition = "transform 0.12s ease";
         lbImg.style.transform = `translate(${_lbTranslateX}px, ${_lbTranslateY}px) scale(${_lbScale})`;
       }
@@ -12672,8 +13355,13 @@
         const lb = document.getElementById("lightbox");
         if (lb.style.display !== "flex") return;
         if (e.key === "Escape") closeLightbox();
-        if (e.key === "ArrowRight") lbGoTo(_lbIndex + 1);
-        if (e.key === "ArrowLeft") lbGoTo(_lbIndex - 1);
+        if (_lbNavAxis === 'ud') {
+          if (e.key === "ArrowDown") lbGoTo(_lbIndex + 1);
+          if (e.key === "ArrowUp")   lbGoTo(_lbIndex - 1);
+        } else {
+          if (e.key === "ArrowRight") lbGoTo(_lbIndex + 1);
+          if (e.key === "ArrowLeft")  lbGoTo(_lbIndex - 1);
+        }
       });
 
       /* ── Collect all images from feed for gallery context ── */
@@ -13893,6 +14581,7 @@
                 <span class="post-detail-time">${dateStr}</span>
               </div>
               <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                ${canDelete ? `<button class="post-del" title="Edit post" style="color:var(--accent)" onclick="openEditPostModal(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>` : ""}
                 ${canDelete ? `<button class="post-del" onclick="deletePost(${post.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>` : ""}
                 ${(currentUser && currentUser.id !== post.userId) ? (() => { const isFollowing = _followingSet.has(post.userId); return `<button class="btn ${isFollowing ? "btn-outline" : "btn-primary"}" id="pd-follow-btn" style="font-size:12px;padding:6px 16px;border-radius:20px" data-following="${isFollowing}" onclick="toggleFollow(${post.userId}, this)">${isFollowing ? "Following" : "Follow"}</button>`; })() : ""}
               </div>
@@ -13935,15 +14624,19 @@
               ${(() => {
                 const isNoQuoteRepost = post.isRepost && post.originalPost && !post.text;
                 const targetId       = isNoQuoteRepost ? post.originalPost.id  : post.id;
-                const targetReposts  = isNoQuoteRepost ? (post.originalPost.reposts || []) : (post.reposts || []);
+                const targetLikes    = isNoQuoteRepost ? (post.originalPost.likes    || []) : (post.likes    || []);
+                const targetComments = isNoQuoteRepost ? (post.originalPost.comments || []) : (post.comments || []);
+                const targetReposts  = isNoQuoteRepost ? (post.originalPost.reposts  || []) : (post.reposts  || []);
+                const targetLiked    = currentUser && targetLikes.some(r => (r.userId || r) === currentUser.id);
                 const targetReposted = currentUser && targetReposts.some(r => (r.userId || r) === currentUser.id);
-                return `<button class="act-btn like-btn${liked ? " liked" : ""}" id="pd-like-btn" onclick="pdToggleLike(${post.id})">
-                <svg fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                <span id="pd-like-count">${post.likes ? post.likes.length : 0}</span>
+                function _countAllComments(arr){return(arr||[]).reduce((n,c)=>n+1+_countAllComments(c.replies||[]),0);}
+                return `<button class="act-btn like-btn${targetLiked ? " liked" : ""}" id="pd-like-btn" onclick="pdToggleLike(${targetId})">
+                <svg fill="${targetLiked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                <span id="pd-like-count">${targetLikes.length || 0}</span>
               </button>
               <button class="act-btn" onclick="document.getElementById('post-detail-reply-input').focus()">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                <span>${post.comments ? post.comments.length || "" : ""}</span>
+                <span>${_countAllComments(targetComments) || ""}</span>
               </button>
               <div class="post-menu-wrap" onclick="event.stopPropagation()">
                 <button class="act-btn repost-btn${targetReposted ? " reposted" : ""}" onclick="toggleRepostMenu(event,${targetId})">
@@ -14105,9 +14798,13 @@
           return;
         }
         await toggleLike(postId);
-        // Refresh the detail view with updated post
-        const post =
-          posts.find((p) => p.id === postId) || PostCache.getPost(postId);
+        // Re-render the detail view. For no-quote reposts the like targets the
+        // original post ID, so we look for a repost wrapper first so the
+        // repost strip and header are preserved in the re-render.
+        const repostWrapper = posts.find(p => p.isRepost && !p.text && p.originalPost && p.originalPost.id === postId);
+        const post = repostWrapper
+          || posts.find((p) => p.id === postId)
+          || PostCache.getPost(postId);
         if (post) renderPostDetail(post);
       }
 
@@ -14238,6 +14935,7 @@
       let _composePrevView = "feed";
       let _composeTabPendingImage = null;
       let _composeTabPendingVideo = null;
+      let _composeTabVideoCompressed = false; // true only when client compression succeeded
 
       function openComposeTab() {
         // Remember where we came from
@@ -14277,6 +14975,11 @@
         goTo(_composePrevView);
       }
 
+      function handleComposeBackdropClick(e) {
+        // On desktop the modal inner div sits inside the backdrop — close if user clicks the backdrop itself
+        if (e.target === document.getElementById("view-compose")) closeComposeTab();
+      }
+
       function composeTabInput(el) {
         const len = el.value.length;
         const MAX = 280;
@@ -14290,47 +14993,92 @@
         }
       }
 
-      function composeTabPreviewImage(event) {
+      async function composeTabPreviewImage(event) {
         const file = event.target.files[0];
         if (!file) return;
         if (file.size > 10 * 1024 * 1024) { showToast("Image must be under 10 MB."); event.target.value = ""; return; }
-        _composeTabPendingImage = file;   // store File object for FormData upload
         _composeTabPendingVideo = null;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.getElementById("compose-tab-img-preview");
-          const vid = document.getElementById("compose-tab-video-preview");
-          img.src = e.target.result;
-          img.style.display = "block";
-          vid.style.display = "none";
-          vid.src = "";
-          document.getElementById("compose-tab-media-preview").style.display = "block";
-        };
-        reader.readAsDataURL(file);
+        const imgEl  = document.getElementById("compose-tab-img-preview");
+        const vidEl  = document.getElementById("compose-tab-video-preview");
+        const wrapEl = document.getElementById("compose-tab-media-preview");
+        // Show raw instantly
+        const rawUrl = URL.createObjectURL(file);
+        imgEl.src = rawUrl;
+        imgEl.style.display = "block";
+        vidEl.style.display = "none";
+        vidEl.src = "";
+        wrapEl.style.display = "block";
+        try {
+          const compressed = await compressImage(file);
+          _composeTabPendingImage = compressed; // store compressed File for FormData upload
+          const compressedUrl = URL.createObjectURL(compressed);
+          imgEl.onload = () => URL.revokeObjectURL(compressedUrl);
+          imgEl.src = compressedUrl;
+          URL.revokeObjectURL(rawUrl);
+        } catch (err) {
+          console.warn('[Circle] Image compression failed, using original:', err);
+          _composeTabPendingImage = file;
+        }
       }
 
-      function composeTabPreviewVideo(event) {
+      async function composeTabPreviewVideo(event) {
         const file = event.target.files[0];
         if (!file) return;
         if (file.size > 200 * 1024 * 1024) { showToast("Video must be under 200 MB."); return; }
-        _composeTabPendingVideo = file;   // store File object for FormData upload
         _composeTabPendingImage = null;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const vid = document.getElementById("compose-tab-video-preview");
-          const img = document.getElementById("compose-tab-img-preview");
-          vid.src = e.target.result;
-          vid.style.display = "block";
-          img.style.display = "none";
-          img.src = "";
-          document.getElementById("compose-tab-media-preview").style.display = "block";
-        };
-        reader.readAsDataURL(file);
+
+        const vidEl      = document.getElementById("compose-tab-video-preview");
+        const imgEl      = document.getElementById("compose-tab-img-preview");
+        const wrapEl     = document.getElementById("compose-tab-media-preview");
+        const progressWrap = document.getElementById("compose-tab-progress");
+        const progressBar  = document.getElementById("compose-tab-progress-bar");
+        const submitBtn    = document.getElementById("compose-tab-submit");
+
+        // Show raw video immediately
+        const rawUrl = URL.createObjectURL(file);
+        vidEl.src = rawUrl;
+        vidEl.style.display = "block";
+        imgEl.style.display = "none";
+        imgEl.src = "";
+        wrapEl.style.display = "block";
+
+        // Lock Post button, activate progress bar
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Compressing…";
+        progressWrap.classList.add("active");
+        progressBar.style.width = "2%";
+
+        _composeTabPendingVideo = file; // fallback
+        _composeTabVideoCompressed = false;
+
+        try {
+          const compressed = await compressVideo(file, (pct) => {
+            progressBar.style.width = pct + "%";
+            submitBtn.textContent = pct < 100 ? `Compressing… ${pct}%` : "Post";
+          });
+          _composeTabPendingVideo = compressed;
+          _composeTabVideoCompressed = true; // client compression succeeded
+          URL.revokeObjectURL(rawUrl);
+          vidEl.src = URL.createObjectURL(compressed);
+        } catch (err) {
+          console.warn('[Circle] Video compression failed, using original:', err);
+          const msg = _ffmpegUnavailable
+            ? "Compressor unavailable — uploading original video."
+            : "Compression failed — uploading original.";
+          showToast(msg);
+        } finally {
+          // Reset progress bar and restore button
+          progressBar.style.width = "0%";
+          progressWrap.classList.remove("active");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Post";
+        }
       }
 
       function removeComposeTabMedia() {
         _composeTabPendingImage = null;
         _composeTabPendingVideo = null;
+        _composeTabVideoCompressed = false;
         const img = document.getElementById("compose-tab-img-preview");
         const vid = document.getElementById("compose-tab-video-preview");
         if (img) { img.src = ""; img.style.display = "none"; }
@@ -14373,7 +15121,10 @@
           const fd = new FormData();
           fd.append("text", text);
           if (_composeTabPendingImage instanceof File) fd.append("image", _composeTabPendingImage);
-          if (_composeTabPendingVideo instanceof File) fd.append("video", _composeTabPendingVideo);
+          if (_composeTabPendingVideo instanceof File) {
+            fd.append("video", _composeTabPendingVideo);
+            fd.append("video_compressed", _composeTabVideoCompressed ? "1" : "0");
+          }
 
           const res = await api("POST", "/api/posts", fd);
 
@@ -14700,12 +15451,13 @@
           goTo('profile');
         } else if (postId) {
           // like / comment / repost / mention / reply / new_post → open the post
-          const cached = posts.find(p => p.id === postId) || PostCache.getPost(postId);
+          // For comment/like/repost/reply always fetch fresh so new reactions show immediately
+          const needsFresh = (notifType === 'comment' || notifType === 'like' || notifType === 'repost' || notifType === 'reply');
+          const cached = !needsFresh && (posts.find(p => p.id === postId) || PostCache.getPost(postId));
           if (cached) {
             renderPostDetail(cached);
             goTo('post-detail');
           } else {
-            showToast('Loading post…');
             try {
               const res = await api('GET', `/api/posts/${postId}`);
               const found = res.data;

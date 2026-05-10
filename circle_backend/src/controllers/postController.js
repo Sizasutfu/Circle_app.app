@@ -12,6 +12,8 @@ const NotificationModel     = require('../models/notificationModel');
 const FollowModel           = require('../models/followModel');
 const TopicPreferenceModel  = require('../models/TopicPreferenceModel');
 const NegativeSignalModel   = require('../models/NegativeSignalModel');
+const GroupModel            = require('../models/GroupModel');
+
 const { getPostsPage }      = require('../feed/feedPipeline');
 const { db }                = require('../config/db');
 const { sendOk, sendError } = require('../middleware/response');
@@ -81,6 +83,8 @@ async function getPostById(req, res) {
 // POST /api/posts  (multipart/form-data)
 // compressUploads middleware runs first — compressed files are
 // already on disk. req.compressedFiles holds their filenames.
+// Optional body field: groupId — scopes the post to a group.
+// The user must be a member of the group to post into it.
 async function createPost(req, res) {
   const userId = req.actorId;
   const text   = req.body.text || '';
@@ -100,11 +104,24 @@ async function createPost(req, res) {
   if (!text && !imagePath && !videoPath)
     return sendError(res, 400, 'A post must have text, an image, or a video.');
 
+  // ── Group validation ───────────────────────────────────────
+  const groupId = req.body.groupId ? parseInt(req.body.groupId) : null;
+  if (groupId) {
+    if (isNaN(groupId) || groupId < 1)
+      return sendError(res, 400, 'Invalid groupId.');
+
+    const group = await GroupModel.getGroupById(groupId, userId);
+    if (!group)
+      return sendError(res, 404, 'Group not found.');
+    if (!group.isMember)
+      return sendError(res, 403, 'You must be a member of this group to post in it.');
+  }
+
   try {
     const user = await UserModel.findById(userId);
     if (!user) return sendError(res, 404, 'User not found.');
 
-    const postId = await PostModel.createPost(userId, text, imagePath, videoPath);
+    const postId = await PostModel.createPost(userId, text, imagePath, videoPath, groupId);
 
     // ── Extract and save hashtags ──────────────────────────────
     await PostModel.savePostTopics(postId, text);
@@ -125,6 +142,9 @@ async function createPost(req, res) {
       text,
       image:         imageUrl,
       video:         videoUrl,
+      groupId:       groupId || null,
+      groupName:     groupId ? group.displayName : null,
+      groupTopic:    groupId ? group.topic       : null,
       likes: [], reposts: [], comments: [],
       isRepost:      false,
       createdAt:     new Date(),
@@ -184,6 +204,9 @@ async function toggleLike(req, res) {
     return sendError(res, 500, 'Server error.');
   }
 }
+
+
+
 
 // POST /api/posts/:id/comment
 async function addComment(req, res) {
@@ -372,7 +395,52 @@ async function getPostsByTopic(req, res) {
     return sendError(res, 500, 'Server error.');
   }
 }
+// GET /api/groups/:groupId/posts?page=<n>&limit=<n>
+// Returns posts scoped to a group via group_id column.
+// Any authenticated or guest user can read; only members can post.
+async function getGroupPosts(req, res) {
+  const groupId = parseInt(req.params.groupId);
+  if (isNaN(groupId) || groupId < 1)
+    return sendError(res, 400, 'Invalid group ID.');
 
+  const page  = Math.max(1, parseInt(req.query.page)  || 1);
+  const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+
+  try {
+    const result = await PostModel.getGroupPosts(groupId, page, limit);
+    return sendOk(res, 200, 'Group posts fetched.', result);
+  } catch (err) {
+    console.error('getGroupPosts error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
+
+// PUT /api/posts/:id
+async function updatePost(req, res) {
+  const postId = Number(req.params.id);
+  const { text } = req.body;
+
+  if (!text || !text.trim()) {
+    return sendError(res, 400, 'Post text cannot be empty.');
+  }
+  if (text.trim().length > 500) {
+    return sendError(res, 400, 'Post text exceeds 500 characters.');
+  }
+
+  try {
+    const post = await PostModel.findById(postId);
+    if (!post) return sendError(res, 404, 'Post not found.');
+    if (post.user_id !== req.actorId) {
+      return sendError(res, 403, 'You can only edit your own posts.');
+    }
+
+    await PostModel.updatePost(postId, text.trim());
+    return sendOk(res, 200, 'Post updated.');
+  } catch (e) {
+    console.error('Edit post error:', e);
+    return sendError(res, 500, 'Server error.');
+  }
+}
 module.exports = {
   getPosts,
   getPostById,
@@ -386,4 +454,7 @@ module.exports = {
   recordSkip,
   getTopics,
   getPostsByTopic,
+  getGroupPosts,
+  updatePost,
+  
 };
