@@ -33,6 +33,8 @@ const exploreRoutes        = require('./routes/exploreRoutes');
 const topicRoutes          = require('./routes/topicRoutes');
 const pushRoutes           = require('./routes/pushRoutes');
 const groupRoutes          = require('./routes/groupsRoutes');
+const phoneAuthRoutes = require('./routes/phoneAuthRoutes');
+
 
 // authRoutes is optional (Google OAuth) — only load if the file exists
 let authRoutes = null;
@@ -63,6 +65,7 @@ app.use('/api/posts',           postRoutes);
 app.use('/api/notifications',   notificationRoutes);
 app.use('/api/search',          searchRoutes);
 app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/auth/phone', phoneAuthRoutes);
 if (authRoutes) app.use('/api/auth', authRoutes);
 app.use('/api',                 followRoutes);
 app.use('/api/dm',              dmRoutes);
@@ -70,6 +73,7 @@ app.use('/api/explore',         exploreRoutes);
 app.use('/api/topics',          topicRoutes);
 app.use('/api/push',            pushRoutes);
 app.use('/api/groups',          groupRoutes);
+
 
 // 404
 app.use((req, res) => sendError(res, 404, `Route '${req.originalUrl}' not found.`));

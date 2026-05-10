@@ -6542,48 +6542,99 @@
               <div class="auth-card">
                 <div class="auth-brand">
                   <div class="auth-brand-icon">
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="9" />
-                    </svg>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /></svg>
                   </div>
                   <span>Circle</span>
                 </div>
                 <h2>Join Circle</h2>
                 <p class="sub">Connect with the people who matter</p>
+
+                <!-- Method tabs -->
+                <div class="auth-method-tabs">
+                  <button class="auth-method-tab active" id="reg-tab-email" onclick="switchRegisterMethod('email')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Email
+                  </button>
+                  <button class="auth-method-tab" id="reg-tab-phone" onclick="switchRegisterMethod('phone')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.0 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+                    Phone
+                  </button>
+                </div>
+
                 <div class="alert" id="register-alert"></div>
-                <div class="field">
-                  <label>Full Name</label
-                  ><input type="text" id="reg-name" placeholder="Jane Doe" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('reg-email').focus()"/>
+
+                <!-- Email registration method -->
+                <div id="reg-email-method">
+                  <div class="field">
+                    <label>Full Name</label>
+                    <input type="text" id="reg-name" placeholder="Jane Doe" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('reg-email').focus()"/>
+                  </div>
+                  <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="jane@example.com"/>
+                  </div>
+                  <div class="field">
+                    <label>Phone <span style="color:var(--txt3);font-weight:400;text-transform:none;font-size:11px">(optional — for SMS login later)</span></label>
+                    <div class="phone-input-wrap">
+                      <select class="phone-dial-select" id="reg-dial-code"></select>
+                      <input class="phone-number-input" type="tel" id="reg-phone" placeholder="712 345 678" inputmode="numeric"/>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label>Password</label>
+                    <div class="pw-wrap"><input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')document.getElementById('reg-confirm-password').focus()"/><button type="button" class="pw-toggle" onclick="togglePw('reg-password',this)" tabindex="-1" aria-label="Show password"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+                  </div>
+                  <div class="field">
+                    <label>Confirm Password</label>
+                    <div class="pw-wrap"><input type="password" id="reg-confirm-password" placeholder="Repeat your password" autocomplete="new-password" onkeydown="if(event.key==='Enter')registerUser()"/><button type="button" class="pw-toggle" onclick="togglePw('reg-confirm-password',this)" tabindex="-1" aria-label="Show password"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+                  </div>
+                  <button class="btn btn-primary btn-full" onclick="registerUser()">Create Account</button>
                 </div>
-                <div class="field">
-                  <label>Email</label
-                  ><input
-                    type="email"
-                    id="reg-email"
-                    placeholder="jane@example.com"
-                  />
-                </div>
-                <div class="field">
-                  <label>Phone <span style="color:var(--txt3);font-weight:400;text-transform:none;font-size:11px">(optional — for SMS login)</span></label>
-                  <div class="phone-input-wrap">
-                    <select class="phone-dial-select" id="reg-dial-code"></select>
-                    <input class="phone-number-input" type="tel" id="reg-phone" placeholder="712 345 678" inputmode="numeric"/>
+
+                <!-- Phone registration method -->
+                <div id="reg-phone-method" style="display:none">
+                  <!-- Step 1: name + phone -->
+                  <div class="phone-step active" id="reg-phone-step1">
+                    <div class="field">
+                      <label>Full Name</label>
+                      <input type="text" id="reg-phone-name" placeholder="Jane Doe" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('reg-phone-number').focus()"/>
+                    </div>
+                    <div class="field">
+                      <label>Phone Number</label>
+                      <div class="phone-input-wrap">
+                        <select class="phone-dial-select" id="reg-phone-dial-code"></select>
+                        <input class="phone-number-input" type="tel" id="reg-phone-number" placeholder="712 345 678" inputmode="numeric" onkeydown="if(event.key==='Enter')phoneRegisterSendOtp()"/>
+                      </div>
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="phoneRegisterSendOtp()" id="reg-send-otp-btn">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      Send Code
+                    </button>
+                  </div>
+                  <!-- Step 2: enter OTP -->
+                  <div class="phone-step" id="reg-phone-step2">
+                    <div class="otp-sent-info">
+                      Code sent to <strong id="reg-otp-phone-display"></strong><br/>
+                      Enter the 6-digit code below
+                    </div>
+                    <div class="otp-group" id="reg-otp-group">
+                      <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this,'reg')" onkeydown="otpKeydown(event,this,'reg')" onpaste="otpPaste(event,'reg')"/>
+                      <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this,'reg')" onkeydown="otpKeydown(event,this,'reg')" onpaste="otpPaste(event,'reg')"/>
+                      <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this,'reg')" onkeydown="otpKeydown(event,this,'reg')" onpaste="otpPaste(event,'reg')"/>
+                      <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this,'reg')" onkeydown="otpKeydown(event,this,'reg')" onpaste="otpPaste(event,'reg')"/>
+                      <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this,'reg')" onkeydown="otpKeydown(event,this,'reg')" onpaste="otpPaste(event,'reg')"/>
+                      <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this,'reg')" onkeydown="otpKeydown(event,this,'reg')" onpaste="otpPaste(event,'reg')"/>
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="phoneRegisterVerifyOtp()" id="reg-verify-otp-btn">Verify &amp; Create Account</button>
+                    <div class="otp-resend-row">
+                      <button onclick="phoneRegisterSendOtp(true)" id="reg-resend-btn" disabled>Resend code <span class="otp-timer" id="reg-otp-timer">(30s)</span></button>
+                    </div>
+                    <div class="auth-switch" style="margin-top:10px">
+                      <button onclick="phoneRegisterBack()">← Change number</button>
+                    </div>
                   </div>
                 </div>
-                <div class="field">
-                  <label>Password</label>
-                  <div class="pw-wrap"><input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')document.getElementById('reg-confirm-password').focus()"/><button type="button" class="pw-toggle" onclick="togglePw('reg-password',this)" tabindex="-1" aria-label="Show password"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-                </div>
-                <div class="field">
-                  <label>Confirm Password</label>
-                  <div class="pw-wrap"><input type="password" id="reg-confirm-password" placeholder="Repeat your password" autocomplete="new-password" onkeydown="if(event.key==='Enter')registerUser()"/><button type="button" class="pw-toggle" onclick="togglePw('reg-confirm-password',this)" tabindex="-1" aria-label="Show password"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-                </div>
-                <button
-                  class="btn btn-primary btn-full"
-                  onclick="registerUser()"
-                >
-                  Create Account
-                </button>
+
                 <div class="auth-switch">
                   Already have an account?
                   <button onclick="goTo('login')">Sign in</button>
@@ -9075,17 +9126,108 @@
         }
       }
 
+      // ── Phone Registration ─────────────────────────────────────────
+
+      function switchRegisterMethod(method) {
+        const isPhone = method === "phone";
+        document.getElementById("reg-tab-email").classList.toggle("active", !isPhone);
+        document.getElementById("reg-tab-phone").classList.toggle("active", isPhone);
+        document.getElementById("reg-email-method").style.display = isPhone ? "none" : "block";
+        document.getElementById("reg-phone-method").style.display = isPhone ? "block" : "none";
+        document.getElementById("register-alert").className = "alert";
+        if (isPhone) {
+          phoneRegisterBack();
+          // Seed dial code dropdown if not yet populated
+          const dial = document.getElementById("reg-phone-dial-code");
+          if (dial && !dial.options.length) {
+            const src = document.getElementById("reg-dial-code");
+            if (src) dial.innerHTML = src.innerHTML;
+          }
+          setTimeout(() => document.getElementById("reg-phone-name").focus(), 80);
+        }
+      }
+
+      function phoneRegisterBack() {
+        document.getElementById("reg-phone-step1").classList.add("active");
+        document.getElementById("reg-phone-step2").classList.remove("active");
+        _clearOtpTimer();
+        _clearOtpDigits("reg");
+      }
+
+      async function phoneRegisterSendOtp(isResend = false) {
+        const name = document.getElementById("reg-phone-name").value.trim();
+        const dialCode = document.getElementById("reg-phone-dial-code").value;
+        const raw = document.getElementById("reg-phone-number").value.trim();
+        const el = document.getElementById("register-alert");
+        el.className = "alert";
+
+        if (!name) return showAlert(el, "Please enter your name.", "error");
+        if (name.length < 2) return showAlert(el, "Name must be at least 2 characters.", "error");
+        if (!raw) return showAlert(el, "Please enter your phone number.", "error");
+        const digits = raw.replace(/\D/g, "");
+        if (digits.length < 5) return showAlert(el, "Please enter a valid phone number.", "error");
+
+        const phone = dialCode + digits;
+        const btn = document.getElementById("reg-send-otp-btn");
+        if (btn) { btn.disabled = true; btn.textContent = "Sending…"; }
+
+        try {
+          await api("POST", "/api/auth/phone/register/send-otp", { phone, name });
+          document.getElementById("reg-otp-phone-display").textContent = dialCode + " " + raw;
+          document.getElementById("reg-phone-step1").classList.remove("active");
+          document.getElementById("reg-phone-step2").classList.add("active");
+          _clearOtpDigits("reg");
+          setTimeout(() => document.querySelector("#reg-otp-group .otp-digit").focus(), 80);
+          _startOtpTimer("reg");
+          if (isResend) showToast("New code sent! 📱");
+        } catch (e) {
+          showAlert(el, e.message || "Failed to send code. Please try again.", "error");
+        } finally {
+          if (btn) { btn.disabled = false; btn.textContent = "Send Code"; }
+        }
+      }
+
+      async function phoneRegisterVerifyOtp() {
+        const name = document.getElementById("reg-phone-name").value.trim();
+        const dialCode = document.getElementById("reg-phone-dial-code").value;
+        const raw = document.getElementById("reg-phone-number").value.trim().replace(/\D/g, "");
+        const phone = dialCode + raw;
+        const code = _getOtpValue("reg");
+        const el = document.getElementById("register-alert");
+        el.className = "alert";
+
+        if (code.length < 6) return showAlert(el, "Please enter the full 6-digit code.", "error");
+
+        const btn = document.getElementById("reg-verify-otp-btn");
+        if (btn) { btn.disabled = true; btn.textContent = "Creating account…"; }
+
+        try {
+          const res = await api("POST", "/api/auth/phone/register/verify-otp", { phone, code, name });
+          _clearOtpTimer();
+          setCurrentUser(res.data);
+          showToast("Welcome to Circle, " + ((res.data?.name ?? "friend").split(" ")[0]) + "! 🎉");
+          setTimeout(() => goTo("feed"), 600);
+        } catch (e) {
+          showAlert(el, e.message || "Invalid code. Please try again.", "error");
+          _shakeOtpGroup("reg");
+        } finally {
+          if (btn) { btn.disabled = false; btn.textContent = "Verify & Create Account"; }
+        }
+      }
+
       // ── OTP input helpers ─────────────────────────────────────────
+      function _otpAutoSubmit(prefix) {
+        if (prefix === "login") phoneLoginVerifyOtp();
+        else if (prefix === "reg") phoneRegisterVerifyOtp();
+      }
+
       function otpInput(el, prefix) {
         el.value = el.value.replace(/\D/g, "").slice(-1);
         el.classList.toggle("filled", !!el.value);
         if (el.value) {
           const next = el.nextElementSibling;
           if (next && next.classList.contains("otp-digit")) next.focus();
-          else {
-            // All filled — auto-submit
-            if (prefix === "login") phoneLoginVerifyOtp();
-          }
+          else _otpAutoSubmit(prefix); // all 6 filled
         }
       }
 
@@ -9100,7 +9242,7 @@
         }
         if (e.key === "ArrowLeft") { const prev = el.previousElementSibling; if (prev && prev.classList.contains("otp-digit")) prev.focus(); }
         if (e.key === "ArrowRight") { const next = el.nextElementSibling; if (next && next.classList.contains("otp-digit")) next.focus(); }
-        if (e.key === "Enter") { if (prefix === "login") phoneLoginVerifyOtp(); }
+        if (e.key === "Enter") _otpAutoSubmit(prefix);
       }
 
       function otpPaste(e, prefix) {
@@ -9112,9 +9254,7 @@
         });
         const lastFilled = Math.min(text.length, 5);
         if (digits[lastFilled]) digits[lastFilled].focus();
-        if (text.length === 6) {
-          if (prefix === "login") setTimeout(phoneLoginVerifyOtp, 120);
-        }
+        if (text.length === 6) setTimeout(() => _otpAutoSubmit(prefix), 120);
       }
 
       function _getOtpValue(prefix) {
@@ -15401,7 +15541,7 @@
           if (tzMap[tz]) defaultCode = tzMap[tz];
         } catch(e) {}
         const html = _buildDialOptions(defaultCode);
-        ["login-dial-code","reg-dial-code"].forEach(id => {
+        ["login-dial-code","reg-dial-code","reg-phone-dial-code"].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.innerHTML = html;
         });
