@@ -1,7 +1,6 @@
 //  app.js  –  Circle API application logic
 
-
-
+const path               = require('path');
 const express            = require('express');
 const webpush            = require('web-push');
 const { cors }           = require('./middleware/cors');
@@ -33,8 +32,7 @@ const exploreRoutes        = require('./routes/exploreRoutes');
 const topicRoutes          = require('./routes/topicRoutes');
 const pushRoutes           = require('./routes/pushRoutes');
 const groupRoutes          = require('./routes/groupsRoutes');
-const phoneAuthRoutes = require('./routes/phoneAuthRoutes');
-
+const phoneAuthRoutes      = require('./routes/phoneAuthRoutes');
 
 // authRoutes is optional (Google OAuth) — only load if the file exists
 let authRoutes = null;
@@ -52,20 +50,35 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Serve uploaded images and videos as static files
 app.use('/uploads', express.static('uploads'));
 
-// Health check
-app.get('/', (req, res) => res.json({
-  message: 'Circle API running',
-  version: '4.0.0',
-}));
+// Serve Circle frontend static files (JS, CSS, images, etc.)
+app.use(express.static(path.join(__dirname, '../../circle_frontend/frontend')));
 
-// ── Mount routes ──────────────────────────────────────────
+// Explicitly serve sw.js and manifest.json from the frontend root
+// (required so they're scoped to '/' and not blocked by the static middleware)
+app.get('/sw.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('Service-Worker-Allowed', '/');
+  res.sendFile(path.join(__dirname, '../../circle_frontend/frontend/sw.js'));
+});
+
+app.get('/manifest.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/manifest+json');
+  res.sendFile(path.join(__dirname, '../../circle_frontend/frontend/manifest.json'));
+});
+
+app.get('/icon.png', (req, res) => {
+  res.setHeader('Content-Type', 'image/png'); 
+  res.sendFile(path.join(__dirname, '../../circle_frontend/frontend/icon.png'));
+});
+
+// ── Mount API routes ──────────────────────────────────────
 app.use('/api/admin',           adminRoutes);
 app.use('/api/users',           userRoutes);
 app.use('/api/posts',           postRoutes);
 app.use('/api/notifications',   notificationRoutes);
 app.use('/api/search',          searchRoutes);
 app.use('/api/recommendations', recommendationRoutes);
-app.use('/api/auth/phone', phoneAuthRoutes);
+app.use('/api/auth/phone',      phoneAuthRoutes);
 if (authRoutes) app.use('/api/auth', authRoutes);
 app.use('/api',                 followRoutes);
 app.use('/api/dm',              dmRoutes);
@@ -74,9 +87,11 @@ app.use('/api/topics',          topicRoutes);
 app.use('/api/push',            pushRoutes);
 app.use('/api/groups',          groupRoutes);
 
-
-// 404
-app.use((req, res) => sendError(res, 404, `Route '${req.originalUrl}' not found.`));
+// ── SPA fallback — serves index.html for all non-API routes ──
+// This allows the frontend router to handle routes like /home, /profile, etc.
+app.get('/{*path}', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../circle_frontend/frontend/index.html'));
+});
 
 // ── Start cron LAST — after all requires are fully resolved ──
 // Placing this after module.exports would be too late; placing

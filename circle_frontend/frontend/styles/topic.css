@@ -1,0 +1,124 @@
+ /* ── Hashtags & Topic Pills ─────────────────────────────────── */
+      .hashtag {
+        color: var(--accent);
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 0 2px;
+        transition: background var(--tr), color var(--tr);
+      }
+      .hashtag:hover {
+        background: var(--accent-bg);
+        text-decoration: underline;
+      }
+      .topic-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 4px 0;
+      }
+      .topic-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid var(--accent-glow);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background var(--tr), transform var(--tr-spring);
+        user-select: none;
+      }
+      .topic-pill:hover {
+        background: var(--accent);
+        color: #fff;
+        transform: translateY(-1px);
+      }
+      .topic-pill-count {
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .topic-pill:not(:hover) .topic-pill-count {
+        background: var(--border2);
+        color: var(--txt2);
+      }
+      .feed-personalised-hint {
+        font-size: 12px;
+        color: var(--txt2);
+        padding: 2px 0 10px;
+        display: none;
+      }
+      /* ── Explore topics ranked list ─────────────────────────────── */
+      .topic-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .topic-list-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: background var(--tr);
+      }
+      .topic-list-row:hover { background: var(--card-hover); }
+      .topic-list-rank {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--txt3);
+        min-width: 18px;
+        text-align: right;
+      }
+      .topic-list-name {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--accent);
+      }
+      .topic-list-count {
+        font-size: 12px;
+        color: var(--txt2);
+        white-space: nowrap;
+      }
+      .topic-show-more {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--accent-bg);
+        border: 1px solid var(--border2);
+        border-radius: var(--radius-sm);
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 9px 14px;
+        margin-top: 6px;
+        width: 100%;
+        transition: background var(--tr), border-color var(--tr);
+      }
+      .topic-show-more:hover { background: var(--accent-bg); border-color: var(--accent); text-decoration: none; }
+      .topic-show-more svg {
+        width: 14px; height: 14px; flex-shrink: 0;
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      }
+      .topic-show-more.open svg { transform: rotate(180deg); }
+
+      /* Animated drawer for extra topics */
+      .topic-extra-drawer {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+        opacity: 0;
+      }
+      .topic-extra-drawer.open {
+        max-height: 2000px;
+        opacity: 1;
+      }

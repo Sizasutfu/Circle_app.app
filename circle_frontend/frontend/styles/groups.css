@@ -1,0 +1,528 @@
+/* ══════════════════════════════════════════════════════════
+         GROUPS — CSS  (dark · refined · premium redesign)
+      ══════════════════════════════════════════════════════════ */
+
+      /* ── Section label ────────────────────────────────────── */
+      .groups-section-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--txt3);
+        margin-bottom: 14px;
+      }
+      .groups-section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── My Groups strip ──────────────────────────────────── */
+      .my-groups-strip-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--txt3);
+        margin-bottom: 14px;
+      }
+      .my-groups-strip-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .my-groups-strip {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        margin-bottom: 28px;
+        scrollbar-width: none;
+      }
+      .my-groups-strip::-webkit-scrollbar { display: none; }
+
+      /* Chip — horizontal pill, not icon stack */
+      .my-group-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 7px 12px 7px 7px;
+        border-radius: 40px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        transition: border-color var(--tr), background var(--tr), transform var(--tr-spring);
+      }
+      .my-group-chip:hover {
+        border-color: var(--border2);
+        background: var(--card-hover);
+        transform: translateY(-1px);
+      }
+      .my-group-chip-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: var(--accent-bg);
+      }
+      .my-group-chip-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+      .my-group-chip-icon svg { width: 13px; height: 13px; stroke: var(--accent); }
+      .my-group-chip-name {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--txt);
+        white-space: nowrap;
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* ── Groups grid ──────────────────────────────────────── */
+      .groups-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      @media (max-width: 480px) {
+        .groups-grid { grid-template-columns: 1fr; }
+      }
+
+      /* Card — borderless, inset glass look */
+      .group-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: border-color var(--tr), box-shadow var(--tr), transform var(--tr-spring), background 0.3s;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .group-card:hover {
+        border-color: var(--border2);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+        transform: translateY(-2px);
+      }
+
+      /* Cover — tall strip, icon centred, subtle scrim */
+      .group-card-cover {
+        height: 64px;
+        flex-shrink: 0;
+        overflow: hidden;
+        position: relative;
+        background: var(--surface);
+      }
+      .group-card-cover::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.55) 100%);
+      }
+      .group-card-cover img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+
+      /* Placeholder cover: dark monochrome, icon only */
+      .group-card-cover-placeholder {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: var(--surface);
+      }
+      .group-card-cover-placeholder svg {
+        width: 22px;
+        height: 22px;
+        stroke: var(--txt3);
+        stroke-width: 1.5;
+        fill: none;
+        opacity: 0.55;
+      }
+
+      .group-card-body {
+        padding: 11px 13px 13px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .group-card-name {
+        font-family: var(--font-head);
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--txt);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        letter-spacing: -0.2px;
+      }
+      .group-card-desc {
+        font-size: 11.5px;
+        color: var(--txt2);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+        margin-top: 1px;
+      }
+      .group-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--txt3);
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      .group-card-meta span { display: flex; align-items: center; gap: 3px; }
+      .group-card-meta svg { width: 11px; height: 11px; }
+
+      /* Join button — slim hairline style */
+      .group-card-join-btn {
+        margin-top: 10px;
+        padding: 6px 0;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all var(--tr);
+        width: 100%;
+        letter-spacing: 0.02em;
+      }
+      .group-card-join-btn.join {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid rgba(124,107,255,0.35);
+      }
+      .group-card-join-btn.join:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+        box-shadow: 0 2px 12px var(--accent-glow);
+      }
+      .group-card-join-btn.joined {
+        background: transparent;
+        color: var(--txt3);
+        border: 1px solid var(--border);
+      }
+      .group-card-join-btn.joined:hover {
+        color: var(--rose);
+        border-color: rgba(255,95,122,0.4);
+        background: var(--rose-bg);
+      }
+
+      /* Load more */
+      .groups-load-more {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: none;
+        color: var(--txt3);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all var(--tr);
+        margin-bottom: 20px;
+        letter-spacing: 0.02em;
+      }
+      .groups-load-more:hover {
+        border-color: var(--border2);
+        color: var(--txt);
+        background: var(--card);
+      }
+
+      /* Group skeleton */
+      .group-skel-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        animation: shimmer 1.4s infinite;
+      }
+      .group-skel-cover { height: 64px; background: var(--surface); }
+      .group-skel-body { padding: 11px 13px; display: flex; flex-direction: column; gap: 8px; }
+      .group-skel-line { height: 10px; border-radius: 5px; background: var(--border); }
+      .group-skel-line.w-60 { width: 60%; }
+      .group-skel-line.w-80 { width: 80%; }
+      .group-skel-line.w-40 { width: 40%; }
+      .group-skel-btn { height: 28px; border-radius: 8px; background: var(--border); margin-top: 4px; }
+
+      /* ══ Group Detail view ═══════════════════════════════════ */
+      .group-detail-banner {
+        height: 130px;
+        border-radius: 14px;
+        margin-bottom: 16px;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        position: relative;
+        flex-shrink: 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+      }
+      .group-detail-banner::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.6) 100%);
+        pointer-events: none;
+      }
+      .group-detail-banner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        inset: 0;
+      }
+      .group-detail-meta {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .group-detail-info { flex: 1; min-width: 0; }
+      .group-detail-name {
+        font-family: var(--font-head);
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        margin-bottom: 4px;
+        color: var(--txt);
+      }
+      .group-detail-desc {
+        font-size: 13px;
+        color: var(--txt2);
+        line-height: 1.55;
+        margin-bottom: 10px;
+      }
+      .group-detail-stats {
+        display: flex;
+        gap: 14px;
+        font-size: 11.5px;
+        color: var(--txt3);
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      .group-detail-stats span { display: flex; align-items: center; gap: 4px; }
+      .group-detail-stats svg { width: 12px; height: 12px; }
+      .group-join-btn {
+        flex-shrink: 0;
+        padding: 8px 18px;
+        border-radius: 9px;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all var(--tr);
+        white-space: nowrap;
+        letter-spacing: 0.02em;
+      }
+      .group-join-btn.join {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid rgba(124,107,255,0.4);
+      }
+      .group-join-btn.join:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+        box-shadow: 0 4px 16px var(--accent-glow);
+      }
+      .group-join-btn.joined {
+        background: transparent;
+        color: var(--txt3);
+        border: 1px solid var(--border);
+      }
+      .group-join-btn.joined:hover {
+        color: var(--rose);
+        border-color: rgba(255,95,122,0.4);
+        background: var(--rose-bg);
+      }
+      .group-detail-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 18px;
+      }
+      .group-detail-tab {
+        padding: 10px 16px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--txt3);
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+        border-bottom: 1.5px solid transparent;
+        margin-bottom: -1px;
+        transition: color var(--tr), border-color var(--tr);
+        letter-spacing: 0.02em;
+      }
+      .group-detail-tab.active {
+        color: var(--txt);
+        border-bottom-color: var(--txt);
+      }
+      .group-detail-tab:hover:not(.active) { color: var(--txt2); }
+
+      /* ── Group card entrance stagger ──────────────────────── */
+      @keyframes groupCardIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .groups-grid .group-card {
+        animation: groupCardIn 0.28s ease both;
+      }
+      .groups-grid .group-card:nth-child(1) { animation-delay: 0ms; }
+      .groups-grid .group-card:nth-child(2) { animation-delay: 40ms; }
+      .groups-grid .group-card:nth-child(3) { animation-delay: 80ms; }
+      .groups-grid .group-card:nth-child(4) { animation-delay: 120ms; }
+      .groups-grid .group-card:nth-child(5) { animation-delay: 160ms; }
+      .groups-grid .group-card:nth-child(6) { animation-delay: 200ms; }
+      .group-compose {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 14px;
+      }
+      .group-compose-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .group-compose-field {
+        flex: 1;
+        background: var(--input-bg, var(--bg));
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        padding: 9px 14px;
+        font-size: 14px;
+        color: var(--txt);
+        resize: none;
+        min-height: 42px;
+        max-height: 140px;
+        overflow-y: auto;
+        font-family: inherit;
+        line-height: 1.45;
+        transition: border-color .15s;
+      }
+      .group-compose-field::placeholder { color: var(--txt2); }
+      .group-compose-field:focus { outline: none; border-color: var(--accent); }
+      .group-compose-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border);
+      }
+      .group-compose-tools { display: flex; gap: 4px; }
+      .group-compose-tool {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--txt2);
+        padding: 6px 8px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        transition: background .15s, color .15s;
+      }
+      .group-compose-tool:hover { background: var(--card-hover); color: var(--accent); }
+      .group-compose-tool svg { width: 18px; height: 18px; }
+      .group-compose-submit {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        padding: 7px 18px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity .15s;
+      }
+      .group-compose-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+      .group-compose-media-preview {
+        margin-top: 10px;
+        position: relative;
+        display: none;
+      }
+      .group-compose-media-preview.has-media { display: block; }
+      .group-compose-media-preview img,
+      .group-compose-media-preview video {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 10px;
+        object-fit: cover;
+        display: block;
+      }
+      .group-compose-remove-media {
+        position: absolute;
+        top: 6px; right: 6px;
+        background: rgba(0,0,0,.55);
+        border: none;
+        border-radius: 50%;
+        width: 26px; height: 26px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: #fff;
+      }
+
+      /* ── Group badge on post cards ─────────────────────────── */
+      .post-group-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11.5px;
+        color: var(--accent);
+        background: var(--accent-bg, rgba(99,102,241,.08));
+        border-radius: 20px;
+        padding: 2px 8px;
+        margin-top: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        border: 1px solid var(--accent-glow, rgba(99,102,241,.18));
+        transition: background .15s;
+        width: fit-content;
+      }
+      .post-group-badge:hover { background: var(--accent-glow, rgba(99,102,241,.18)); }
+      .post-group-badge svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+      /* Guest join nudge inside group feed */
+      .group-join-nudge {
+        background: linear-gradient(135deg, var(--accent-bg), var(--card));
+        border: 1.5px solid var(--accent-glow);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 13.5px;
+      }
+      .group-join-nudge-icon {
+        width: 40px; height: 40px; border-radius: 12px;
+        background: var(--accent); display: grid; place-items: center;
+        color: #fff; flex-shrink: 0;
+      }
+      .group-join-nudge-icon svg { width: 20px; height: 20px; }
+      .group-join-nudge-body { flex: 1; }
+      .group-join-nudge-title { font-weight: 700; color: var(--txt); margin-bottom: 3px; }
+      .group-join-nudge-sub { font-size: 12.5px; color: var(--txt2); margin-bottom: 10px; }

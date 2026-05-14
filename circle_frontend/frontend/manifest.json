@@ -3,17 +3,39 @@
   "short_name": "Circle",
   "description": "Circle — where real connections happen. Share moments, join conversations, and grow your community.",
   "start_url": "/index.html",
+  "id": "/index.html",
   "display": "standalone",
   "background_color": "#0a0a0d",
   "theme_color": "#7c6bff",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
+     
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "722x1286",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1910x972",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ],
   "categories": ["social", "communication"],
