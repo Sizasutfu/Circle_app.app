@@ -370,33 +370,18 @@
 
               <!-- Router: category tabs -->
               <div class="trending-router" id="trending-router">
-                <button class="trending-route-btn active" data-category="all" onclick="setTrendingCategory('all',this)">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                  All
-                </button>
-                <button class="trending-route-btn" data-category="popular" onclick="setTrendingCategory('popular',this)">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                  Most Liked
-                </button>
-                <button class="trending-route-btn" data-category="discussed" onclick="setTrendingCategory('discussed',this)">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                  Most Discussed
-                </button>
-                <button class="trending-route-btn" data-category="shared" onclick="setTrendingCategory('shared',this)">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
-                  Most Shared
-                </button>
-                <button class="trending-route-btn" data-category="media" onclick="setTrendingCategory('media',this)">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  With Media
-                </button>
+                <button class="trending-route-btn active" data-category="all" onclick="setTrendingCategory('all',this)">🌐 All</button>
+                <button class="trending-route-btn" data-category="popular" onclick="setTrendingCategory('popular',this)">❤️ Most Liked</button>
+                <button class="trending-route-btn" data-category="discussed" onclick="setTrendingCategory('discussed',this)">💬 Most Discussed</button>
+                <button class="trending-route-btn" data-category="shared" onclick="setTrendingCategory('shared',this)">♻️ Most Shared</button>
+                <button class="trending-route-btn" data-category="media" onclick="setTrendingCategory('media',this)">🖼️ With Media</button>
               </div>
 
               <!-- Controller: sort + result count -->
               <div class="trending-controller" id="trending-controller">
                 <span class="trending-sort-label">Sort:</span>
                 <button class="trending-sort-btn active" data-sort="hot" onclick="setTrendingSort('hot',this)">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8c0 2-1 3-2 4s-2 2-2 4h8c0-2-1-3-2-4s-2-2-2-4z" stroke-linejoin="round"/><path d="M10 20h4" stroke-linecap="round"/></svg>
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
                   Hot
                 </button>
                 <button class="trending-sort-btn" data-sort="newest" onclick="setTrendingSort('newest',this)">
@@ -896,13 +881,7 @@
 
             <!-- 1. Banner with avatar anchored bottom-left -->
             <div class="profile-banner" id="profile-banner">
-              <img id="profile-cover-img" class="profile-cover-img" src="" alt="" style="display:none"/>
               <div class="profile-banner-gradient" id="profile-banner-gradient"></div>
-              <button class="profile-cover-edit-btn" id="profile-cover-edit-btn" style="display:none" title="Change cover image" onclick="document.getElementById('profile-cover-input').click()">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                Edit cover
-              </button>
-              <input type="file" id="profile-cover-input" accept="image/*" onchange="handleCoverImageUpload(event)" style="display:none"/>
               <div class="profile-av-anchor">
                 <div class="av-upload-wrap" id="profile-av-wrap" title="Change profile picture">
                   <div class="av profile-lg" id="profile-av">?</div>
@@ -1930,14 +1909,14 @@
           <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
           </svg>
-          Echo post
+          Quote post
         </div>
-        <div class="echo-preview">
-          <div class="echo-preview-name" id="modal-orig-author">—</div>
-          <div class="echo-preview-text" id="modal-orig-text"></div>
+        <div class="repost-preview">
+          <div class="repost-preview-name" id="modal-orig-author">—</div>
+          <div class="repost-preview-text" id="modal-orig-text"></div>
           <img
             id="modal-orig-img"
-            class="echo-preview-img"
+            class="repost-preview-img"
             src=""
             alt=""
             loading="lazy"
@@ -1945,7 +1924,7 @@
           />
           <video
             id="modal-orig-video"
-            class="echo-preview-img"
+            class="repost-preview-img"
             src=""
             controls
             playsinline
@@ -1962,8 +1941,10 @@
             Cancel
           </button>
           <button class="modal-confirm" onclick="confirmQuote()">
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><path d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M5.636 5.636a9 9 0 000 12.728M8.464 8.464a5 5 0 000 7.072M12 13a1 1 0 100-2 1 1 0 000 2z"/></svg>
-            Echo
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            Quote
           </button>
         </div>
       </div>
@@ -2544,9 +2525,21 @@
             id="lb-like-btn"
             onclick="lbToggleLike()"
             title="Like"
-            style="background:none;border:none;color:#fff;display:grid;place-items:center;cursor:pointer;padding:6px;transition:transform 0.2s;"
-            onmouseover="this.style.transform='scale(1.15)';"
-            onmouseout="this.style.transform='scale(1)';"
+            style="
+              width: 52px;
+              height: 52px;
+              border-radius: 50%;
+              background: rgba(255,255,255,0.1);
+              border: 1px solid rgba(255,255,255,0.15);
+              color: #fff;
+              display: grid;
+              place-items: center;
+              backdrop-filter: blur(8px);
+              transition: background 0.2s, transform 0.2s, color 0.2s;
+              cursor: pointer;
+            "
+            onmouseover="if(!this.classList.contains('lb-liked')){this.style.background='rgba(255,95,122,0.25)';this.style.transform='scale(1.1)';}"
+            onmouseout="if(!this.classList.contains('lb-liked')){this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)';}"
           >
             <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="22" height="22" id="lb-like-icon">
               <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
@@ -2561,9 +2554,22 @@
             id="lb-comment-btn"
             onclick="lbOpenComments()"
             title="Comment"
-            style="background:none;border:none;color:#fff;display:grid;place-items:center;cursor:pointer;padding:6px;transition:transform 0.2s;"
-            onmouseover="this.style.transform='scale(1.15)';"
-            onmouseout="this.style.transform='scale(1)';"
+           
+            style="
+              width: 52px;
+              height: 52px;
+              border-radius: 50%;
+              background: rgba(255,255,255,0.1);
+              border: 1px solid rgba(255,255,255,0.15);
+              color: #fff;
+              display: grid;
+              place-items: center;
+              backdrop-filter: blur(8px);
+              transition: background 0.2s, transform 0.2s;
+              cursor: pointer;
+            "
+            onmouseover="this.style.background='rgba(124,107,255,0.3)';this.style.transform='scale(1.1)';"
+            onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)';"
           >
             <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="22" height="22">
               <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
@@ -2578,13 +2584,31 @@
             <button
               id="lb-repost-btn"
               onclick="lbToggleRepost()"
-              title="Echo"
-              style="background:none;border:none;color:#fff;display:grid;place-items:center;cursor:pointer;padding:6px;transition:transform 0.2s;"
-              onmouseover="this.style.transform='scale(1.15)';"
-              onmouseout="this.style.transform='scale(1)';"
+              title="Repost"
+              style="
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.15);
+                color: #fff;
+                display: grid;
+                place-items: center;
+                backdrop-filter: blur(8px);
+                transition: background 0.2s, transform 0.2s;
+                cursor: pointer;
+              "
+              onmouseover="this.style.background='rgba(34,212,143,0.25)';this.style.transform='scale(1.1)';"
+              onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)';"
             >
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="22" height="22"><path d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M5.636 5.636a9 9 0 000 12.728M8.464 8.464a5 5 0 000 7.072M12 13a1 1 0 100-2 1 1 0 000 2z"/></svg>
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="22" height="22"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
             </button>
+            <div class="post-dropdown" id="lb-repost-menu">
+              <button class="post-dropdown-item" id="lb-rp-do-btn" onclick="lbCloseRepost();confirmRepost()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Repost</button>
+              <button class="post-dropdown-item rp-undo" id="lb-rp-undo-btn" onclick="lbCloseRepost();undoRepost(_lbPostId)" style="display:none"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Undo repost</button>
+              <div class="post-dropdown-divider"></div>
+              <button class="post-dropdown-item" onclick="lbCloseRepost();openQuoteModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quote</button>
+            </div>
           </div>
           <span id="lb-repost-count" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);font-family:var(--font-body)">0</span>
         </div>
@@ -2595,9 +2619,21 @@
             id="lb-report-btn"
             onclick="lbOpenReport()"
             title="Report post"
-            style="background:none;border:none;color:rgba(255,255,255,0.5);display:grid;place-items:center;cursor:pointer;padding:6px;transition:transform 0.2s,color 0.2s;"
-            onmouseover="this.style.transform='scale(1.15)';this.style.color='#ff5f7a';"
-            onmouseout="this.style.transform='scale(1)';this.style.color='rgba(255,255,255,0.5)';"
+            style="
+              width: 52px;
+              height: 52px;
+              border-radius: 50%;
+              background: rgba(255,255,255,0.1);
+              border: 1px solid rgba(255,255,255,0.15);
+              color: rgba(255,255,255,0.6);
+              display: grid;
+              place-items: center;
+              backdrop-filter: blur(8px);
+              transition: background 0.2s, transform 0.2s, color 0.2s;
+              cursor: pointer;
+            "
+            onmouseover="this.style.background='rgba(255,95,122,0.25)';this.style.transform='scale(1.1)';this.style.color='#ff5f7a';"
+            onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)';this.style.color='rgba(255,255,255,0.6)';"
           >
             <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="20" height="20">
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
@@ -2728,7 +2764,7 @@
       </div>
     </div>
 
-    <script src="main_v3.js"></script>
+    <script src="main_v2.js"></script>
 
   <!-- Avatar action menu — fixed position, anchored via JS to avatar -->
   <div class="av-action-menu" id="profile-av-menu">

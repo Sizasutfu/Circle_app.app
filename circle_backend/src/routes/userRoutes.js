@@ -27,6 +27,7 @@ router.get('/new-members', userController.getNewMembers);
 
 // Protected routes — must send X-User-Id header
 router.put('/:id/picture', requireAuth, upload.fields([{ name: 'image', maxCount: 1 }]), compressUploads, userController.updatePicture);
+router.put('/:id/cover', requireAuth, upload.fields([{ name: 'image', maxCount: 1 }]), compressUploads, userController.updateCoverImage);
 router.put('/:id',         requireAuth, userController.updateProfile);
 
 router.post("/reset-password",         requestPasswordReset);

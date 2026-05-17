@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 5000;
 
 // mkcert certs live in src/ alongside app.js
 const sslOptions = {
-  key:  fs.readFileSync(path.join(__dirname, 'src/sizabeats+2-key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'src/sizabeats+2.pem')),
+  key:  fs.readFileSync(path.join(__dirname, 'src/sizabeats+3-key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'src/sizabeats+3.pem')),
 };
 
 async function start() {

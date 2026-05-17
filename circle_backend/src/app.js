@@ -33,6 +33,7 @@ const topicRoutes          = require('./routes/topicRoutes');
 const pushRoutes           = require('./routes/pushRoutes');
 const groupRoutes          = require('./routes/groupsRoutes');
 const phoneAuthRoutes      = require('./routes/phoneAuthRoutes');
+const linkPreviewRoutes     = require('./routes/linkpreviewRoutes'); // lightweight OG tag scraper for link previews
 
 // authRoutes is optional (Google OAuth) — only load if the file exists
 let authRoutes = null;
@@ -53,6 +54,7 @@ app.use('/uploads', express.static('uploads'));
 // Serve Circle frontend static files (JS, CSS, images, etc.)
 app.use(express.static(path.join(__dirname, '../../circle_frontend/frontend')));
 
+// ── Error handling middleware ─────────────────────────────
 // Explicitly serve sw.js and manifest.json from the frontend root
 // (required so they're scoped to '/' and not blocked by the static middleware)
 app.get('/sw.js', (req, res) => {
@@ -86,7 +88,7 @@ app.use('/api/explore',         exploreRoutes);
 app.use('/api/topics',          topicRoutes);
 app.use('/api/push',            pushRoutes);
 app.use('/api/groups',          groupRoutes);
-
+app.use('/api/link-preview',    linkPreviewRoutes);
 // ── SPA fallback — serves index.html for all non-API routes ──
 // This allows the frontend router to handle routes like /home, /profile, etc.
 app.get('/{*path}', (req, res) => {

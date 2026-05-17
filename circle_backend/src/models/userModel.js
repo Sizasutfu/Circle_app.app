@@ -14,7 +14,7 @@ const UserModel = {
   async findById(id) {
     const [rows] = await db.query(
       `SELECT
-         id, name, email, bio, picture,
+         id, name, email, bio, picture, cover_image AS coverImage,
          phone, location, school, occupation, website,
          date_of_birth  AS dateOfBirth,
          gender,
@@ -98,13 +98,17 @@ const UserModel = {
     await db.query("UPDATE users SET picture = ? WHERE id = ?", [picture, id]);
   },
 
+  async updateCoverImage(id, coverImage) {
+    await db.query("UPDATE users SET cover_image = ? WHERE id = ?", [coverImage, id]);
+  },
+
   // ─── Profile (public view) ─────────────────────────────────────────────────
   // NOTE: phone and dateOfBirth are intentionally excluded — private fields.
 
   async getProfile(targetId, viewerId = null) {
     const [rows] = await db.query(
       `SELECT
-         id, name, bio, picture,
+         id, name, bio, picture, cover_image AS coverImage,
          location, school, occupation, website, gender
        FROM users WHERE id = ?`,
       [targetId]

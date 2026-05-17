@@ -140,6 +140,34 @@ async function updatePicture(req, res) {
   }
 }
 
+// ─── PUT /api/users/:id/cover ─────────────────────────────────────────────────
+// Route must use: upload.fields([{ name: 'image', maxCount: 1 }]), compressUploads
+
+async function updateCoverImage(req, res) {
+  const userId = parseInt(req.params.id);
+
+  if (req.actorId !== userId)
+    return sendError(res, 403, 'Forbidden.');
+
+  try {
+    const user = await UserModel.findById(userId);
+    if (!user) return sendError(res, 404, 'User not found.');
+
+    // compressUploads middleware compresses the image to .webp
+    const compressed = req.compressedFiles?.image;
+    const coverUrl = compressed
+      ? `/uploads/${compressed.filename}`
+      : null;
+
+    await UserModel.updateCoverImage(userId, coverUrl);
+
+    return sendOk(res, 200, 'Cover image updated.', { coverImage: coverUrl });
+  } catch (err) {
+    console.error('updateCoverImage error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
+
 // ─── PUT /api/users/:id ───────────────────────────────────────────────────────
 
 async function updateProfile(req, res) {
@@ -219,6 +247,7 @@ module.exports = {
   login,
   getProfile,
   updatePicture,
+  updateCoverImage,
   updateProfile,
   searchUsers,
   getNewMembers,

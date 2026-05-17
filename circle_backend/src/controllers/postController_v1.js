@@ -301,6 +301,22 @@ async function repost(req, res) {
   }
 }
 
+// DELETE /api/posts/:id/repost
+async function unrepost(req, res) {
+  const origId = parseInt(req.params.id);
+  const userId = req.actorId;
+
+  try {
+    const existing = await PostModel.getExistingRepost(userId, origId);
+    if (!existing) return sendError(res, 404, 'No simple repost found to remove.');
+
+    await PostModel.deleteRepost(userId, origId);
+    return sendOk(res, 200, 'Repost removed.');
+  } catch (err) {
+    console.error('unrepost error:', err);
+    return sendError(res, 500, 'Server error.');
+  }
+}
 
 // POST /api/posts/:id/view
 // Body: { fingerprint?: string, dwellMs?: number }
@@ -433,6 +449,7 @@ module.exports = {
   toggleLike,
   addComment,
   repost,
+  unrepost,
   recordView,
   recordSkip,
   getTopics,
