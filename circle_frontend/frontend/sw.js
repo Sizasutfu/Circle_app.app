@@ -1,30 +1,32 @@
 // ============================================================
 //  sw.js  –  Circle Service Worker
 //  Strategy:
-//    • App shell (HTML, JS, CSS, JSON)   → Cache-first (text only)
+//    • App shell (HTML, icons, manifest) → Cache-first
 //    • API calls (/api/*)                → Stale-while-revalidate
-//                                           (JSON responses only)
-//    • Uploaded media (/uploads/*)       → Network only (never cached)
-//    • Images, fonts, binary assets      → Network only (never cached)
+//                                           (serve cache, update in bg)
+//    • Uploaded media (/uploads/*)       → Cache-first, network fallback
 //    • Everything else                   → Network, fall back to cache
 //    • Push notifications                → Show system notification
 //                                           + deep-link on click
 // ============================================================
 
-const CACHE_NAME    = 'circle-v6';
-const API_CACHE     = 'circle-api-v6';
+const CACHE_NAME    = 'circle-v4';
+const API_CACHE     = 'circle-api-v3';
+const MEDIA_CACHE   = 'circle-media-v3';
 const OFFLINE_URL   = './index.html';
 
 // Max age for cached API responses (5 minutes)
-const API_MAX_AGE_MS    = 5 * 60 * 1000;
+const API_MAX_AGE_MS    = 30 * 60 * 1000;
 // Max number of API responses to cache
-const API_MAX_ENTRIES   = 15;
+const API_MAX_ENTRIES   = 20;
+// Max number of media files to cache
+const MEDIA_MAX_ENTRIES = 100;
 
 const PRECACHE_URLS = [
   './',
   './index.html',
   './manifest.json',
-  // icon.png excluded — only text assets are cached
+  './icon.png',
 ];
 
 // ── Helpers ───────────────────────────────────────────────
@@ -40,83 +42,11 @@ function stampResponse(response) {
   });
 }
 
-// Strip imageUrl/videoUrl from a single post object
-function stripPostMedia(post) {
-  if (!post || typeof post !== 'object') return post;
-  const clean = { ...post };
-  delete clean.imageUrl;
-  delete clean.videoUrl;
-  delete clean.image;
-  delete clean.video;
-  return clean;
-}
-
-// Walk a parsed API response body and strip media from any post objects found
-function stripMediaFromBody(body) {
-  if (!body || typeof body !== 'object') return body;
-
-  // Array of posts at root
-  if (Array.isArray(body)) return body.map(stripPostMedia);
-
-  const out = { ...body };
-
-  // Common envelope shapes: { data: post[] }, { posts: post[] }, { data: { posts: post[] } }
-  if (Array.isArray(out.data))            out.data    = out.data.map(stripPostMedia);
-  if (Array.isArray(out.posts))           out.posts   = out.posts.map(stripPostMedia);
-  if (out.data && Array.isArray(out.data.posts)) {
-    out.data = { ...out.data, posts: out.data.posts.map(stripPostMedia) };
-  }
-  // Single post envelope: { data: post }
-  if (out.data && !Array.isArray(out.data) && out.data.id) {
-    out.data = stripPostMedia(out.data);
-  }
-
-  return out;
-}
-
-// Build a cache-safe Response with media stripped from JSON body
-async function stripMediaFromResponse(response) {
-  const ct = (response.headers.get('Content-Type') || '');
-  if (!ct.includes('application/json')) return response;
-
-  try {
-    const body = await response.json();
-    const clean = stripMediaFromBody(body);
-    const headers = new Headers(response.headers);
-    headers.set('sw-cached-at', Date.now().toString());
-    return new Response(JSON.stringify(clean), {
-      status:     response.status,
-      statusText: response.statusText,
-      headers,
-    });
-  } catch {
-    // If JSON parsing fails, fall back to plain stamp
-    return stampResponse(response);
-  }
-}
-
 // Returns true if the cached response is older than API_MAX_AGE_MS
 function isStale(cachedResponse) {
   const cachedAt = cachedResponse.headers.get('sw-cached-at');
   if (!cachedAt) return true;
   return Date.now() - parseInt(cachedAt, 10) > API_MAX_AGE_MS;
-}
-
-// Returns true only for text-based content types (HTML, JS, CSS, JSON, etc.)
-// Images, fonts, audio, video, and other binary types are excluded.
-const TEXT_CONTENT_TYPES = [
-  'text/html',
-  'text/css',
-  'text/javascript',
-  'application/javascript',
-  'application/json',
-  'text/plain',
-  'application/manifest+json',
-  'application/x-javascript',
-];
-function isTextResponse(response) {
-  const ct = (response.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
-  return TEXT_CONTENT_TYPES.some(t => ct === t || ct.startsWith('text/'));
 }
 
 // Trim a cache to a max number of entries (evict oldest first)
@@ -140,7 +70,7 @@ self.addEventListener('install', event => {
 
 // ── Activate: remove old caches ───────────────────────────
 self.addEventListener('activate', event => {
-  const KEEP = [CACHE_NAME, API_CACHE];
+  const KEEP = [CACHE_NAME, API_CACHE, MEDIA_CACHE];
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
@@ -281,8 +211,30 @@ self.addEventListener('fetch', event => {
   // Never intercept non-GET or cross-origin requests
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // ── Uploaded media → network only (not cached) ──────
-  if (url.pathname.startsWith('/uploads/')) return;
+  // ── Uploaded media → cache-first, network fallback ──
+  // Profile pictures and post images/videos are cached aggressively
+  // since they rarely change. Evict oldest when cache gets too large.
+  if (url.pathname.startsWith('/uploads/')) {
+    event.respondWith(
+      caches.open(MEDIA_CACHE).then(async cache => {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+
+        try {
+          const response = await fetch(request);
+          if (response && response.status === 200) {
+            cache.put(request, response.clone());
+            trimCache(MEDIA_CACHE, MEDIA_MAX_ENTRIES);
+          }
+          return response;
+        } catch {
+          // Media unavailable offline — return nothing (browser shows broken img)
+          return new Response('', { status: 503 });
+        }
+      })
+    );
+    return;
+  }
 
   // ── API calls → stale-while-revalidate ──────────────
   // Serve cached response immediately (so feed loads offline),
@@ -298,12 +250,6 @@ self.addEventListener('fetch', event => {
 
     if (shouldSkip) return; // network-only for auth/push/admin
 
-    // Only cache posts endpoints — all other API calls are network-only
-    const shouldCache = url.pathname.startsWith('/api/posts') ||
-                        url.pathname.startsWith('/api/groups') && url.pathname.includes('/feed');
-
-    if (!shouldCache) return;
-
     event.respondWith(
       caches.open(API_CACHE).then(async cache => {
         const cached = await cache.match(request);
@@ -311,9 +257,9 @@ self.addEventListener('fetch', event => {
         // Always fire a background network request to refresh the cache
         const networkFetch = fetch(request)
           .then(async response => {
-            if (response && response.status === 200 && isTextResponse(response)) {
-              const stripped = await stripMediaFromResponse(response.clone());
-              await cache.put(request, stripped);
+            if (response && response.status === 200) {
+              const stamped = stampResponse(response.clone());
+              await cache.put(request, stamped);
               trimCache(API_CACHE, API_MAX_ENTRIES);
             }
             return response;

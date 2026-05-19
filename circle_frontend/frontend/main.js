@@ -3322,7 +3322,9 @@ async function renderProfile(viewedUserId = null) {
     showToast("Couldn't load profile. Showing cached info.");
   }
   const name = profileData?.name || currentUser.name;
-  const email = profileData?.email || currentUser.email;
+  const email = isOwnProfile
+    ? (profileData?.email || currentUser.email)
+    : (profileData?.email || null);
   const pic = resolveMediaUrl(
     profileData?.picture || (isOwnProfile ? currentUser.picture : null),
   );
@@ -3402,7 +3404,7 @@ async function renderProfile(viewedUserId = null) {
     ? email
     : profileData?.handle
       ? `@${profileData.handle}`
-      : email || "";
+      : "";
   const bio = profileData?.bio || (isOwnProfile ? currentUser.bio || "" : "");
   const bioEl = document.getElementById("profile-bio");
   if (bioEl) {

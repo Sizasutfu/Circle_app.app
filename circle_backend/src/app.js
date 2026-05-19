@@ -101,6 +101,6 @@ app.get('/{*path}', (req, res) => {
 // Bottom of the file (before module.exports) is the safe spot.
 const { startGroupCron } = require('./models/GroupModel');
 startGroupCron();
-console.log('👥 Group auto-creation cron started.');
+console.log('Group auto-creation cron started.');
 
 module.exports = app;
